@@ -9,6 +9,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <a href="/admin" className="text-zinc-400 hover:text-primary transition-colors font-medium tracking-wide">
               Dashboard
             </a>
+            <a href="/admin/socios" className="text-zinc-500 hover:text-primary transition-colors tracking-wide">
+              🐒 Club
+            </a>
             <a href="/admin/eventos/nuevo" className="text-zinc-500 hover:text-primary transition-colors tracking-wide">
               + Nuevo evento
             </a>

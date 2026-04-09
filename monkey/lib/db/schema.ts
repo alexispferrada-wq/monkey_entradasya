@@ -16,6 +16,37 @@ export const estadoInvitacion = pgEnum('estado_invitacion', [
   'cancelada',
 ])
 
+export const nivelSocio = pgEnum('nivel_socio', [
+  'bronze',
+  'silver',
+  'gold',
+  'vip',
+])
+
+export const socios = pgTable('socios', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  nombre: text('nombre').notNull(),
+  email: text('email').unique().notNull(),
+  telefono: text('telefono'),
+  puntos: integer('puntos').notNull().default(0),
+  nivel: nivelSocio('nivel').notNull().default('bronze'),
+  googlePassObjectId: text('google_pass_object_id'),
+  activo: boolean('activo').default(true).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
+
+export const movimientosPuntos = pgTable('movimientos_puntos', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  socioId: uuid('socio_id')
+    .references(() => socios.id, { onDelete: 'cascade' })
+    .notNull(),
+  puntos: integer('puntos').notNull(),
+  motivo: text('motivo').notNull(),
+  operadorNombre: text('operador_nombre'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
 export const eventos = pgTable('eventos', {
   id: uuid('id').defaultRandom().primaryKey(),
   nombre: text('nombre').notNull(),
@@ -57,7 +88,21 @@ export const invitacionesRelations = relations(invitaciones, ({ one }) => ({
   }),
 }))
 
+export const sociosRelations = relations(socios, ({ many }) => ({
+  movimientos: many(movimientosPuntos),
+}))
+
+export const movimientosPuntosRelations = relations(movimientosPuntos, ({ one }) => ({
+  socio: one(socios, {
+    fields: [movimientosPuntos.socioId],
+    references: [socios.id],
+  }),
+}))
+
 export type Evento = typeof eventos.$inferSelect
 export type NuevoEvento = typeof eventos.$inferInsert
 export type Invitacion = typeof invitaciones.$inferSelect
 export type NuevaInvitacion = typeof invitaciones.$inferInsert
+export type Socio = typeof socios.$inferSelect
+export type NuevoSocio = typeof socios.$inferInsert
+export type MovimientoPuntos = typeof movimientosPuntos.$inferSelect

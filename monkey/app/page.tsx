@@ -181,6 +181,23 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Club Monkey banner */}
+      <section className="pb-16 px-4">
+        <div className="max-w-5xl mx-auto">
+          <Link
+            href="/club"
+            className="glass-card rounded-2xl p-8 flex flex-col sm:flex-row items-center gap-6 border-primary/20 hover:border-primary/50 transition-all duration-300 group"
+          >
+            <div className="text-5xl">🐒</div>
+            <div className="flex-1 text-center sm:text-left">
+              <h3 className="font-display text-2xl text-primary tracking-widest uppercase mb-1">Club Monkey</h3>
+              <p className="text-zinc-400 text-sm">Únete gratis · Acumula puntos · Accede a beneficios exclusivos y tu tarjeta digital de socio</p>
+            </div>
+            <div className="shrink-0 text-zinc-600 group-hover:text-primary transition-colors text-2xl">→</div>
+          </Link>
+        </div>
+      </section>
+
       {/* Footer */}
       <div className="text-center pb-10 text-zinc-700 text-xs tracking-widest uppercase">
         Monkey Restobar · Av. Concha y Toro 1060, Local 3
