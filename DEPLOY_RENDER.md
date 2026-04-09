@@ -86,8 +86,8 @@ postgresql://username:password@hostname:5432/database_name
 - **Branch**: `main`
 - **Root Directory**: `monkey` (donde está Next.js)
 - **Runtime**: `Node`
-- **Build Command**: `npm install && npm run build`
-- **Start Command**: `npm start`
+- **Build Command**: `yarn install && yarn build`
+- **Start Command**: `yarn start`
 
 ### 3.3 Configurar Variables de Entorno
 En la sección **"Environment"**, agrega:
@@ -141,8 +141,8 @@ Opción A: **Usar Render Shell**
 ```bash
 # En Dashboard → Tu Web Service → "Shell"
 cd app
-npm run db:push
-npm run seed
+yarn db:push
+yarn seed
 ```
 
 Opción B: **Desde Local (si tienes acceso)**
@@ -150,8 +150,8 @@ Opción B: **Desde Local (si tienes acceso)**
 # En tu máquina local
 export DATABASE_URL="postgresql://user:pass@hostname.render.com:5432/database_name"
 cd monkey
-npm run db:push
-npm run seed
+yarn db:push
+yarn seed
 ```
 
 > ⚠️ El `DATABASE_URL` debe ser **internal** (desde Render Shell) o **external** (desde local).
