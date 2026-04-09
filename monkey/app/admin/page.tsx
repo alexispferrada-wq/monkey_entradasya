@@ -1,23 +1,10 @@
 import { db } from '@/lib/db'
 import { eventos, invitaciones } from '@/lib/db/schema'
-import { eq, count } from 'drizzle-orm'
+import { eq, count, sql } from 'drizzle-orm'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
 export const revalidate = 0
-
-async function getStats(eventoId: string) {
-  const [{ total }] = await db
-    .select({ total: count() })
-    .from(invitaciones)
-    .where(eq(invitaciones.eventoId, eventoId))
-
-  const [{ usadas }] = await db
-    .select({ usadas: count() })
-    .from(invitaciones)
-    .where(eq(invitaciones.eventoId, eventoId))
-
-  return { total: Number(total), usadas: Number(usadas) }
-}
 
 function formatFecha(fecha: Date) {
   return new Date(fecha).toLocaleDateString('es-CL', {
@@ -26,14 +13,47 @@ function formatFecha(fecha: Date) {
 }
 
 export default async function AdminPage() {
-  const lista = await db.select().from(eventos).orderBy(eventos.fecha)
+  const lista = (await db
+    .select({
+      id: eventos.id,
+      nombre: eventos.nombre,
+      fecha: eventos.fecha,
+      lugar: eventos.lugar,
+      cuposTotal: eventos.cuposTotal,
+      cuposDisponibles: eventos.cuposDisponibles,
+      activo: eventos.activo,
+      slug: eventos.slug,
+      total: count(invitaciones.id),
+      usadas: sql`count(*) FILTER (WHERE ${invitaciones.estado} = 'usada')`,
+    })
+    .from(eventos)
+    .leftJoin(invitaciones, eq(eventos.id, invitaciones.eventoId))
+    .groupBy(eventos.id)
+    .orderBy(eventos.fecha)) as Array<{
+      id: string
+      nombre: string
+      fecha: Date
+      lugar: string
+      cuposTotal: number
+      cuposDisponibles: number
+      activo: boolean
+      slug: string
+      total: number
+      usadas: number
+    }>
+
+  const listaNormalizada = lista.map((evento) => ({
+    ...evento,
+    total: Number(evento.total),
+    usadas: Number(evento.usadas),
+  }))
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-black text-white">Dashboard</h1>
-          <p className="text-slate-500 text-sm mt-1">{lista.length} evento{lista.length !== 1 ? 's' : ''} en total</p>
+          <p className="text-slate-500 text-sm mt-1">{listaNormalizada.length} evento{listaNormalizada.length !== 1 ? 's' : ''} en total</p>
         </div>
         <Link href="/admin/eventos/nuevo" className="btn-primary text-sm px-5 py-2.5">
           + Nuevo evento
@@ -50,8 +70,7 @@ export default async function AdminPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {await Promise.all(lista.map(async (evento) => {
-            const stats = await getStats(evento.id)
+          {listaNormalizada.map((evento) => {
             const pct = evento.cuposTotal > 0
               ? Math.round(((evento.cuposTotal - evento.cuposDisponibles) / evento.cuposTotal) * 100)
               : 0
@@ -74,8 +93,8 @@ export default async function AdminPage() {
 
                   {/* Stats row */}
                   <div className="flex items-center gap-4 mt-3 text-xs text-slate-500">
-                    <span className="text-slate-300 font-medium">{stats.total} invitaciones</span>
-                    <span>{stats.usadas} usadas</span>
+                    <span className="text-slate-300 font-medium">{evento.total} invitaciones</span>
+                    <span>{evento.usadas} usadas</span>
                     <span>{evento.cuposDisponibles} cupos restantes</span>
                   </div>
 
@@ -110,7 +129,7 @@ export default async function AdminPage() {
                 </div>
               </div>
             )
-          }))}
+          })}
         </div>
       )}
     </div>

@@ -5,6 +5,8 @@ import { notFound } from 'next/navigation'
 import EventoForm from '../EventoForm'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   params: { id: string }
 }

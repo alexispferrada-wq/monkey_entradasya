@@ -10,12 +10,14 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
+        display: ['"Bebas Neue"', 'sans-serif'],
       },
       colors: {
-        primary: '#6366f1',
-        secondary: '#f43f5e',
-        dark: '#0f172a',
-        darker: '#020617',
+        primary: '#F5C200',      // Amarillo Monkey
+        secondary: '#F97316',    // Naranja acento
+        jungle: '#15532A',       // Verde selva
+        dark: '#0A0A0A',
+        darker: '#050505',
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',

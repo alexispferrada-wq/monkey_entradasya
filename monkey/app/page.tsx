@@ -31,37 +31,46 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen">
+
       {/* Hero */}
       <section className="py-20 px-4 text-center">
         <div className="max-w-3xl mx-auto animate-fade-in">
-          <div className="inline-flex items-center gap-2 glass-card rounded-full px-4 py-2 text-sm text-slate-400 mb-8">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            Invitaciones disponibles
+
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 glass-card rounded-full px-5 py-2 text-sm text-zinc-400 mb-10 border-primary/20">
+            <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+            Invitaciones disponibles — entrada gratuita
           </div>
-          <h1 className="text-5xl sm:text-6xl font-black mb-6 leading-tight">
-            Eventos{' '}
-            <span className="gradient-text">exclusivos</span>
-            <br />para ti
+
+          {/* Título */}
+          <h1 className="font-display text-7xl sm:text-8xl md:text-9xl mb-4 tracking-wide leading-none uppercase">
+            <span className="gradient-text">Eventos</span>
           </h1>
-          <p className="text-slate-400 text-xl max-w-xl mx-auto">
-            Solicita tu invitación gratuita. Solo necesitas tu correo y en minutos
-            tendrás tu acceso QR.
+          <h2 className="font-display text-4xl sm:text-5xl text-white tracking-widest mb-8 uppercase">
+            Monkey Restobar
+          </h2>
+
+          <div className="jungle-divider max-w-sm mx-auto mb-8" />
+
+          <p className="text-zinc-400 text-lg max-w-xl mx-auto">
+            Solicita tu invitación gratuita. Solo necesitas tu correo
+            y en minutos tendrás tu código QR de acceso.
           </p>
         </div>
       </section>
 
       {/* Lista de eventos */}
-      <section className="pb-20 px-4">
+      <section className="pb-24 px-4">
         <div className="max-w-5xl mx-auto">
           {eventosActivos.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="w-20 h-20 mx-auto mb-6 rounded-full glass-card flex items-center justify-center text-4xl">
+            <div className="text-center py-24">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full glass-card flex items-center justify-center text-4xl border-primary/20">
                 🎭
               </div>
-              <h2 className="text-2xl font-bold text-slate-300 mb-2">
-                No hay eventos disponibles
+              <h2 className="font-display text-4xl text-zinc-300 mb-3 tracking-wide">
+                Próximamente
               </h2>
-              <p className="text-slate-500">Vuelve pronto, pronto habrá nuevos eventos.</p>
+              <p className="text-zinc-600">Vuelve pronto, hay nuevos eventos en camino.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -74,76 +83,80 @@ export default async function Home() {
                 return (
                   <div
                     key={evento.id}
-                    className="glass-card rounded-2xl overflow-hidden hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 group animate-slide-up"
+                    className="glass-card rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 group animate-slide-up"
                   >
                     {/* Imagen */}
-                    <div className="relative h-52 bg-gradient-to-br from-slate-800 to-slate-900 overflow-hidden">
+                    <div className="relative h-60 bg-black overflow-hidden">
                       {evento.imagenUrl ? (
                         <Image
                           src={evento.imagenUrl}
                           alt={evento.nombre}
                           fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-90"
                         />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="text-6xl opacity-20">🎉</div>
+                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-zinc-900 to-black">
+                          <span className="font-display text-6xl text-primary/20 tracking-widest">MONKEY</span>
                         </div>
                       )}
+
                       {/* Badge estado */}
-                      <div className="absolute top-3 right-3">
+                      <div className="absolute top-3 right-3 z-10">
                         {agotado ? (
-                          <span className="bg-rose-500/90 text-white text-xs font-bold px-3 py-1 rounded-full">
+                          <span className="bg-red-600/90 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                             Agotado
                           </span>
                         ) : (
-                          <span className="bg-green-500/90 text-white text-xs font-bold px-3 py-1 rounded-full">
+                          <span className="bg-primary text-black text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
                             {evento.cuposDisponibles} cupos
                           </span>
                         )}
                       </div>
+
                       {/* Overlay gradient */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
                     </div>
 
                     {/* Contenido */}
                     <div className="p-6">
-                      <h2 className="text-xl font-bold text-white mb-1">{evento.nombre}</h2>
+                      <h2 className="font-display text-2xl text-white mb-1 tracking-wide uppercase">
+                        {evento.nombre}
+                      </h2>
                       {evento.descripcion && (
-                        <p className="text-slate-400 text-sm mb-4 line-clamp-2">
+                        <p className="text-zinc-500 text-sm mb-4 line-clamp-2">
                           {evento.descripcion}
                         </p>
                       )}
 
-                      <div className="space-y-2 mb-5">
-                        <div className="flex items-center gap-2 text-sm text-slate-400">
-                          <span>📅</span>
+                      <div className="space-y-1.5 mb-5">
+                        <div className="flex items-center gap-2 text-sm text-zinc-400">
+                          <span className="text-primary">📅</span>
                           <span className="capitalize">{formatFecha(evento.fecha)}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-slate-400">
-                          <span>🕐</span>
+                        <div className="flex items-center gap-2 text-sm text-zinc-400">
+                          <span className="text-primary">🕐</span>
                           <span>{formatHora(evento.fecha)}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-slate-400">
-                          <span>📍</span>
+                        <div className="flex items-center gap-2 text-sm text-zinc-400">
+                          <span className="text-primary">📍</span>
                           <span>{evento.lugar}</span>
                         </div>
                       </div>
 
                       {/* Barra de ocupación */}
                       <div className="mb-5">
-                        <div className="flex justify-between text-xs text-slate-500 mb-1">
+                        <div className="flex justify-between text-xs text-zinc-600 mb-1">
                           <span>Ocupación</span>
                           <span>{porcentaje}%</span>
                         </div>
-                        <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                        <div className="h-1 bg-zinc-800 rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-500"
                             style={{
                               width: `${porcentaje}%`,
                               background: porcentaje > 80
-                                ? 'linear-gradient(90deg, #f43f5e, #fb923c)'
-                                : 'linear-gradient(90deg, #6366f1, #8b5cf6)',
+                                ? 'linear-gradient(90deg, #dc2626, #f97316)'
+                                : 'linear-gradient(90deg, #F5C200, #F97316)',
                             }}
                           />
                         </div>
@@ -151,13 +164,13 @@ export default async function Home() {
 
                       <Link
                         href={`/${evento.slug}`}
-                        className={`block text-center font-bold py-3 px-6 rounded-xl transition-all duration-300 ${
+                        className={`block text-center font-display text-lg py-3 px-6 rounded-xl transition-all duration-300 tracking-wider uppercase ${
                           agotado
-                            ? 'bg-slate-700/50 text-slate-500 cursor-not-allowed pointer-events-none'
+                            ? 'bg-zinc-800/50 text-zinc-600 cursor-not-allowed pointer-events-none'
                             : 'btn-primary'
                         }`}
                       >
-                        {agotado ? 'Sin cupos disponibles' : 'Solicitar invitación →'}
+                        {agotado ? 'Sin cupos' : 'Solicitar invitación'}
                       </Link>
                     </div>
                   </div>
@@ -167,6 +180,11 @@ export default async function Home() {
           )}
         </div>
       </section>
+
+      {/* Footer */}
+      <div className="text-center pb-10 text-zinc-700 text-xs tracking-widest uppercase">
+        Monkey Restobar · Av. Concha y Toro 1060, Local 3
+      </div>
     </div>
   )
 }

@@ -29,6 +29,8 @@ export default function EventoForm({ evento }: Props) {
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [savedSlug, setSavedSlug] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
   const [uploadState, setUploadState] = useState<'idle' | 'uploading' | 'done' | 'error'>('idle')
   const [uploadInfo, setUploadInfo] = useState<{ width: number; height: number; format: string; bytes: number } | null>(null)
   const [previewLocal, setPreviewLocal] = useState<string | null>(null)
@@ -119,18 +121,94 @@ export default function EventoForm({ evento }: Props) {
       return
     }
 
-    router.push('/admin')
-    router.refresh()
+    // Mostrar el link del evento en vez de redirigir
+    setSavedSlug(data.slug || form.slug)
+    setLoading(false)
+  }
+
+  async function copyLink(url: string) {
+    await navigator.clipboard.writeText(url)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2500)
   }
 
   async function handleDelete() {
     if (!confirm('¿Eliminar este evento? Se borrarán todas las invitaciones asociadas.')) return
-    await fetch(`/api/admin/eventos/${evento!.id}`, { method: 'DELETE' })
-    router.push('/admin')
+    setLoading(true)
+    setError('')
+
+    const res = await fetch(`/api/admin/eventos/${evento!.id}`, { method: 'DELETE' })
+    const data = await res.json()
+
+    if (!res.ok) {
+      setError(data.error || 'No fue posible eliminar el evento.')
+      setLoading(false)
+      return
+    }
+
+    await router.push('/admin')
     router.refresh()
   }
 
   const imagenPreview = previewLocal || form.imagenUrl
+
+  // ── Panel de éxito: muestra el link para compartir ──────────────────────
+  if (savedSlug) {
+    const baseUrl = typeof window !== 'undefined'
+      ? window.location.origin
+      : 'https://monkey.entradasya.cl'
+    const eventoUrl = `${baseUrl}/${savedSlug}`
+
+    return (
+      <div className="glass-card rounded-2xl p-8 text-center space-y-6">
+        <div className="w-20 h-20 mx-auto rounded-full bg-green-500/20 border border-green-500/40 flex items-center justify-center text-4xl">
+          ✅
+        </div>
+        <div>
+          <h2 className="text-2xl font-black text-white mb-1">
+            {isEdit ? '¡Cambios guardados!' : '¡Evento creado!'}
+          </h2>
+          <p className="text-slate-400 text-sm">
+            {form.nombre} está listo. Comparte este link:
+          </p>
+        </div>
+
+        {/* Link grande y copiable */}
+        <div className="bg-black/50 border border-primary/40 rounded-2xl p-5">
+          <p className="text-xs text-slate-500 uppercase tracking-widest mb-3 font-bold">
+            Link del evento — comparte esto
+          </p>
+          <p className="font-display text-xl text-primary tracking-wide break-all mb-4">
+            {eventoUrl}
+          </p>
+          <button
+            onClick={() => copyLink(eventoUrl)}
+            className="btn-primary w-full py-4 text-lg font-black"
+          >
+            {copied ? '✓ ¡Copiado!' : '📋 Copiar link'}
+          </button>
+        </div>
+
+        {/* Abrir directamente */}
+        <a
+          href={eventoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block text-slate-400 hover:text-white text-sm transition-colors underline underline-offset-4"
+        >
+          Ver página del evento ↗
+        </a>
+
+        {/* Volver al admin */}
+        <button
+          onClick={() => { window.location.href = '/admin' }}
+          className="block w-full text-slate-600 hover:text-slate-400 text-sm transition-colors"
+        >
+          ← Volver al dashboard
+        </button>
+      </div>
+    )
+  }
 
   return (
     <form onSubmit={handleSubmit} className="glass-card rounded-2xl p-8 space-y-6">

@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import InvitacionForm from './InvitacionForm'
+import ColorExtractor from './ColorExtractor'
 
 export const revalidate = 0
 
@@ -34,85 +35,101 @@ export default async function EventoPage({ params }: Props) {
   const agotado = evento.cuposDisponibles <= 0
 
   return (
-    <div className="min-h-screen py-12 px-4">
-      <div className="max-w-2xl mx-auto">
+    <>
+      {/* Extrae colores del flyer y los aplica como CSS vars */}
+      {evento.imagenUrl && <ColorExtractor imageUrl={evento.imagenUrl} />}
 
-        {/* Back */}
-        <a
-          href="/"
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8 text-sm"
-        >
-          ← Volver a eventos
-        </a>
+<div className="min-h-screen py-12 px-4 evento-bg">
 
-        {/* Card del evento */}
-        <div className="glass-card rounded-3xl overflow-hidden animate-slide-up">
+        <div className="max-w-2xl mx-auto relative z-10">
 
-          {/* Imagen */}
-          <div className="relative h-64 bg-gradient-to-br from-slate-800 to-slate-900">
-            {evento.imagenUrl ? (
-              <Image
-                src={evento.imagenUrl}
-                alt={evento.nombre}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center text-8xl opacity-10">
-                🎉
-              </div>
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
+          {/* Back */}
+          <a
+            href="/"
+            className="inline-flex items-center gap-2 text-zinc-500 hover:text-white transition-colors mb-8 text-sm tracking-widest uppercase font-medium"
+          >
+            ← Volver
+          </a>
 
-            {/* Badge cupos */}
-            <div className="absolute bottom-4 left-6">
-              {agotado ? (
-                <span className="bg-rose-500/90 text-white text-sm font-bold px-4 py-2 rounded-full">
-                  Sin cupos disponibles
-                </span>
+          {/* Card */}
+          <div className="glass-card rounded-2xl overflow-hidden animate-slide-up evento-border evento-glow" style={{ borderWidth: '1px', borderStyle: 'solid' }}>
+
+            {/* Imagen */}
+            <div className="relative h-80 bg-black">
+              {evento.imagenUrl ? (
+                <Image
+                  src={evento.imagenUrl}
+                  alt={evento.nombre}
+                  fill
+                  className="object-cover"
+                  priority
+                />
               ) : (
-                <span className="bg-green-500/20 border border-green-500/40 text-green-400 text-sm font-bold px-4 py-2 rounded-full">
-                  {evento.cuposDisponibles} invitaciones disponibles
-                </span>
+                <div className="absolute inset-0 flex items-center justify-center bg-black">
+                  <span className="font-display text-5xl text-primary/20 tracking-widest">MONKEY</span>
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+
+              {/* Badge cupos */}
+              <div className="absolute bottom-4 left-6">
+                {agotado ? (
+                  <span className="bg-red-600 text-white text-sm font-black px-4 py-2 rounded-full uppercase tracking-wider">
+                    Sin cupos disponibles
+                  </span>
+                ) : (
+                  <span className="evento-badge text-sm font-black px-4 py-2 rounded-full uppercase tracking-wider">
+                    {evento.cuposDisponibles} invitaciones disponibles
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="p-8">
+              {/* Título */}
+              <h1 className="font-display text-4xl sm:text-5xl text-white mb-2 tracking-wide uppercase leading-none">
+                {evento.nombre}
+              </h1>
+              {evento.descripcion && (
+                <p className="text-zinc-500 mb-6 text-sm leading-relaxed">{evento.descripcion}</p>
+              )}
+
+              <div className="evento-divider mb-6" />
+
+              {/* Info grid */}
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="glass-card rounded-xl p-4 evento-border" style={{ borderWidth: '1px', borderStyle: 'solid' }}>
+                  <p className="evento-label text-xs mb-1 font-bold uppercase tracking-wider">Fecha y hora</p>
+                  <p className="text-white font-medium text-sm capitalize">
+                    {formatFechaCompleta(evento.fecha)}
+                  </p>
+                </div>
+                <div className="glass-card rounded-xl p-4 evento-border" style={{ borderWidth: '1px', borderStyle: 'solid' }}>
+                  <p className="evento-label text-xs mb-1 font-bold uppercase tracking-wider">Lugar</p>
+                  <p className="text-white font-medium text-sm">{evento.lugar}</p>
+                </div>
+              </div>
+
+              {/* Formulario */}
+              {agotado ? (
+                <div className="text-center py-8">
+                  <div className="font-display text-5xl text-zinc-700 mb-4 tracking-wide">AGOTADO</div>
+                  <p className="text-zinc-500">Las invitaciones para este evento se agotaron.</p>
+                </div>
+              ) : (
+                <InvitacionForm
+                  eventoId={evento.id}
+                  eventoNombre={evento.nombre}
+                />
               )}
             </div>
           </div>
 
-          <div className="p-8">
-            {/* Info */}
-            <h1 className="text-3xl font-black text-white mb-3">{evento.nombre}</h1>
-            {evento.descripcion && (
-              <p className="text-slate-400 mb-6">{evento.descripcion}</p>
-            )}
-
-            <div className="grid grid-cols-2 gap-4 mb-8">
-              <div className="glass-card rounded-xl p-4">
-                <p className="text-slate-500 text-xs mb-1">Fecha y hora</p>
-                <p className="text-white font-medium text-sm capitalize">
-                  {formatFechaCompleta(evento.fecha)}
-                </p>
-              </div>
-              <div className="glass-card rounded-xl p-4">
-                <p className="text-slate-500 text-xs mb-1">Lugar</p>
-                <p className="text-white font-medium text-sm">{evento.lugar}</p>
-              </div>
-            </div>
-
-            {/* Formulario */}
-            {agotado ? (
-              <div className="text-center py-8">
-                <div className="text-5xl mb-4">😔</div>
-                <p className="text-slate-400">
-                  Las invitaciones para este evento se agotaron.
-                </p>
-              </div>
-            ) : (
-              <InvitacionForm eventoId={evento.id} eventoNombre={evento.nombre} />
-            )}
-          </div>
+          <p className="text-center text-zinc-700 text-xs mt-6 tracking-widest uppercase">
+            Monkey Restobar · Av. Concha y Toro 1060, Local 3
+          </p>
         </div>
-
       </div>
-    </div>
+    </>
   )
 }

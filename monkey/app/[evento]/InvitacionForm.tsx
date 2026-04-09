@@ -120,7 +120,7 @@ export default function InvitacionForm({ eventoId, eventoNombre }: Props) {
       <button
         type="submit"
         disabled={estado === 'loading'}
-        className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+        className="evento-btn w-full flex items-center justify-center gap-2 py-4 px-8 rounded-xl font-black disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
       >
         {estado === 'loading' ? (
           <>

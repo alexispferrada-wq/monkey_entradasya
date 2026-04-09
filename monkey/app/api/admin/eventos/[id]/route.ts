@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { eventos, invitaciones } from '@/lib/db/schema'
-import { eq, count } from 'drizzle-orm'
+import { eq, count, and, sql } from 'drizzle-orm'
+import { eventoUpdateSchema } from '@/lib/schemas'
+import { handleError } from '@/lib/errors'
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
   const [evento] = await db.select().from(eventos).where(eq(eventos.id, params.id)).limit(1)
-  if (!evento) return NextResponse.json({ error: 'No encontrado.' }, { status: 404 })
+  if (!evento) return NextResponse.json({ success: false, error: { code: 'NOT_FOUND', message: 'No encontrado.' } }, { status: 404 })
 
-  const [{ total }] = await db
-    .select({ total: count() })
-    .from(invitaciones)
-    .where(eq(invitaciones.eventoId, params.id))
-
-  const [{ usadas }] = await db
-    .select({ usadas: count() })
+  const [{ total, usadas }] = await db
+    .select({
+      total: count(invitaciones.id),
+      usadas: sql`count(*) FILTER (WHERE ${invitaciones.estado} = 'usada')`,
+    })
     .from(invitaciones)
     .where(eq(invitaciones.eventoId, params.id))
 
@@ -23,28 +23,28 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const body = await req.json()
-    const { nombre, descripcion, fecha, lugar, cuposTotal, cuposDisponibles, slug, activo, imagenUrl } = body
+    const validated = eventoUpdateSchema.parse(body)
+
+    const updateData: Record<string, unknown> = {
+      ...(validated.nombre && { nombre: validated.nombre }),
+      ...(validated.descripcion !== undefined && { descripcion: validated.descripcion }),
+      ...(validated.fecha && { fecha: validated.fecha }),
+      ...(validated.lugar && { lugar: validated.lugar }),
+      ...(validated.cuposTotal !== undefined && { cuposTotal: validated.cuposTotal }),
+      ...(validated.cuposDisponibles !== undefined && { cuposDisponibles: validated.cuposDisponibles }),
+      ...(validated.activo !== undefined && { activo: validated.activo }),
+      ...(validated.imagenUrl !== undefined && { imagenUrl: validated.imagenUrl }),
+    }
 
     const [updated] = await db
       .update(eventos)
-      .set({
-        ...(nombre && { nombre }),
-        ...(descripcion !== undefined && { descripcion }),
-        ...(fecha && { fecha: new Date(fecha) }),
-        ...(lugar && { lugar }),
-        ...(cuposTotal !== undefined && { cuposTotal: Number(cuposTotal) }),
-        ...(cuposDisponibles !== undefined && { cuposDisponibles: Number(cuposDisponibles) }),
-        ...(slug && { slug: slug.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') }),
-        ...(activo !== undefined && { activo }),
-        ...(imagenUrl !== undefined && { imagenUrl }),
-      })
+      .set(updateData)
       .where(eq(eventos.id, params.id))
       .returning()
 
     return NextResponse.json(updated)
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : 'Error interno'
-    return NextResponse.json({ error: msg }, { status: 500 })
+    return NextResponse.json(handleError(error), { status: 400 })
   }
 }
 
