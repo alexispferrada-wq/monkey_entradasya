@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EntradasYa - La plataforma de eventos que se adapta a ti</title>
+    <meta name="description" content="Vende entradas para tus eventos con la plataforma más moderna. Efecto camaleón, pagos instantáneos y validación QR.">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%236366f1'/%3E%3Cstop offset='100%25' style='stop-color:%23f43f5e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='20' fill='url(%23g)'/%3E%3Cpath d='M30 35 L30 30 Q30 25 35 25 L40 25 M60 25 L65 25 Q70 25 70 30 L70 35 M70 45 L70 55 Q55 50 55 65 Q55 80 70 75 L70 85 Q70 90 65 90 L35 90 Q30 90 30 85 L30 75 Q45 80 45 65 Q45 50 30 55 L30 45' stroke='white' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%236366f1'/%3E%3Cstop offset='100%25' style='stop-color:%23f43f5e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='url(%23g)'/%3E%3Cpath d='M54 63 L54 54 Q54 45 63 45 L72 45 M108 45 L117 45 Q126 45 126 54 L126 63 M126 81 L126 99 Q99 90 99 117 Q99 144 126 135 L126 153 Q126 162 117 162 L63 162 Q54 162 54 153 L54 135 Q81 144 81 117 Q81 90 54 99 L54 81' stroke='white' stroke-width='10' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#f43f5e',
+                        dark: '#0f172a',
+                        darker: '#020617',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'gradient': 'gradient 8s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        gradient: {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        * {
+            scroll-behavior: smooth;
+        }
+        
+        .glass {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .glass-card {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1 0%, #f43f5e 50%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-gradient {
+            background: radial-gradient(ellipse at top, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                        radial-gradient(ellipse at bottom right, rgba(244, 63, 94, 0.1) 0%, transparent 50%),
+                        radial-gradient(ellipse at bottom left, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+        }
+        
+        .glow-primary {
+            box-shadow: 0 0 40px rgba(99, 102, 241, 0.3);
+        }
+        
+        .glow-secondary {
+            box-shadow: 0 0 40px rgba(244, 63, 94, 0.3);
+        }
+        
+        .feature-icon {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(244, 63, 94, 0.2) 100%);
+        }
+        
+        .mockup-phone {
+            transform: perspective(1000px) rotateY(-15deg) rotateX(5deg);
+            transition: transform 0.5s ease;
+        }
+        
+        .mockup-phone:hover {
+            transform: perspective(1000px) rotateY(-5deg) rotateX(2deg);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #f43f5e 0%, #ec4899 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(244, 63, 94, 0.4);
+        }
+        
+        .step-line {
+            background: linear-gradient(to bottom, #6366f1, #f43f5e);
+        }
+        
+        .stats-gradient {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(244, 63, 94, 0.1) 100%);
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-darker text-white font-sans overflow-x-hidden">
+    
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                        <i class="fas fa-ticket-alt text-white text-lg"></i>
+                    </div>
+                    <span class="text-xl font-black tracking-tight">Entradas<span class="text-primary">Ya</span></span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#features" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Características</a>
+                    <a href="#how-it-works" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Cómo funciona</a>
+                    <a href="#pricing" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Precios</a>
+                    <a href="#testimonials" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Testimonios</a>
+                </div>
+                
+                <!-- CTA Buttons -->
+                <div class="flex items-center gap-3">
+                    <button onclick="showComingSoon()" class="hidden sm:block text-sm font-medium text-slate-300 hover:text-white transition-colors px-4 py-2">
+                        Iniciar sesión
+                    </button>
+                    <button onclick="showComingSoon()" class="btn-primary text-white text-sm font-bold px-5 py-2.5 rounded-full">
+                        Crear evento
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center pt-16 hero-gradient overflow-hidden">
+        <!-- Background Elements -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-[100px] animate-pulse-slow"></div>
+            <div class="absolute bottom-20 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-[120px] animate-pulse-slow" style="animation-delay: 2s;"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-900/10 rounded-full blur-[150px]"></div>
+        </div>
+        
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- Content -->
+                <div class="space-y-8">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card">
+                        <span class="flex h-2 w-2 rounded-full bg-green-400 animate-pulse"></span>
+                        <span class="text-xs font-semibold text-slate-300">Plataforma líder en Latinoamérica</span>
+                    </div>
+                    
+                    <h1 class="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight">
+                        Vende entradas<br>
+                        <span class="gradient-text">sin fricción</span>
+                    </h1>
+                    
+                    <p class="text-lg sm:text-xl text-slate-400 max-w-xl leading-relaxed">
+                        La plataforma de gestión de eventos diseñada para la era de las redes sociales. 
+                        Páginas que se adaptan a tu flyer, pagos instantáneos y validación QR.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button onclick="showComingSoon()" class="btn-primary text-white font-bold px-8 py-4 rounded-full text-lg flex items-center justify-center gap-2">
+                            <span>Comenzar gratis</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button onclick="showComingSoon()" class="glass-card text-white font-semibold px-8 py-4 rounded-full text-lg hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+                            <i class="fas fa-play-circle text-primary"></i>
+                            <span>Ver demo</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Trust Badges -->
+                    <div class="flex flex-wrap items-center gap-6 pt-4">
+                        <div class="flex items-center gap-2 text-slate-400 text-sm">
+                            <i class="fas fa-check-circle text-green-400"></i>
+                            <span>Sin costo inicial</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-slate-400 text-sm">
+                            <i class="fas fa-check-circle text-green-400"></i>
+                            <span>Comisión solo por venta</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-slate-400 text-sm">
+                            <i class="fas fa-check-circle text-green-400"></i>
+                            <span>Setup en 2 minutos</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mockup -->
+                <div class="relative lg:pl-8">
+                    <div class="mockup-phone relative">
+                        <!-- Phone Frame -->
+                        <div class="relative bg-slate-900 rounded-[3rem] p-3 shadow-2xl border border-slate-700">
+                            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-slate-900 rounded-b-2xl z-10"></div>
+                            <div class="bg-slate-800 rounded-[2.5rem] overflow-hidden">
+                                <!-- Mock Screen -->
+                                <div class="aspect-[9/19] bg-gradient-to-b from-slate-800 to-slate-900 p-4 flex flex-col">
+                                    <!-- Status Bar -->
+                                    <div class="flex justify-between items-center text-xs text-white mb-4 pt-2">
+                                        <span>9:41</span>
+                                        <div class="flex gap-1">
+                                            <i class="fas fa-signal"></i>
+                                            <i class="fas fa-wifi"></i>
+                                            <i class="fas fa-battery-full"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Event Card -->
+                                    <div class="rounded-2xl overflow-hidden mb-4 shadow-lg">
+                                        <div class="h-40 bg-gradient-to-br from-purple-600 to-pink-600 relative">
+                                            <div class="absolute inset-0 flex items-center justify-center">
+                                                <i class="fas fa-music text-6xl text-white/30"></i>
+                                            </div>
+                                            <div class="absolute bottom-3 left-3">
+                                                <span class="bg-white/20 backdrop-blur text-white text-xs px-2 py-1 rounded-full">🎵 Música</span>
+                                            </div>
+                                        </div>
+                                        <div class="bg-slate-800 p-3">
+                                            <p class="text-primary text-xs font-bold">VIE 15 MAR • 22:00</p>
+                                            <h3 class="text-white font-bold text-sm mt-1">Fiesta Neon 2025</h3>
+                                            <p class="text-slate-400 text-xs mt-1">Club Downtown</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Ticket Options -->
+                                    <div class="space-y-2">
+                                        <div class="glass-card rounded-xl p-3 flex justify-between items-center">
+                                            <div>
+                                                <p class="text-white text-sm font-semibold">Early Bird</p>
+                                                <p class="text-slate-400 text-xs">Venta limitada</p>
+                                            </div>
+                                            <span class="text-green-400 font-bold text-sm">$15.000</span>
+                                        </div>
+                                        <div class="glass-card rounded-xl p-3 flex justify-between items-center border-primary/30">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                                                <div>
+                                                    <p class="text-white text-sm font-semibold">General</p>
+                                                    <p class="text-slate-400 text-xs">Disponible</p>
+                                                </div>
+                                            </div>
+                                            <span class="text-green-400 font-bold text-sm">$25.000</span>
+                                        </div>
+                                        <div class="glass-card rounded-xl p-3 flex justify-between items-center">
+                                            <div>
+                                                <p class="text-white text-sm font-semibold">VIP Mesa</p>
+                                                <p class="text-slate-400 text-xs">Hasta 6 personas</p>
+                                            </div>
+                                            <span class="text-green-400 font-bold text-sm">$180.000</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- CTA Button -->
+                                    <div class="mt-auto pt-4">
+                                        <div class="btn-primary text-white text-center font-bold py-3 rounded-xl text-sm">
+                                            Comprar Entradas
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Floating Elements -->
+                        <div class="absolute -top-4 -right-4 glass-card rounded-2xl p-4 animate-float">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                                    <i class="fas fa-check text-green-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-white text-sm font-semibold">¡Venta realizada!</p>
+                                    <p class="text-slate-400 text-xs">+$25.000 CLP</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="absolute -bottom-4 -left-4 glass-card rounded-2xl p-4 animate-float" style="animation-delay: 1s;">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-qrcode text-primary text-2xl"></i>
+                                <div>
+                                    <p class="text-white text-sm font-semibold">QR Validado</p>
+                                    <p class="text-slate-400 text-xs">Acceso permitido</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+            <i class="fas fa-chevron-down text-slate-500 text-xl"></i>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-16 border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <p class="text-4xl md:text-5xl font-black gradient-text">500+</p>
+                    <p class="text-slate-400 mt-2">Eventos creados</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-4xl md:text-5xl font-black gradient-text">50K+</p>
+                    <p class="text-slate-400 mt-2">Entradas vendidas</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-4xl md:text-5xl font-black gradient-text">200+</p>
+                    <p class="text-slate-400 mt-2">Organizadores</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-4xl md:text-5xl font-black gradient-text">99.9%</p>
+                    <p class="text-slate-400 mt-2">Uptime</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-24 relative">
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-[120px]"></div>
+            <div class="absolute bottom-0 left-0 w-96 h-96 bg-secondary/10 rounded-full blur-[120px]"></div>
+        </div>
+        
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-primary font-semibold text-sm uppercase tracking-wider">Características</span>
+                <h2 class="text-4xl md:text-5xl font-black mt-4 mb-6">
+                    Todo lo que necesitas para <span class="gradient-text">vender más</span>
+                </h2>
+                <p class="text-slate-400 text-lg">
+                    Herramientas potentes diseñadas para maximizar tus ventas y simplificar la gestión de tus eventos.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Feature 1 -->
+                <div class="glass-card rounded-3xl p-8 group hover:border-primary/50 transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-14 h-14 rounded-2xl feature-icon flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-palette text-2xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Efecto Camaleón</h3>
+                    <p class="text-slate-400 leading-relaxed">
+                        Tu página de venta adopta automáticamente los colores del flyer de tu evento. 
+                        Cada evento tiene su propia identidad visual única.
+                    </p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="glass-card rounded-3xl p-8 group hover:border-secondary/50 transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-14 h-14 rounded-2xl feature-icon flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-bolt text-2xl text-secondary"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Checkout de Urgencia</h3>
+                    <p class="text-slate-400 leading-relaxed">
+                        Temporizadores inteligentes y contadores de stock que generan FOMO y aceleran 
+                        la decisión de compra de tus asistentes.
+                    </p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="glass-card rounded-3xl p-8 group hover:border-green-500/50 transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-14 h-14 rounded-2xl bg-green-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-mobile-alt text-2xl text-green-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">App de Validación</h3>
+                    <p class="text-slate-400 leading-relaxed">
+                        Web App Progresiva para tu staff de seguridad. Funciona offline, 
+                        sincroniza automáticamente y valida entradas al instante.
+                    </p>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="glass-card rounded-3xl p-8 group hover:border-blue-500/50 transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-credit-card text-2xl text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Pagos Instantáneos</h3>
+                    <p class="text-slate-400 leading-relaxed">
+                        Integración directa con Mercado Pago. Recibe el dinero al instante 
+                        en tu cuenta. Acepta Webpay, tarjetas y billeteras digitales.
+                    </p>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="glass-card rounded-3xl p-8 group hover:border-pink-500/50 transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-utensils text-2xl text-pink-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Reservas de Mesas</h3>
+                    <p class="text-slate-400 leading-relaxed">
+                        Módulo especializado para restaurantes y clubs. Gestiona cupos por horario, 
+                        zonas y pide seña para confirmar la reserva.
+                    </p>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="glass-card rounded-3xl p-8 group hover:border-yellow-500/50 transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-14 h-14 rounded-2xl bg-yellow-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-chart-line text-2xl text-yellow-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Dashboard en Tiempo Real</h3>
+                    <p class="text-slate-400 leading-relaxed">
+                        Métricas de ventas, asistencia y control financiero. Observa cómo 
+                        se comportan tus ventas en vivo desde cualquier dispositivo.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-24 bg-slate-900/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-primary font-semibold text-sm uppercase tracking-wider">Cómo funciona</span>
+                <h2 class="text-4xl md:text-5xl font-black mt-4 mb-6">
+                    De la idea al evento en <span class="gradient-text">2 minutos</span>
+                </h2>
+                <p class="text-slate-400 text-lg">
+                    Publicar un evento nunca fue tan fácil. Sigue estos simples pasos y comienza a vender.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 relative">
+                <!-- Step 1 -->
+                <div class="relative">
+                    <div class="glass-card rounded-3xl p-8 text-center h-full">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center mx-auto mb-6 text-2xl font-black">
+                            1
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Crea tu evento</h3>
+                        <p class="text-slate-400">
+                            Ingresa los datos básicos: título, fecha, ubicación y sube el flyer de tu evento.
+                        </p>
+                    </div>
+                    <!-- Connector Line -->
+                    <div class="hidden md:block absolute top-16 left-full w-full h-0.5 bg-gradient-to-r from-primary to-secondary -z-10" style="width: calc(100% - 4rem); margin-left: 2rem;"></div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="relative">
+                    <div class="glass-card rounded-3xl p-8 text-center h-full">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center mx-auto mb-6 text-2xl font-black">
+                            2
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Configura tickets</h3>
+                        <p class="text-slate-400">
+                            Define los tipos de entradas, precios y cantidades disponibles. Early bird, VIP, mesas y más.
+                        </p>
+                    </div>
+                    <!-- Connector Line -->
+                    <div class="hidden md:block absolute top-16 left-full w-full h-0.5 bg-gradient-to-r from-secondary to-primary -z-10" style="width: calc(100% - 4rem); margin-left: 2rem;"></div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="relative">
+                    <div class="glass-card rounded-3xl p-8 text-center h-full">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-600 to-secondary flex items-center justify-center mx-auto mb-6 text-2xl font-black">
+                            3
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Comparte y vende</h3>
+                        <p class="text-slate-400">
+                            Obtén tu link único y compártelo en Instagram, WhatsApp y redes. El dinero va directo a tu cuenta.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-16 text-center">
+                <button onclick="showComingSoon()" class="btn-primary text-white font-bold px-10 py-4 rounded-full text-lg inline-flex items-center gap-2">
+                    <span>Crear mi primer evento</span>
+                    <i class="fas fa-rocket"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof / Testimonials -->
+    <section id="testimonials" class="py-24 relative overflow-hidden">
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-primary/5 rounded-full blur-[150px]"></div>
+        </div>
+        
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-primary font-semibold text-sm uppercase tracking-wider">Testimonios</span>
+                <h2 class="text-4xl md:text-5xl font-black mt-4 mb-6">
+                    Lo que dicen los <span class="gradient-text">organizadores</span>
+                </h2>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Testimonial 1 -->
+                <div class="glass-card rounded-3xl p-8">
+                    <div class="flex items-center gap-1 mb-4">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                    </div>
+                    <p class="text-slate-300 mb-6 leading-relaxed">
+                        "EntradasYa cambió la forma de vender para nuestro club. El efecto camaleón hace que cada evento se vea único y profesional."
+                    </p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-lg font-bold">
+                            JD
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">Juan Díaz</p>
+                            <p class="text-slate-400 text-sm">Club Downtown</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="glass-card rounded-3xl p-8">
+                    <div class="flex items-center gap-1 mb-4">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                    </div>
+                    <p class="text-slate-300 mb-6 leading-relaxed">
+                        "La app de validación es increíble. Mis guardias solo necesitan su celular, no hay que instalar nada y funciona sin internet."
+                    </p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-secondary to-pink-600 flex items-center justify-center text-lg font-bold">
+                            MR
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">María Rodríguez</p>
+                            <p class="text-slate-400 text-sm">Productora de Eventos</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="glass-card rounded-3xl p-8">
+                    <div class="flex items-center gap-1 mb-4">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                    </div>
+                    <p class="text-slate-300 mb-6 leading-relaxed">
+                        "Vendí 500 entradas en 2 horas para mi fiesta. El checkout de urgencia realmente funciona para crear esa presión de compra."
+                    </p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-lg font-bold">
+                            CM
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">Carlos Méndez</p>
+                            <p class="text-slate-400 text-sm">DJ & Productor</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-24 bg-slate-900/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-primary font-semibold text-sm uppercase tracking-wider">Precios</span>
+                <h2 class="text-4xl md:text-5xl font-black mt-4 mb-6">
+                    Sin costos fijos, <span class="gradient-text">paga solo si vendes</span>
+                </h2>
+                <p class="text-slate-400 text-lg">
+                    Comisión transparente por cada entrada vendida. Sin suscripciones mensuales ni costos ocultos.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <!-- Free Plan -->
+                <div class="glass-card rounded-3xl p-8">
+                    <h3 class="text-xl font-bold text-white mb-2">Estándar</h3>
+                    <p class="text-slate-400 mb-6">Para eventos ocasionales</p>
+                    
+                    <div class="mb-6">
+                        <span class="text-5xl font-black text-white">5%</span>
+                        <span class="text-slate-400"> + IVA por entrada</span>
+                    </div>
+                    
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span>Hasta 3 eventos activos</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span>Efecto camaleón</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span>Pagos con Mercado Pago</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span>App de validación QR</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span>Soporte por email</span>
+                        </li>
+                    </ul>
+                    
+                    <button onclick="showComingSoon()" class="w-full py-4 rounded-full border border-white/20 text-white font-semibold hover:bg-white/10 transition-colors">
+                        Comenzar gratis
+                    </button>
+                </div>
+                
+                <!-- Pro Plan -->
+                <div class="glass-card rounded-3xl p-8 border-primary/50 relative">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2">
+                        <span class="bg-gradient-to-r from-primary to-secondary text-white text-xs font-bold px-4 py-1.5 rounded-full">
+                            MÁS POPULAR
+                        </span>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold text-white mb-2">Pro</h3>
+                    <p class="text-slate-400 mb-6">Para organizadores frecuentes</p>
+                    
+                    <div class="mb-6">
+                        <span class="text-5xl font-black gradient-text">3%</span>
+                        <span class="text-slate-400"> + IVA por entrada</span>
+                    </div>
+                    
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <i class="fas fa-check text-primary"></i>
+                            <span>Eventos ilimitados</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <i class="fas fa-check text-primary"></i>
+                            <span>Todas las características estándar</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <i class="fas fa-check text-primary"></i>
+                            <span>Reservas de mesas</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <i class="fas fa-check text-primary"></i>
+                            <span>Slug personalizado</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <i class="fas fa-check text-primary"></i>
+                            <span>Soporte prioritario 24/7</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <i class="fas fa-check text-primary"></i>
+                            <span>Reportes avanzados</span>
+                        </li>
+                    </ul>
+                    
+                    <button onclick="showComingSoon()" class="w-full btn-primary text-white font-semibold py-4 rounded-full">
+                        Actualizar a Pro
+                    </button>
+                </div>
+            </div>
+            
+            <p class="text-center text-slate-500 mt-8 text-sm">
+                *La comisión se aplica solo sobre el precio de la entrada. No hay costos de setup ni mensualidades.
+            </p>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-24 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20"></div>
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-0 left-1/4 w-96 h-96 bg-primary/30 rounded-full blur-[150px]"></div>
+            <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/30 rounded-full blur-[150px]"></div>
+        </div>
+        
+        <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl md:text-6xl font-black mb-6">
+                ¿Listo para vender<br><span class="gradient-text">más entradas?</span>
+            </h2>
+            <p class="text-xl text-slate-300 mb-10 max-w-2xl mx-auto">
+                Únete a cientos de organizadores que ya están usando EntradasYa para hacer crecer sus eventos.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="showComingSoon()" class="btn-primary text-white font-bold px-10 py-4 rounded-full text-lg inline-flex items-center justify-center gap-2">
+                    <span>Crear cuenta gratuita</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <button onclick="showComingSoon()" class="glass-card text-white font-semibold px-10 py-4 rounded-full text-lg hover:bg-white/10 transition-colors inline-flex items-center justify-center gap-2">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Agendar demo</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-darker border-t border-white/5 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-12 mb-12">
+                <!-- Brand -->
+                <div class="md:col-span-1">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                            <i class="fas fa-ticket-alt text-white text-lg"></i>
+                        </div>
+                        <span class="text-xl font-black tracking-tight">Entradas<span class="text-primary">Ya</span></span>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                        La plataforma de gestión de eventos y venta de entradas diseñada para la era de las redes sociales.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full glass-card flex items-center justify-center text-slate-400 hover:text-white hover:border-primary/50 transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full glass-card flex items-center justify-center text-slate-400 hover:text-white hover:border-primary/50 transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full glass-card flex items-center justify-center text-slate-400 hover:text-white hover:border-primary/50 transition-colors">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Product -->
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Producto</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#features" class="text-slate-400 hover:text-white transition-colors text-sm">Características</a></li>
+                        <li><a href="#pricing" class="text-slate-400 hover:text-white transition-colors text-sm">Precios</a></li>
+                        <li><a href="#" onclick="showComingSoon()" class="text-slate-400 hover:text-white transition-colors text-sm">Validación QR</a></li>
+                        <li><a href="#" onclick="showComingSoon()" class="text-slate-400 hover:text-white transition-colors text-sm">Integraciones</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Company -->
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Empresa</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" onclick="showComingSoon()" class="text-slate-400 hover:text-white transition-colors text-sm">Sobre nosotros</a></li>
+                        <li><a href="#" onclick="showComingSoon()" class="text-slate-400 hover:text-white transition-colors text-sm">Blog</a></li>
+                        <li><a href="#" onclick="showComingSoon()" class="text-slate-400 hover:text-white transition-colors text-sm">Trabaja con nosotros</a></li>
+                        <li><a href="#" onclick="showComingSoon()" class="text-slate-400 hover:text-white transition-colors text-sm">Contacto</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Support -->
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Soporte</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" onclick="showComingSoon()" class="text-slate-400 hover:text-white transition-colors text-sm">Centro de ayuda</a></li>
+                        <li><a href="#" onclick="showComingSoon()" class="text-slate-400 hover:text-white transition-colors text-sm">Términos de servicio</a></li>
+                        <li><a href="#" onclick="showComingSoon()" class="text-slate-400 hover:text-white transition-colors text-sm">Política de privacidad</a></li>
+                        <li><a href="#" onclick="showComingSoon()" class="text-slate-400 hover:text-white transition-colors text-sm"> Estado del sistema</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-slate-500 text-sm">
+                    © 2025 EntradasYa. Todos los derechos reservados.
+                </p>
+                <div class="flex items-center gap-4">
+                    <span class="text-slate-500 text-sm">Hecho con</span>
+                    <i class="fas fa-heart text-secondary"></i>
+                    <span class="text-slate-500 text-sm">en Chile</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Coming Soon Modal -->
+    <div id="comingSoonModal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeComingSoon()"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="glass-card rounded-3xl p-8 max-w-md w-full text-center relative">
+                <button onclick="closeComingSoon()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+                <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-rocket text-3xl text-white"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-3">¡Próximamente!</h3>
+                <p class="text-slate-400 mb-6">
+                    Estamos trabajando en esta función. Déjanos tu email y te notificaremos cuando esté disponible.
+                </p>
+                <div class="flex gap-2">
+                    <input type="email" placeholder="tu@email.com" class="flex-1 bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-colors">
+                    <button onclick="closeComingSoon()" class="btn-primary text-white font-semibold px-6 py-3 rounded-xl">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Coming Soon Modal Functions
+        function showComingSoon() {
+            document.getElementById('comingSoonModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeComingSoon() {
+            document.getElementById('comingSoonModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeComingSoon();
+            }
+        });
+        
+        // Navbar scroll effect
+        const nav = document.querySelector('nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-lg');
+            } else {
+                nav.classList.remove('shadow-lg');
+            }
+        });
+        
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Apply fade-in to elements
+        document.querySelectorAll('.glass-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

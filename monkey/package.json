@@ -1,0 +1,43 @@
+{
+  "name": "monkey-entradasya",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "db:push": "dotenv -e .env.local -- drizzle-kit push",
+    "db:studio": "dotenv -e .env.local -- drizzle-kit studio",
+    "db:generate": "dotenv -e .env.local -- drizzle-kit generate",
+    "db:seed": "dotenv -e .env.local -- tsx lib/db/seed.ts",
+    "db:seed-selena": "dotenv -e .env.local -- tsx lib/db/seed-selena.ts",
+    "db:reset": "dotenv -e .env.local -- tsx lib/db/reset.ts"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "react": "^18",
+    "react-dom": "^18",
+    "@neondatabase/serverless": "^0.9.4",
+    "drizzle-orm": "^0.31.4",
+    "resend": "^3.4.0",
+    "cloudinary": "^2.4.0",
+    "qrcode": "^1.5.4",
+    "uuid": "^10.0.0",
+    "clsx": "^2.1.1",
+    "jose": "^5.6.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/qrcode": "^1.5.5",
+    "@types/uuid": "^10.0.0",
+    "typescript": "^5",
+    "tailwindcss": "^3.4.1",
+    "autoprefixer": "^10.0.1",
+    "postcss": "^8",
+    "drizzle-kit": "^0.22.8",
+    "dotenv-cli": "^7.4.2",
+    "tsx": "^4.15.7"
+  }
+}
