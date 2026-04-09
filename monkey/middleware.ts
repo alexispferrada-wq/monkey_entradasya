@@ -16,7 +16,7 @@ export async function middleware(req: NextRequest) {
 
   // Rate limiting for public API endpoints
   if (pathname === '/api/invitaciones' && req.method === 'POST') {
-    const rateLimit = await checkRateLimit(rateLimiters.invitations, clientIp)
+    const rateLimit = await checkRateLimit(rateLimiters?.invitations, clientIp)
     if (!rateLimit.allowed) {
       return NextResponse.json(
         { error: 'Demasiadas solicitudes. Intenta más tarde.' },
@@ -26,7 +26,7 @@ export async function middleware(req: NextRequest) {
   }
 
   if (pathname === '/api/scanner/validate' && req.method === 'POST') {
-    const rateLimit = await checkRateLimit(rateLimiters.scanner, clientIp)
+    const rateLimit = await checkRateLimit(rateLimiters?.scanner, clientIp)
     if (!rateLimit.allowed) {
       return NextResponse.json(
         { error: 'Demasiadas solicitudes. Intenta más tarde.' },
@@ -36,7 +36,7 @@ export async function middleware(req: NextRequest) {
   }
 
   if (pathname === '/api/auth/login' && req.method === 'POST') {
-    const rateLimit = await checkRateLimit(rateLimiters.login, clientIp)
+    const rateLimit = await checkRateLimit(rateLimiters?.login, clientIp)
     if (!rateLimit.allowed) {
       return NextResponse.json(
         { error: 'Demasiados intentos de login. Intenta más tarde.' },
