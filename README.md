@@ -23,13 +23,28 @@ cd monkey
 npm run dev
 ```
 
-Abre `http://localhost:3000` en el navegador.
+Abre `http://localhost:3001` en el navegador.
 
 ## Configuración de entorno
 
-Crea un archivo `monkey/.env.local` con tus variables de entorno privadas. No compartas este archivo.
+Copia `monkey/.env.example` a `monkey/.env.local` y completa los valores antes de ejecutar la app.
+
+Ejemplo de variables necesarias:
+
+- `DATABASE_URL`
+- `NEXT_PUBLIC_BASE_URL`
+- `CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
+- `RESEND_API_KEY`
+- `ADMIN_USER`
+- `ADMIN_PASSWORD`
+- `ADMIN_JWT_SECRET`
+
+No compartas `monkey/.env.local` en el repositorio.
 
 ## Notas
 
 - Esta carpeta raíz contiene la app en `monkey/`.
+- El panel de administración está disponible en `/admin/login`.
 - Usa `git init`, agrega el remoto y haz push a GitHub cuando estés listo.
