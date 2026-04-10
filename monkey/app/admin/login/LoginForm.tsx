@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function LoginForm() {
-  const [user, setUser] = useState('')
+  const [usuario, setUsuario] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -18,7 +18,7 @@ export default function LoginForm() {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user, password }),
+      body: JSON.stringify({ usuario, password }),
     })
 
     if (res.ok) {
@@ -37,8 +37,8 @@ export default function LoginForm() {
         <label className="block text-sm font-medium text-slate-300 mb-2">Usuario</label>
         <input
           type="text"
-          value={user}
-          onChange={(e) => setUser(e.target.value)}
+          value={usuario}
+          onChange={(e) => setUsuario(e.target.value)}
           placeholder="admin"
           required
           className="input-glass"
