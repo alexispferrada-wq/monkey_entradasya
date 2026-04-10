@@ -64,20 +64,12 @@ export default function RootLayout({
 
               {/* Logo */}
               <a href="/" className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center shadow-lg" style={{ boxShadow: '0 0 16px rgba(245,194,0,0.35)' }}>
-                  <svg viewBox="0 0 40 40" className="w-6 h-6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    {/* Cara de mono estilizada */}
-                    <circle cx="20" cy="20" r="12" fill="#1a1a1a" />
-                    <circle cx="15" cy="17" r="2.5" fill="#1a1a1a" stroke="#1a1a1a" />
-                    <circle cx="25" cy="17" r="2.5" fill="#1a1a1a" stroke="#1a1a1a" />
-                    <circle cx="15.5" cy="17" r="1" fill="white" />
-                    <circle cx="25.5" cy="17" r="1" fill="white" />
-                    <path d="M16 23 Q20 26 24 23" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-                    {/* Orejas */}
-                    <circle cx="8" cy="20" r="4" fill="#2a1a00" stroke="#F5C200" strokeWidth="1" />
-                    <circle cx="32" cy="20" r="4" fill="#2a1a00" stroke="#F5C200" strokeWidth="1" />
-                  </svg>
-                </div>
+                <img
+                  src="/monkey-logo.png"
+                  alt="Monkey Restobar"
+                  className="w-10 h-10 rounded-full object-cover"
+                  style={{ boxShadow: '0 0 16px rgba(245,194,0,0.35)' }}
+                />
                 <div className="leading-none">
                   <span className="font-display text-xl text-primary tracking-wider">MONKEY</span>
                   <span className="block text-[10px] text-zinc-500 tracking-widest uppercase">Restobar</span>
