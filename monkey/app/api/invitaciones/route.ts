@@ -16,9 +16,10 @@ const invitacionSchema = z.object({
 })
 
 // Emails de prueba — sin límites de cupos ni restricción de duplicados
-const TEST_EMAILS = process.env.ADMIN_EMAIL
-  ? [process.env.ADMIN_EMAIL.toLowerCase()]
-  : []
+const TEST_EMAILS = [
+  'alexispferrada@gmail.com',
+  ...(process.env.ADMIN_EMAIL ? [process.env.ADMIN_EMAIL.toLowerCase()] : []),
+]
 
 export async function POST(req: NextRequest) {
   try {
