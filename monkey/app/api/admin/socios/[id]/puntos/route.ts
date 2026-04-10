@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { socios, movimientosPuntos } from '@/lib/db/schema'
