@@ -1,24 +1,11 @@
 import { GoogleAuth } from 'google-auth-library'
 import type { Socio } from '@/lib/db/schema'
+import { NIVELES, calcularNivel } from './config'
+export { NIVELES, calcularNivel } from './config'
 
 const ISSUER_ID = process.env.GOOGLE_WALLET_ISSUER_ID!
 const CLASS_SUFFIX = 'club_monkey'
 const CLASS_ID = `${ISSUER_ID}.${CLASS_SUFFIX}`
-
-// Niveles y sus colores/labels
-export const NIVELES = {
-  bronze: { label: 'Bronze', color: '#CD7F32', puntosMin: 0, puntosMax: 499 },
-  silver: { label: 'Silver', color: '#C0C0C0', puntosMin: 500, puntosMax: 1499 },
-  gold:   { label: 'Gold',   color: '#F5C200', puntosMin: 1500, puntosMax: 2999 },
-  vip:    { label: 'VIP',    color: '#F5C200', puntosMin: 3000, puntosMax: Infinity },
-} as const
-
-export function calcularNivel(puntos: number): 'bronze' | 'silver' | 'gold' | 'vip' {
-  if (puntos >= 3000) return 'vip'
-  if (puntos >= 1500) return 'gold'
-  if (puntos >= 500) return 'silver'
-  return 'bronze'
-}
 
 function getAuth() {
   const credentialsB64 = process.env.GOOGLE_WALLET_CREDENTIALS_BASE64

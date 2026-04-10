@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import type { Socio } from '@/lib/db/schema'
-import { NIVELES } from '@/lib/wallet/google'
+import { NIVELES } from '@/lib/wallet/config'
 
 type Nivel = 'bronze' | 'silver' | 'gold' | 'vip'
 
