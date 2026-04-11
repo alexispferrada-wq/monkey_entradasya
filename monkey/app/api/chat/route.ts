@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { db } from '@/lib/db'
-import { eventos, chatbotDocs } from '@/lib/db/schema'
+import { eventos, chatbotDocs, type ChatbotDoc } from '@/lib/db/schema'
 import { eq, asc } from 'drizzle-orm'
 import { Resend } from 'resend'
 import { buildSystemPromptFromDocs } from '@/lib/chatbot/system-prompt'
@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
 
     // Fetch active events and chatbot docs in parallel
     let eventosActivos: Array<{ nombre: string; fecha: Date; slug: string; cuposDisponibles: number }> = []
-    let knowledgeDocs: Awaited<ReturnType<typeof db.select>>  = []
+    let knowledgeDocs: ChatbotDoc[] = []
     try {
       const [evts, docs] = await Promise.all([
         db.select({ nombre: eventos.nombre, fecha: eventos.fecha, slug: eventos.slug, cuposDisponibles: eventos.cuposDisponibles })
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
       // If DB fails, proceed with empty context
     }
 
-    const systemPrompt = buildSystemPromptFromDocs(knowledgeDocs as Parameters<typeof buildSystemPromptFromDocs>[0], eventosActivos)
+    const systemPrompt = buildSystemPromptFromDocs(knowledgeDocs, eventosActivos)
 
     // Validate messages structure
     const validMessages: Anthropic.MessageParam[] = messages
