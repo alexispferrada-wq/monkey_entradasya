@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import JungleCorner from './components/JungleCorner'
 import TropicalBackground from './components/TropicalBackground'
+import ChatWidget from './components/ChatWidget'
 
 export const metadata: Metadata = {
   title: 'Monkey Restobar — Invitaciones',
@@ -90,6 +91,9 @@ export default function RootLayout({
         <main className="relative z-10 pt-16">
           {children}
         </main>
+
+        {/* Chatbot flotante */}
+        <ChatWidget />
 
       </body>
     </html>

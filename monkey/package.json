@@ -19,6 +19,7 @@
     "db:reset": "dotenv -e .env.local -- tsx lib/db/reset.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.88.0",
     "@neondatabase/serverless": "^0.9.4",
     "@types/jsonwebtoken": "^9.0.10",
     "@upstash/ratelimit": "^1.0.0",
