@@ -53,7 +53,7 @@ export default function SociosPanel({ sociosIniciales }: Props) {
       const data = await res.json()
 
       if (!res.ok) {
-        setMsg({ tipo: 'err', texto: data.error || 'Error al actualizar puntos' })
+        setMsg({ tipo: 'err', texto: typeof data.error === 'string' ? data.error : data.error?.message || 'Error al actualizar puntos' })
       } else {
         setSocios(prev => prev.map(s => s.id === data.id ? data : s))
         setSeleccionado(data)

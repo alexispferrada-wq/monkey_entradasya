@@ -40,7 +40,7 @@ export default function ClubPage() {
       const data = await res.json()
 
       if (!res.ok) {
-        setErrorMsg(data.error || 'Error al registrarse')
+        setErrorMsg(typeof data.error === 'string' ? data.error : data.error?.message || 'Error al registrarse')
         setEstado('error')
         return
       }

@@ -30,13 +30,13 @@ export default function InvitacionForm({ eventoId, eventoNombre }: Props) {
 
       if (res.status === 409) {
         setEstado('duplicado')
-        setMensaje(data.error)
+        setMensaje(typeof data.error === 'string' ? data.error : data.error?.message || 'Ya tienes una invitación registrada.')
         return
       }
 
       if (!res.ok) {
         setEstado('error')
-        setMensaje(data.error || 'Hubo un error. Intenta de nuevo.')
+        setMensaje(typeof data.error === 'string' ? data.error : data.error?.message || 'Hubo un error. Intenta de nuevo.')
         return
       }
 

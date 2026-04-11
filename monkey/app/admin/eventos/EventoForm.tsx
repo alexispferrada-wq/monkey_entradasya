@@ -73,7 +73,7 @@ export default function EventoForm({ evento }: Props) {
 
       if (!res.ok) {
         setUploadState('error')
-        setError(data.error || 'Error al subir imagen.')
+        setError(typeof data.error === 'string' ? data.error : data.error?.message || 'Error al subir imagen.')
         return
       }
 
@@ -116,7 +116,7 @@ export default function EventoForm({ evento }: Props) {
     const data = await res.json()
 
     if (!res.ok) {
-      setError(data.error || 'Error al guardar.')
+      setError(typeof data.error === 'string' ? data.error : data.error?.message || 'Error al guardar.')
       setLoading(false)
       return
     }
@@ -141,7 +141,7 @@ export default function EventoForm({ evento }: Props) {
     const data = await res.json()
 
     if (!res.ok) {
-      setError(data.error || 'No fue posible eliminar el evento.')
+      setError(typeof data.error === 'string' ? data.error : data.error?.message || 'No fue posible eliminar el evento.')
       setLoading(false)
       return
     }
