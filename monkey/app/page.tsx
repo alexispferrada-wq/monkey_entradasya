@@ -73,7 +73,7 @@ export default async function Home() {
               <p className="text-zinc-600">Vuelve pronto, hay nuevos eventos en camino.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
               {eventosActivos.map((evento) => {
                 const agotado = evento.cuposDisponibles <= 0
                 const porcentaje = Math.round(
@@ -81,99 +81,82 @@ export default async function Home() {
                 )
 
                 return (
-                  <div
+                  <Link
                     key={evento.id}
-                    className="glass-card rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 group animate-slide-up"
+                    href={agotado ? '#' : `/${evento.slug}`}
+                    className={`group block animate-slide-up ${agotado ? 'pointer-events-none' : ''}`}
                   >
-                    {/* Imagen */}
-                    <div className="relative h-60 bg-black overflow-hidden">
+                    {/* Card tipo poster vertical 9:16 */}
+                    <div className="relative rounded-2xl overflow-hidden bg-black" style={{ aspectRatio: '9/16' }}>
+
+                      {/* Imagen de fondo — ocupa todo */}
                       {evento.imagenUrl ? (
                         <Image
                           src={evento.imagenUrl}
                           alt={evento.nombre}
                           fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-90"
+                          className="object-cover group-hover:scale-105 transition-transform duration-700"
+                          sizes="(max-width: 768px) 50vw, 33vw"
                         />
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-zinc-900 to-black">
-                          <span className="font-display text-6xl text-primary/20 tracking-widest">MONKEY</span>
+                          <span className="font-display text-4xl text-primary/20 tracking-widest">MONKEY</span>
                         </div>
                       )}
 
-                      {/* Badge estado */}
+                      {/* Badge estado — arriba derecha */}
                       <div className="absolute top-3 right-3 z-10">
                         {agotado ? (
-                          <span className="bg-red-600/90 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                          <span className="bg-red-600/90 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
                             Agotado
                           </span>
                         ) : (
-                          <span className="bg-primary text-black text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
+                          <span className="bg-primary text-black text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-wider">
                             {evento.cuposDisponibles} cupos
                           </span>
                         )}
                       </div>
 
-                      {/* Overlay gradient */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-                    </div>
+                      {/* Overlay degradado fuerte abajo */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
 
-                    {/* Contenido */}
-                    <div className="p-6">
-                      <h2 className="font-display text-2xl text-white mb-1 tracking-wide uppercase">
-                        {evento.nombre}
-                      </h2>
-                      {evento.descripcion && (
-                        <p className="text-zinc-500 text-sm mb-4 line-clamp-2">
-                          {evento.descripcion}
-                        </p>
-                      )}
-
-                      <div className="space-y-1.5 mb-5">
-                        <div className="flex items-center gap-2 text-sm text-zinc-400">
+                      {/* Info superpuesta en la parte inferior */}
+                      <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 z-10">
+                        <h2 className="font-display text-sm md:text-lg text-white tracking-wide uppercase leading-tight mb-1 line-clamp-2">
+                          {evento.nombre}
+                        </h2>
+                        <div className="flex items-center gap-1 text-[10px] md:text-xs text-zinc-400 mb-2">
                           <span className="text-primary">📅</span>
-                          <span className="capitalize">{formatFecha(evento.fecha)}</span>
+                          <span className="capitalize truncate">{formatFecha(evento.fecha)}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-zinc-400">
-                          <span className="text-primary">🕐</span>
-                          <span>{formatHora(evento.fecha)}</span>
+
+                        {/* Barra de ocupación */}
+                        <div className="mb-3">
+                          <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all duration-500"
+                              style={{
+                                width: `${porcentaje}%`,
+                                background: porcentaje > 80
+                                  ? 'linear-gradient(90deg, #dc2626, #f97316)'
+                                  : 'linear-gradient(90deg, #F5C200, #F97316)',
+                              }}
+                            />
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-zinc-400">
-                          <span className="text-primary">📍</span>
-                          <span>{evento.lugar}</span>
+
+                        <div
+                          className={`w-full text-center font-display text-xs md:text-sm py-2 px-3 rounded-xl tracking-wider uppercase transition-all duration-300 ${
+                            agotado
+                              ? 'bg-zinc-800/70 text-zinc-600'
+                              : 'bg-primary text-black group-hover:bg-yellow-400'
+                          }`}
+                        >
+                          {agotado ? 'Sin cupos' : 'Ver invitación →'}
                         </div>
                       </div>
-
-                      {/* Barra de ocupación */}
-                      <div className="mb-5">
-                        <div className="flex justify-between text-xs text-zinc-600 mb-1">
-                          <span>Ocupación</span>
-                          <span>{porcentaje}%</span>
-                        </div>
-                        <div className="h-1 bg-zinc-800 rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full transition-all duration-500"
-                            style={{
-                              width: `${porcentaje}%`,
-                              background: porcentaje > 80
-                                ? 'linear-gradient(90deg, #dc2626, #f97316)'
-                                : 'linear-gradient(90deg, #F5C200, #F97316)',
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      <Link
-                        href={`/${evento.slug}`}
-                        className={`block text-center font-display text-lg py-3 px-6 rounded-xl transition-all duration-300 tracking-wider uppercase ${
-                          agotado
-                            ? 'bg-zinc-800/50 text-zinc-600 cursor-not-allowed pointer-events-none'
-                            : 'btn-primary'
-                        }`}
-                      >
-                        {agotado ? 'Sin cupos' : 'Solicitar invitación'}
-                      </Link>
                     </div>
-                  </div>
+                  </Link>
                 )
               })}
             </div>
