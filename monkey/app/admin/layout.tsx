@@ -6,6 +6,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <nav className="fixed top-16 left-0 right-0 z-40 border-b border-primary/10 bg-black/90 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-11">
           <div className="flex items-center gap-6 text-sm">
+            <a href="/" className="shrink-0">
+              <img
+                src="https://res.cloudinary.com/dqsz4ua73/image/upload/v1775919972/logo300xp_s0gh7w.png"
+                alt="Monkey Restobar"
+                className="h-7 w-auto object-contain"
+              />
+            </a>
             <a href="/admin" className="text-zinc-400 hover:text-primary transition-colors font-medium tracking-wide">
               Dashboard
             </a>

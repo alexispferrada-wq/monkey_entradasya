@@ -6,7 +6,7 @@ const PUBLIC_PATHS = ['/admin/login', '/api/auth']
 
 function getClientIp(req: NextRequest): string {
   const forwarded = req.headers.get('x-forwarded-for')
-  const ip = forwarded ? forwarded.split(',')[0].trim() : req.ip || 'unknown'
+  const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown'
   return ip
 }
 

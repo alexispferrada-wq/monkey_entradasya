@@ -1,5 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  outputFileTracingRoot: __dirname,
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'res.cloudinary.com' },
@@ -12,7 +18,7 @@ const nextConfig = {
         source: '/sw.js',
         headers: [
           { key: 'Cache-Control', value: 'no-cache' },
-          { key: 'Service-Worker-Allowed', value: '/' },
+          { key: 'Service-Worker-Allowed', value: ' /' },
         ],
       },
     ]

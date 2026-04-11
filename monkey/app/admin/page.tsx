@@ -2,6 +2,7 @@ import { db } from '@/lib/db'
 import { eventos, invitaciones } from '@/lib/db/schema'
 import { eq, count, sql } from 'drizzle-orm'
 import Link from 'next/link'
+import DeleteEventButton from './DeleteEventButton'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -126,6 +127,13 @@ export default async function AdminPage() {
                   >
                     Ver lista
                   </Link>
+                  <Link
+                    href="/scanner"
+                    className="text-sm px-4 py-2 rounded-xl border border-white/10 text-slate-300 hover:border-white/30 hover:text-white transition-all"
+                  >
+                    Scan QR
+                  </Link>
+                  <DeleteEventButton eventoId={evento.id} nombreEvento={evento.nombre} />
                 </div>
               </div>
             )

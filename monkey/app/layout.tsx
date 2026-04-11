@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
-import JungleCorner from './components/JungleCorner'
-import TropicalBackground from './components/TropicalBackground'
 import ChatWidget from './components/ChatWidget'
 
 export const metadata: Metadata = {
@@ -33,26 +31,14 @@ export default function RootLayout({
     <html lang="es">
       <body className="bg-darker text-white antialiased min-h-screen" style={{ backgroundColor: '#050505' }}>
 
-        {/* Background — jungla tropical con palmeras */}
+        {/* Background — imagen Cloudinary */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
-          <TropicalBackground />
-
-          {/* Hojas tropicales en esquinas animadas */}
-          <JungleCorner
-            className="absolute top-0 left-0 opacity-75"
-            style={{ width: 360, height: 360, animation: 'leaf-sway 7s ease-in-out infinite', transformOrigin: '0 0' }}
-          />
-          <JungleCorner flip
-            className="absolute top-0 right-0 opacity-75"
-            style={{ width: 360, height: 360, animation: 'leaf-sway-alt 8s ease-in-out infinite', transformOrigin: '100% 0' }}
-          />
-          <JungleCorner invert
-            className="absolute bottom-0 left-0 opacity-55"
-            style={{ width: 290, height: 290, animation: 'leaf-sway-alt 9s ease-in-out infinite', transformOrigin: '0 100%' }}
-          />
-          <JungleCorner flip invert
-            className="absolute bottom-0 right-0 opacity-55"
-            style={{ width: 290, height: 290, animation: 'leaf-sway 10s ease-in-out infinite', transformOrigin: '100% 100%' }}
+          <img
+            src="https://res.cloudinary.com/dqsz4ua73/image/upload/q_auto/f_auto/v1775919165/Gemini_Generated_Image_zjq5wzjq5wzjq5wz_kcpqql.png"
+            alt=""
+            aria-hidden="true"
+            className="w-full h-full object-cover object-center"
+            style={{ opacity: 0.25 }}
           />
         </div>
 
@@ -62,26 +48,12 @@ export default function RootLayout({
             <div className="flex items-center justify-between h-16">
 
               {/* Logo */}
-              <a href="/" className="flex items-center gap-3">
+              <a href="/" className="flex items-center">
                 <img
-                  src="/monkey-logo.png"
+                  src="https://res.cloudinary.com/dqsz4ua73/image/upload/v1775919972/logo300xp_s0gh7w.png"
                   alt="Monkey Restobar"
-                  className="w-10 h-10 rounded-full object-cover"
-                  style={{ boxShadow: '0 0 16px rgba(245,194,0,0.35)' }}
+                  className="h-10 w-auto object-contain"
                 />
-                <div className="leading-none">
-                  <span className="font-display text-xl text-primary tracking-wider">MONKEY</span>
-                  <span className="block text-[10px] text-zinc-500 tracking-widest uppercase">Restobar</span>
-                </div>
-              </a>
-
-              {/* Scanner link */}
-              <a
-                href="/scanner"
-                className="text-sm text-zinc-400 hover:text-primary transition-colors flex items-center gap-2 font-medium"
-              >
-                <span className="hidden sm:inline tracking-wide">Soy anfitrión</span>
-                <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
               </a>
 
             </div>
@@ -92,8 +64,8 @@ export default function RootLayout({
           {children}
         </main>
 
-        {/* Chatbot flotante — desactivado temporalmente mientras se carga el contenido */}
-        {/* <ChatWidget /> */}
+        {/* Chatbot flotante */}
+        <ChatWidget />
 
       </body>
     </html>

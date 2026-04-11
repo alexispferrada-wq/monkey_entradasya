@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 
 interface Props {
-  params: { token: string }
+  params: Promise<{ token: string }>
 }
 
 function formatFechaCompleta(fecha: Date): string {
@@ -27,6 +27,7 @@ const estadoConfig = {
 }
 
 export default async function InvitacionPage({ params }: Props) {
+  const { token } = await params
   const [result] = await db
     .select({
       invitacion: invitaciones,
@@ -34,7 +35,7 @@ export default async function InvitacionPage({ params }: Props) {
     })
     .from(invitaciones)
     .innerJoin(eventos, eq(invitaciones.eventoId, eventos.id))
-    .where(eq(invitaciones.token, params.token))
+    .where(eq(invitaciones.token, token))
     .limit(1)
 
   if (!result) notFound()

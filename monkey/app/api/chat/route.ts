@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
+import Groq from 'groq-sdk'
 import { db } from '@/lib/db'
 import { eventos, chatbotDocs, type ChatbotDoc } from '@/lib/db/schema'
 import { eq, asc } from 'drizzle-orm'
@@ -8,25 +8,34 @@ import { buildSystemPromptFromDocs } from '@/lib/chatbot/system-prompt'
 
 export const dynamic = 'force-dynamic'
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
-const resend = new Resend(process.env.RESEND_API_KEY!)
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
-// Tool definition: crear reserva
-const TOOLS: Anthropic.Tool[] = [
+function getResend() {
+  if (!process.env.RESEND_API_KEY) return null
+  return new Resend(process.env.RESEND_API_KEY)
+}
+
+const GROQ_MODEL = 'llama-3.3-70b-versatile'
+
+// Tool definition (formato OpenAI/Groq)
+const TOOLS: Groq.Chat.Completions.ChatCompletionTool[] = [
   {
-    name: 'crear_reserva',
-    description: 'Crea una reserva de mesa en Monkey Restobar. Llama esta herramienta cuando tengas todos los datos necesarios del cliente.',
-    input_schema: {
-      type: 'object',
-      properties: {
-        nombre: { type: 'string', description: 'Nombre completo del cliente' },
-        fecha: { type: 'string', description: 'Fecha de la reserva (ej: "sábado 15 de junio")' },
-        hora: { type: 'string', description: 'Hora de llegada (ej: "21:00")' },
-        personas: { type: 'number', description: 'Número de personas' },
-        contacto: { type: 'string', description: 'Teléfono o correo electrónico de contacto' },
-        notas: { type: 'string', description: 'Notas adicionales o requerimientos especiales (opcional)' },
+    type: 'function',
+    function: {
+      name: 'crear_reserva',
+      description: 'Crea una reserva de mesa en Monkey Restobar. Llama esta herramienta cuando tengas todos los datos necesarios del cliente.',
+      parameters: {
+        type: 'object',
+        properties: {
+          nombre:   { type: 'string', description: 'Nombre completo del cliente' },
+          fecha:    { type: 'string', description: 'Fecha de la reserva (ej: "sábado 15 de junio")' },
+          hora:     { type: 'string', description: 'Hora de llegada (ej: "21:00")' },
+          personas: { type: 'number', description: 'Número de personas' },
+          contacto: { type: 'string', description: 'Teléfono o correo electrónico de contacto' },
+          notas:    { type: 'string', description: 'Notas adicionales o requerimientos especiales (opcional)' },
+        },
+        required: ['nombre', 'fecha', 'hora', 'personas', 'contacto'],
       },
-      required: ['nombre', 'fecha', 'hora', 'personas', 'contacto'],
     },
   },
 ]
@@ -39,6 +48,11 @@ async function enviarEmailReserva(reserva: {
   contacto: string
   notas?: string
 }) {
+  const resend = getResend()
+  if (!resend) throw new Error('RESEND_API_KEY no configurado')
+
+  const emailReservas = process.env.RESERVAS_EMAIL || 'reservas@monkeyrestobar.cl'
+
   const htmlRestaurant = `
 <!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Nueva Reserva</title></head>
 <body style="margin:0;padding:24px;background:#050505;font-family:Arial,sans-serif;color:#e5e7eb;">
@@ -59,9 +73,6 @@ async function enviarEmailReserva(reserva: {
   </div>
 </body></html>`
 
-  const emailReservas = process.env.RESERVAS_EMAIL || 'reservas@monkeyrestobar.cl'
-
-  // Email al restaurante
   await resend.emails.send({
     from: 'Chatbot Monkey <invitaciones@entradasya.cl>',
     to: emailReservas,
@@ -69,7 +80,6 @@ async function enviarEmailReserva(reserva: {
     html: htmlRestaurant,
   })
 
-  // Email de confirmación al cliente (si dio correo)
   if (reserva.contacto.includes('@')) {
     const htmlCliente = `
 <!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Reserva confirmada</title></head>
@@ -128,38 +138,43 @@ export async function POST(req: NextRequest) {
       eventosActivos = evts
       knowledgeDocs = docs
     } catch {
-      // If DB fails, proceed with empty context
+      // Si la DB falla, continúa sin contexto
     }
 
     const systemPrompt = buildSystemPromptFromDocs(knowledgeDocs, eventosActivos)
 
-    // Validate messages structure
-    const validMessages: Anthropic.MessageParam[] = messages
+    // Construir historial de mensajes (formato OpenAI/Groq)
+    const chatMessages: Groq.Chat.Completions.ChatCompletionMessageParam[] = messages
       .filter((m: { role: string; content: string }) => m.role === 'user' || m.role === 'assistant')
       .map((m: { role: string; content: string }) => ({
         role: m.role as 'user' | 'assistant',
         content: m.content,
       }))
 
-    if (validMessages.length === 0) {
+    if (chatMessages.length === 0) {
       return NextResponse.json({ error: 'No hay mensajes válidos' }, { status: 400 })
     }
 
-    // Call Claude
-    const response = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
+    // Primera llamada a Groq
+    const response = await groq.chat.completions.create({
+      model: GROQ_MODEL,
       max_tokens: 1024,
-      system: systemPrompt,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...chatMessages,
+      ],
       tools: TOOLS,
-      messages: validMessages,
+      tool_choice: 'auto',
     })
 
-    // Handle tool use (reservation creation)
-    if (response.stop_reason === 'tool_use') {
-      const toolUse = response.content.find(c => c.type === 'tool_use') as Anthropic.ToolUseBlock | undefined
+    const choice = response.choices[0]
 
-      if (toolUse && toolUse.name === 'crear_reserva') {
-        const reservaData = toolUse.input as {
+    // Manejar tool call (crear reserva)
+    if (choice.finish_reason === 'tool_calls' && choice.message.tool_calls?.length) {
+      const toolCall = choice.message.tool_calls[0]
+
+      if (toolCall.function.name === 'crear_reserva') {
+        const reservaData = JSON.parse(toolCall.function.arguments) as {
           nombre: string; fecha: string; hora: string; personas: number; contacto: string; notas?: string
         }
 
@@ -172,41 +187,38 @@ export async function POST(req: NextRequest) {
           emailError = err instanceof Error ? err.message : 'Error desconocido'
         }
 
-        // Continue conversation with tool result
-        const followUp = await anthropic.messages.create({
-          model: 'claude-haiku-4-5-20251001',
+        // Continuar la conversación con el resultado del tool
+        const followUp = await groq.chat.completions.create({
+          model: GROQ_MODEL,
           max_tokens: 512,
-          system: systemPrompt,
-          tools: TOOLS,
           messages: [
-            ...validMessages,
-            { role: 'assistant', content: response.content },
+            { role: 'system', content: systemPrompt },
+            ...chatMessages,
+            choice.message,
             {
-              role: 'user',
-              content: [{
-                type: 'tool_result',
-                tool_use_id: toolUse.id,
-                content: emailEnviado
-                  ? `Reserva creada exitosamente. Email enviado al restaurante${reservaData.contacto.includes('@') ? ' y al cliente' : ''}.`
-                  : `Error al enviar email: ${emailError}. Indica al cliente que contacte por WhatsApp.`,
-              }],
+              role: 'tool',
+              tool_call_id: toolCall.id,
+              content: emailEnviado
+                ? `Reserva creada exitosamente. Email enviado al restaurante${reservaData.contacto.includes('@') ? ' y al cliente' : ''}.`
+                : `Error al enviar email: ${emailError}. Indica al cliente que contacte por WhatsApp.`,
             },
           ],
         })
 
-        const textBlock = followUp.content.find(c => c.type === 'text') as Anthropic.TextBlock | undefined
-        return NextResponse.json({ reply: textBlock?.text || '¡Reserva recibida! Te contactaremos pronto.' })
+        const reply = followUp.choices[0].message.content
+        return NextResponse.json({ reply: reply || '¡Reserva recibida! Te contactaremos pronto.' })
       }
     }
 
-    // Normal text response
-    const textBlock = response.content.find(c => c.type === 'text') as Anthropic.TextBlock | undefined
-    return NextResponse.json({ reply: textBlock?.text || 'Disculpa, no pude procesar tu consulta. ¿Puedo ayudarte con algo más?' })
+    // Respuesta normal de texto
+    const reply = choice.message.content
+    return NextResponse.json({ reply: reply || 'Disculpa, no pude procesar tu consulta. ¿Puedo ayudarte con algo más?' })
 
   } catch (error) {
-    console.error('[Chat API Error]', error)
+    const msg = error instanceof Error ? error.message : String(error)
+    console.error('[Chat API Error]', msg)
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: msg || 'Error interno del servidor' },
       { status: 500 }
     )
   }

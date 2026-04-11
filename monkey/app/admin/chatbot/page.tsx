@@ -2,6 +2,7 @@ import { db } from '@/lib/db'
 import { chatbotDocs } from '@/lib/db/schema'
 import { asc } from 'drizzle-orm'
 import ChatbotPanel from './ChatbotPanel'
+import ChatbotTester from './ChatbotTester'
 
 export const dynamic = 'force-dynamic'
 
@@ -32,17 +33,22 @@ export default async function ChatbotAdminPage() {
           </div>
         </div>
 
-        <div className="glass-card rounded-xl p-4 mt-4 border-yellow-500/20">
+        <div className="glass-card rounded-xl p-4 mt-4 border-green-500/20">
           <p className="text-zinc-400 text-sm">
-            <span className="text-primary font-bold">Estado:</span>{' '}
-            <span className="text-zinc-500">Desactivado temporalmente</span>
+            <span className="text-green-400 font-bold">Estado:</span>{' '}
+            <span className="text-green-500">Activo</span>
             {' · '}
-            <span className="text-zinc-600 text-xs">Para activarlo, descomenta &lt;ChatWidget /&gt; en layout.tsx</span>
+            <span className="text-zinc-600 text-xs">El chatbot está visible en el sitio público</span>
           </p>
           <p className="text-zinc-600 text-xs mt-1">
             Aquí puedes editar todo el contenido que el chatbot usa para responder. Los cambios son inmediatos.
           </p>
         </div>
+      </div>
+
+      {/* Chat tester */}
+      <div className="mb-8">
+        <ChatbotTester />
       </div>
 
       <ChatbotPanel docs={docs} categorias={CATEGORIAS} />

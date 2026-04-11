@@ -34,21 +34,18 @@ export default async function Home() {
 
       {/* Hero */}
       <section className="py-20 px-4 text-center">
-        <div className="max-w-3xl mx-auto animate-fade-in">
+        <div className="max-w-3xl mx-auto">
 
           {/* Badge */}
           <div className="inline-flex items-center gap-2 glass-card rounded-full px-5 py-2 text-sm text-zinc-400 mb-10 border-primary/20">
-            <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+            <span className="w-2 h-2 bg-primary rounded-full" />
             Invitaciones disponibles — entrada gratuita
           </div>
 
           {/* Título */}
-          <h1 className="font-display text-7xl sm:text-8xl md:text-9xl mb-4 tracking-wide leading-none uppercase">
-            <span className="gradient-text">Eventos</span>
+          <h1 className="font-sans text-5xl sm:text-6xl md:text-7xl mb-8 tracking-wide leading-tight uppercase font-bold">
+            <span className="gradient-text">Eventos y Reservas</span>
           </h1>
-          <h2 className="font-display text-4xl sm:text-5xl text-white tracking-widest mb-8 uppercase">
-            Monkey Restobar
-          </h2>
 
           <div className="jungle-divider max-w-sm mx-auto mb-8" />
 
@@ -84,7 +81,7 @@ export default async function Home() {
                   <Link
                     key={evento.id}
                     href={agotado ? '#' : `/${evento.slug}`}
-                    className={`group block animate-slide-up ${agotado ? 'pointer-events-none' : ''}`}
+                    className={`group block ${agotado ? 'pointer-events-none' : ''}`}
                   >
                     {/* Card tipo poster vertical 9:16 */}
                     <div className="relative rounded-2xl overflow-hidden bg-black" style={{ aspectRatio: '9/16' }}>
@@ -95,7 +92,9 @@ export default async function Home() {
                           src={evento.imagenUrl}
                           alt={evento.nombre}
                           fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-700"
+                          quality={100}
+                          className="object-cover"
+                          style={{ filter: 'contrast(1.1) saturate(1.05)' }}
                           sizes="(max-width: 768px) 50vw, 33vw"
                         />
                       ) : (
@@ -117,11 +116,8 @@ export default async function Home() {
                         )}
                       </div>
 
-                      {/* Overlay degradado fuerte abajo */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-
                       {/* Info superpuesta en la parte inferior */}
-                      <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 z-10">
+                      <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 z-10 bg-black/60 backdrop-blur-sm">
                         <h2 className="font-display text-sm md:text-lg text-white tracking-wide uppercase leading-tight mb-1 line-clamp-2">
                           {evento.nombre}
                         </h2>
@@ -134,7 +130,7 @@ export default async function Home() {
                         <div className="mb-3">
                           <div className="h-1 bg-white/10 rounded-full overflow-hidden">
                             <div
-                              className="h-full rounded-full transition-all duration-500"
+                              className="h-full rounded-full"
                               style={{
                                 width: `${porcentaje}%`,
                                 background: porcentaje > 80
@@ -146,10 +142,10 @@ export default async function Home() {
                         </div>
 
                         <div
-                          className={`w-full text-center font-display text-xs md:text-sm py-2 px-3 rounded-xl tracking-wider uppercase transition-all duration-300 ${
+                          className={`w-full text-center font-display text-xs md:text-sm py-2 px-3 rounded-xl tracking-wider uppercase ${
                             agotado
                               ? 'bg-zinc-800/70 text-zinc-600'
-                              : 'bg-primary text-black group-hover:bg-yellow-400'
+                              : 'bg-primary text-black'
                           }`}
                         >
                           {agotado ? 'Sin cupos' : 'Ver invitación →'}

@@ -14,8 +14,9 @@ const puntosSchema = z.object({
 // POST /api/admin/socios/[id]/puntos — sumar o restar puntos (protegido por middleware)
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     const body = await req.json()
     const { puntos, motivo } = puntosSchema.parse(body)
@@ -23,7 +24,7 @@ export async function POST(
     const [socio] = await db
       .select()
       .from(socios)
-      .where(eq(socios.id, params.id))
+      .where(eq(socios.id, id))
       .limit(1)
 
     if (!socio) return NextResponse.json({ error: 'Socio no encontrado.' }, { status: 404 })
@@ -34,11 +35,11 @@ export async function POST(
     const [actualizado] = await db
       .update(socios)
       .set({ puntos: nuevosPuntos, nivel: nuevoNivel, updatedAt: new Date() })
-      .where(eq(socios.id, params.id))
+      .where(eq(socios.id, id))
       .returning()
 
     await db.insert(movimientosPuntos).values({
-      socioId: params.id,
+      socioId: id,
       puntos,
       motivo,
       operadorNombre: 'admin',

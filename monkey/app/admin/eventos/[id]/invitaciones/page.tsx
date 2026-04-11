@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 
 interface Props {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 const estadoStyles = {
@@ -25,10 +25,11 @@ function formatFecha(fecha: Date) {
 export const revalidate = 0
 
 export default async function InvitacionesPage({ params }: Props) {
+  const { id } = await params
   const [evento] = await db
     .select()
     .from(eventos)
-    .where(eq(eventos.id, params.id))
+    .where(eq(eventos.id, id))
     .limit(1)
 
   if (!evento) notFound()
@@ -36,7 +37,7 @@ export default async function InvitacionesPage({ params }: Props) {
   const lista = await db
     .select()
     .from(invitaciones)
-    .where(eq(invitaciones.eventoId, params.id))
+    .where(eq(invitaciones.eventoId, id))
     .orderBy(desc(invitaciones.createdAt))
 
   const stats = {
@@ -50,7 +51,7 @@ export default async function InvitacionesPage({ params }: Props) {
     <div className="max-w-5xl mx-auto px-4 py-10">
       {/* Header */}
       <div className="flex items-center gap-4 mb-2">
-        <Link href={`/admin/eventos/${params.id}`} className="text-slate-400 hover:text-white text-sm transition-colors">
+        <Link href={`/admin/eventos/${id}`} className="text-slate-400 hover:text-white text-sm transition-colors">
           ← Editar evento
         </Link>
       </div>

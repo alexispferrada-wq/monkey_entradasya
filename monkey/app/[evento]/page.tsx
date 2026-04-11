@@ -9,7 +9,7 @@ import ColorExtractor from './ColorExtractor'
 export const revalidate = 0
 
 interface Props {
-  params: { evento: string }
+  params: Promise<{ evento: string }>
 }
 
 function formatFechaCompleta(fecha: Date): string {
@@ -24,10 +24,11 @@ function formatFechaCompleta(fecha: Date): string {
 }
 
 export default async function EventoPage({ params }: Props) {
+  const { evento: eventoSlug } = await params
   const [evento] = await db
     .select()
     .from(eventos)
-    .where(eq(eventos.slug, params.evento))
+    .where(eq(eventos.slug, eventoSlug))
     .limit(1)
 
   if (!evento || !evento.activo) notFound()

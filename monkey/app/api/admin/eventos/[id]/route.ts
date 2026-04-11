@@ -6,8 +6,9 @@ import { eq, count, and, sql } from 'drizzle-orm'
 import { eventoUpdateSchema } from '@/lib/schemas'
 import { handleError } from '@/lib/errors'
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
-  const [evento] = await db.select().from(eventos).where(eq(eventos.id, params.id)).limit(1)
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const [evento] = await db.select().from(eventos).where(eq(eventos.id, id)).limit(1)
   if (!evento) return NextResponse.json({ success: false, error: { code: 'NOT_FOUND', message: 'No encontrado.' } }, { status: 404 })
 
   const [{ total, usadas }] = await db
@@ -16,12 +17,13 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
       usadas: sql`count(*) FILTER (WHERE ${invitaciones.estado} = 'usada')`,
     })
     .from(invitaciones)
-    .where(eq(invitaciones.eventoId, params.id))
+    .where(eq(invitaciones.eventoId, id))
 
   return NextResponse.json({ ...evento, totalInvitaciones: total, usadas })
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   try {
     const body = await req.json()
     const validated = eventoUpdateSchema.parse(body)
@@ -40,7 +42,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     const [updated] = await db
       .update(eventos)
       .set(updateData)
-      .where(eq(eventos.id, params.id))
+      .where(eq(eventos.id, id))
       .returning()
 
     return NextResponse.json(updated)
@@ -49,7 +51,21 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
-  await db.delete(eventos).where(eq(eventos.id, params.id))
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const body = await req.formData()
+  const method = body.get('_method')
+
+  if (method === 'delete') {
+    await db.delete(eventos).where(eq(eventos.id, id))
+    return NextResponse.redirect(new URL('/admin', req.url))
+  }
+
+  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 })
+}
+
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  await db.delete(eventos).where(eq(eventos.id, id))
   return NextResponse.json({ ok: true })
 }
