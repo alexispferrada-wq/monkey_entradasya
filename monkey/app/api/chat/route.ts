@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { db } from '@/lib/db'
-import { eventos } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { eventos, chatbotDocs } from '@/lib/db/schema'
+import { eq, asc } from 'drizzle-orm'
 import { Resend } from 'resend'
-import { buildSystemPrompt } from '@/lib/chatbot/system-prompt'
-import { RESTAURANT_INFO } from '@/lib/chatbot/knowledge'
+import { buildSystemPromptFromDocs } from '@/lib/chatbot/system-prompt'
 
 export const dynamic = 'force-dynamic'
 
@@ -60,10 +59,12 @@ async function enviarEmailReserva(reserva: {
   </div>
 </body></html>`
 
+  const emailReservas = process.env.RESERVAS_EMAIL || 'reservas@monkeyrestobar.cl'
+
   // Email al restaurante
   await resend.emails.send({
     from: 'Chatbot Monkey <invitaciones@entradasya.cl>',
-    to: RESTAURANT_INFO.email_reservas,
+    to: emailReservas,
     subject: `🐒 Nueva reserva: ${reserva.nombre} — ${reserva.fecha} ${reserva.hora} (${reserva.personas}p)`,
     html: htmlRestaurant,
   })
@@ -88,7 +89,7 @@ async function enviarEmailReserva(reserva: {
       Recibimos tu solicitud de reserva. Nuestro equipo la confirmará a la brevedad.<br><br>
       ¿Dudas? Escríbenos por WhatsApp:
     </p>
-    <a href="https://wa.me/${RESTAURANT_INFO.whatsapp.replace(/\D/g, '')}"
+    <a href="https://wa.me/${(process.env.WHATSAPP_NUMBER || '56912345678').replace(/\D/g, '')}"
        style="background:#F5C200;color:#000;text-decoration:none;padding:12px 32px;border-radius:10px;font-weight:900;display:inline-block;margin-top:8px;letter-spacing:1px;">
       CONTACTAR POR WHATSAPP
     </a>
@@ -115,19 +116,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Mensajes inválidos' }, { status: 400 })
     }
 
-    // Fetch active events for context
+    // Fetch active events and chatbot docs in parallel
     let eventosActivos: Array<{ nombre: string; fecha: Date; slug: string; cuposDisponibles: number }> = []
+    let knowledgeDocs: Awaited<ReturnType<typeof db.select>>  = []
     try {
-      eventosActivos = await db
-        .select({ nombre: eventos.nombre, fecha: eventos.fecha, slug: eventos.slug, cuposDisponibles: eventos.cuposDisponibles })
-        .from(eventos)
-        .where(eq(eventos.activo, true))
-        .orderBy(eventos.fecha)
+      const [evts, docs] = await Promise.all([
+        db.select({ nombre: eventos.nombre, fecha: eventos.fecha, slug: eventos.slug, cuposDisponibles: eventos.cuposDisponibles })
+          .from(eventos).where(eq(eventos.activo, true)).orderBy(eventos.fecha),
+        db.select().from(chatbotDocs).orderBy(asc(chatbotDocs.orden)),
+      ])
+      eventosActivos = evts
+      knowledgeDocs = docs
     } catch {
-      // If DB fails, proceed without event context
+      // If DB fails, proceed with empty context
     }
 
-    const systemPrompt = buildSystemPrompt(eventosActivos)
+    const systemPrompt = buildSystemPromptFromDocs(knowledgeDocs as Parameters<typeof buildSystemPromptFromDocs>[0], eventosActivos)
 
     // Validate messages structure
     const validMessages: Anthropic.MessageParam[] = messages

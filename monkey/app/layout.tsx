@@ -92,8 +92,8 @@ export default function RootLayout({
           {children}
         </main>
 
-        {/* Chatbot flotante */}
-        <ChatWidget />
+        {/* Chatbot flotante — desactivado temporalmente mientras se carga el contenido */}
+        {/* <ChatWidget /> */}
 
       </body>
     </html>

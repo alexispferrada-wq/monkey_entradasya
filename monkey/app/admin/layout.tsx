@@ -15,6 +15,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <a href="/admin/eventos/nuevo" className="text-zinc-500 hover:text-primary transition-colors tracking-wide">
               + Nuevo evento
             </a>
+            <a href="/admin/chatbot" className="text-zinc-500 hover:text-primary transition-colors tracking-wide">
+              🤖 Chatbot
+            </a>
             <a href="/" target="_blank" className="text-zinc-700 hover:text-zinc-400 transition-colors text-xs tracking-wide">
               Ver sitio ↗
             </a>

@@ -1,96 +1,79 @@
-import { RESTAURANT_INFO, MENU, POLITICAS_RESERVAS, FAQ } from './knowledge'
+import type { ChatbotDoc } from '@/lib/db/schema'
 
-export function buildSystemPrompt(eventosActivos?: Array<{ nombre: string; fecha: Date; slug: string; cuposDisponibles: number }>) {
-  const hoy = new Date().toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+export function buildSystemPromptFromDocs(
+  docs: ChatbotDoc[],
+  eventosActivos?: Array<{ nombre: string; fecha: Date; slug: string; cuposDisponibles: number }>
+) {
+  const hoy = new Date().toLocaleDateString('es-CL', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  })
 
+  // Get whatsapp from info_general doc
+  const infoDoc = docs.find(d => d.clave === 'info_general')
+  const whatsappMatch = infoDoc?.contenido.match(/WhatsApp:\s*([+\d\s]+)/)
+  const whatsapp = whatsappMatch?.[1]?.trim().replace(/\D/g, '') || '56912345678'
+
+  // Build events context
   const eventosTexto = eventosActivos && eventosActivos.length > 0
     ? eventosActivos.map(e => {
         const fecha = new Date(e.fecha).toLocaleDateString('es-CL', {
           weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
           hour: '2-digit', minute: '2-digit',
         })
-        return `  - ${e.nombre} | ${fecha} | ${e.cuposDisponibles} cupos disponibles | Invitación: monkey.entradasya.cl/${e.slug}`
+        return `  - ${e.nombre} | ${fecha} | ${e.cuposDisponibles} cupos | Invitación: monkey.entradasya.cl/${e.slug}`
       }).join('\n')
     : '  (No hay eventos activos en este momento)'
 
-  const menuTexto = [
-    '🍹 COCTELERÍA:',
-    ...MENU.cocteleria.map(i => `  - ${i.nombre} ${i.precio}: ${i.descripcion}`),
-    '',
-    '🍺 CERVEZAS Y VINOS:',
-    ...MENU.cervezas_y_vinos.map(i => `  - ${i.nombre}: ${i.precio}`),
-    '',
-    '🍽️ TABLAS PARA COMPARTIR:',
-    ...MENU.tabla_para_compartir.map(i => `  - ${i.nombre} ${i.precio}: ${i.descripcion}`),
-    '',
-    '🥩 PLATOS PRINCIPALES:',
-    ...MENU.platos_principales.map(i => `  - ${i.nombre} ${i.precio}: ${i.descripcion}`),
-    '',
-    '🥤 SIN ALCOHOL:',
-    ...MENU.sin_alcohol.map(i => `  - ${i.nombre}: ${i.precio}`),
-  ].join('\n')
+  // Group active docs by category for the prompt
+  const activeDocs = docs.filter(d => d.activo)
 
-  const faqTexto = FAQ.map(f => `P: ${f.pregunta}\nR: ${f.respuesta}`).join('\n\n')
+  const sections = [
+    { key: 'info',      label: 'INFORMACIÓN GENERAL' },
+    { key: 'ambiente',  label: 'AMBIENTES DEL LOCAL' },
+    { key: 'horarios',  label: 'HORARIOS' },
+    { key: 'template',  label: 'RESPUESTAS PREDEFINIDAS (usa estas palabras cuando aplique)' },
+    { key: 'reservas',  label: 'POLÍTICAS DE RESERVAS' },
+    { key: 'menu',      label: 'MENÚ' },
+    { key: 'faq',       label: 'PREGUNTAS FRECUENTES' },
+  ]
 
-  const horariosTexto = Object.entries(RESTAURANT_INFO.horarios)
-    .map(([dia, hora]) => `  ${dia.charAt(0).toUpperCase() + dia.slice(1)}: ${hora}`)
-    .join('\n')
+  const knowledgeSections = sections.map(({ key, label }) => {
+    const catDocs = activeDocs.filter(d => d.categoria === key)
+    if (catDocs.length === 0) return null
+    const content = catDocs.map(d => `### ${d.titulo}\n${d.contenido}`).join('\n\n')
+    return `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${label}:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${content}`
+  }).filter(Boolean).join('\n\n')
 
-  return `Eres el asistente virtual de ${RESTAURANT_INFO.nombre}, un exclusivo restobar en Santiago de Chile.
-Tu nombre es "Mono" y usas un tono amigable, cálido y con personalidad — eres como el anfitrión del bar.
-Respondes SIEMPRE en español chileno (puedes usar expresiones locales) y eres conciso pero útil.
+  return `Eres el asistente virtual de Monkey Restobar, un exclusivo restobar en Santiago de Chile.
+Tu nombre es "Mono" y usas un tono amigable, cálido y con personalidad — como el anfitrión del bar.
+Respondes SIEMPRE en español chileno y eres conciso pero útil. Puedes usar emojis de forma moderada.
 Hoy es ${hoy}.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-INFORMACIÓN DEL RESTAURANTE:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Nombre: ${RESTAURANT_INFO.nombre}
-Dirección: ${RESTAURANT_INFO.direccion}
-WhatsApp: ${RESTAURANT_INFO.whatsapp}
-Descripción: ${RESTAURANT_INFO.descripcion}
+${knowledgeSections}
 
-HORARIOS:
-${horariosTexto}
-
-${RESTAURANT_INFO.politicas_generales}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-EVENTOS PRÓXIMOS:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EVENTOS PRÓXIMOS CON INVITACIÓN:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${eventosTexto}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-MENÚ:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${menuTexto}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-POLÍTICA DE RESERVAS:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${POLITICAS_RESERVAS}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-PREGUNTAS FRECUENTES:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${faqTexto}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 INSTRUCCIONES DE COMPORTAMIENTO:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. Si alguien quiere RESERVAR UNA MESA, usa la herramienta "crear_reserva" para recopilar y confirmar la reserva.
-   Necesitas: nombre completo, fecha deseada, hora, número de personas, teléfono o correo de contacto.
-   Si el usuario te da todos los datos en un solo mensaje, úsalos directamente sin volver a preguntar.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. RESERVAS: Cuando alguien quiera reservar, usa la herramienta "crear_reserva".
+   Necesitas: nombre completo, fecha, hora, número de personas, y teléfono o correo de contacto.
+   Si tienes template predefinido para ese tipo de reserva (cumpleaños, lounge, etc.), úsalo como base.
 
-2. Si alguien quiere HABLAR CON UN HUMANO, dales el WhatsApp: ${RESTAURANT_INFO.whatsapp}
-   Puedes generar el link directo: https://wa.me/${RESTAURANT_INFO.whatsapp.replace(/\D/g, '')}
+2. Si el cliente menciona CUMPLEAÑOS, usa el template de cumpleaños.
+   Si pregunta por el LOUNGE, usa el template del lounge.
+   Adapta los templates al contexto de la conversación.
 
-3. Para INVITACIONES a eventos, dirígelos a monkey.entradasya.cl
+3. HUMANO: Si alguien quiere hablar con una persona, dales el WhatsApp: https://wa.me/${whatsapp}
 
-4. Sé BREVE: respuestas de máximo 3-4 oraciones, salvo que pidan el menú completo.
+4. INVITACIONES a eventos especiales: dirígelos a monkey.entradasya.cl
 
-5. NO inventes información que no esté aquí. Si no sabes algo, ofrece derivar a WhatsApp.
+5. Sé BREVE: máximo 3-4 párrafos por respuesta, salvo que pidan el menú completo.
 
-6. Cuando muestres el menú, usa un formato legible con emojis y precios claros.
+6. NO inventes información. Si no sabes algo, ofrece derivar a WhatsApp.
 
-7. Si la persona está enojada o tiene un reclamo serio, ofrece inmediatamente el contacto humano.`
+7. Si hay reclamos o problemas serios, ofrece WhatsApp de inmediato.`
 }

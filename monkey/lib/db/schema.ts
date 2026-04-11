@@ -77,6 +77,23 @@ export const invitaciones = pgTable('invitaciones', {
   usedAt: timestamp('used_at'),
 })
 
+// ============================================================
+// CHATBOT — base de conocimiento editable desde el admin
+// ============================================================
+export const chatbotDocs = pgTable('chatbot_docs', {
+  id:        uuid('id').defaultRandom().primaryKey(),
+  clave:     text('clave').unique().notNull(),     // ej: 'ambiente_lounge', 'template_reservas'
+  categoria: text('categoria').notNull(),          // 'ambiente' | 'reservas' | 'template' | 'horarios' | 'info' | 'faq'
+  titulo:    text('titulo').notNull(),
+  contenido: text('contenido').notNull(),
+  activo:    boolean('activo').default(true).notNull(),
+  orden:     integer('orden').default(0).notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
+
+export type ChatbotDoc    = typeof chatbotDocs.$inferSelect
+export type NuevoChatbotDoc = typeof chatbotDocs.$inferInsert
+
 export const eventosRelations = relations(eventos, ({ many }) => ({
   invitaciones: many(invitaciones),
 }))

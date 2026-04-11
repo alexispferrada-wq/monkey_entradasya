@@ -16,7 +16,8 @@
     "db:generate": "dotenv -e .env.local -- drizzle-kit generate",
     "db:seed": "dotenv -e .env.local -- tsx lib/db/seed.ts",
     "db:seed-selena": "dotenv -e .env.local -- tsx lib/db/seed-selena.ts",
-    "db:reset": "dotenv -e .env.local -- tsx lib/db/reset.ts"
+    "db:reset": "dotenv -e .env.local -- tsx lib/db/reset.ts",
+    "db:seed-chatbot": "dotenv -e .env.local -- tsx lib/db/seed-chatbot.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.88.0",
