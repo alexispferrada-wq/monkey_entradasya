@@ -26,7 +26,8 @@ export default function LoginForm() {
       router.refresh()
     } else {
       const data = await res.json()
-      setError(data.error || 'Error al iniciar sesión.')
+      const errorMessage = typeof data.error === 'string' ? data.error : data.error?.message || 'Error al iniciar sesión.'
+      setError(errorMessage)
       setLoading(false)
     }
   }

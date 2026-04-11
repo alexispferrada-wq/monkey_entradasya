@@ -6,10 +6,8 @@ export const metadata: Metadata = {
   title: 'Monkey Restobar — Invitaciones',
   description: 'Solicita tu invitación gratuita para los eventos de Monkey Restobar.',
   manifest: '/manifest.json',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'Monkey Scanner',
+  other: {
+    'mobile-web-app-capable': 'yes',
   },
   icons: {
     apple: '/icons/icon-192.png',
