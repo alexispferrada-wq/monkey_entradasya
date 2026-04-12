@@ -1,14 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   outputFileTracingRoot: __dirname,
+  // Disable source maps in production to avoid leaking implementation details
+  productionBrowserSourceMaps: false,
   // Enable gzip/brotli compression on all responses
   compress: true,
+  // Optimize web fonts (subset, preload)
+  optimizeFonts: true,
   logging: {
     fetches: {
       fullUrl: true,
     },
   },
   images: {
+    // Serve modern formats — browser picks best supported
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       { protocol: 'https', hostname: 'res.cloudinary.com' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
@@ -28,11 +34,28 @@ const nextConfig = {
     ]
   },
 
+  /**
+   * HTTPS redirect: force all HTTP traffic to HTTPS in production.
+   * No-op in local dev (http://localhost is fine).
+   */
+  async redirects() {
+    if (process.env.NODE_ENV !== 'production') return []
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'header', key: 'x-forwarded-proto', value: 'http' }],
+        destination: 'https://:path*',
+        permanent: true,
+      },
+    ]
+  },
+
   async headers() {
     const csp = [
       "default-src 'self'",
-      // Next.js App Router requires unsafe-inline for hydration scripts
-      "script-src 'self' 'unsafe-inline'",
+      // Next.js App Router requires unsafe-inline for hydration scripts.
+      // cdn.jsdelivr.net is needed for jsQR (QR scanner library loaded at runtime).
+      "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com",
       // API calls (Groq/Resend/Cloudinary) are server-side only; client only calls 'self'
@@ -54,6 +77,13 @@ const nextConfig = {
       { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
     ]
 
+    // CORS headers for public API endpoints (invitations, chat, socios)
+    const corsHeaders = [
+      { key: 'Access-Control-Allow-Origin', value: '*' },
+      { key: 'Access-Control-Allow-Methods', value: 'GET, POST, OPTIONS' },
+      { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
+    ]
+
     return [
       {
         source: '/sw.js',
@@ -62,6 +92,12 @@ const nextConfig = {
           { key: 'Service-Worker-Allowed', value: ' /' },
         ],
       },
+      // CORS for public-facing API routes only
+      {
+        source: '/api/(invitaciones|chat|socios)/:path*',
+        headers: corsHeaders,
+      },
+      // Security headers on all routes
       {
         source: '/(.*)',
         headers: securityHeaders,

@@ -9,13 +9,40 @@ interface Props {
 
 type Estado = 'idle' | 'loading' | 'success' | 'error' | 'duplicado'
 
+// Client-side field validation (mirrors server Zod schema for instant feedback)
+function validateNombre(v: string): string {
+  if (!v.trim()) return 'Ingresa tu nombre'
+  if (v.trim().length < 2) return 'Mínimo 2 caracteres'
+  if (v.trim().length > 100) return 'Máximo 100 caracteres'
+  return ''
+}
+
+function validateEmail(v: string): string {
+  if (!v.trim()) return 'Ingresa tu correo'
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return 'Correo inválido'
+  // Warn about common disposable domains (non-exhaustive, just UX hint)
+  const domain = v.split('@')[1]?.toLowerCase() ?? ''
+  const warnDomains = ['mailinator.com', 'guerrillamail.com', 'yopmail.com', 'tempmail.com', 'trashmail.com', 'maildrop.cc']
+  if (warnDomains.includes(domain)) return 'No se permiten correos temporales'
+  return ''
+}
+
 export default function InvitacionForm({ eventoId, eventoNombre }: Props) {
   const [nombre, setNombre] = useState('')
   const [email, setEmail] = useState('')
   const [estado, setEstado] = useState<Estado>('idle')
   const [mensaje, setMensaje] = useState('')
+  // Field-level validation errors (shown only after the field has been touched)
+  const [touched, setTouched] = useState({ nombre: false, email: false })
+
+  const nombreError = touched.nombre ? validateNombre(nombre) : ''
+  const emailError  = touched.email  ? validateEmail(email)   : ''
+  const hasFieldErrors = !!validateNombre(nombre) || !!validateEmail(email)
 
   async function handleSubmit(e: React.FormEvent) {
+    // Mark all fields as touched to surface any errors
+    setTouched({ nombre: true, email: true })
+    if (hasFieldErrors) { e.preventDefault(); return }
     e.preventDefault()
     setEstado('loading')
 
@@ -80,12 +107,20 @@ export default function InvitacionForm({ eventoId, eventoNombre }: Props) {
           type="text"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
+          onBlur={() => setTouched(t => ({ ...t, nombre: true }))}
           placeholder="Ej: María González"
           required
           minLength={2}
-          className="input-glass"
+          className={`input-glass transition-colors ${nombreError ? 'border-rose-500/60 focus:border-rose-500' : nombre && !nombreError ? 'border-green-500/40' : ''}`}
           disabled={estado === 'loading'}
+          aria-invalid={!!nombreError}
+          aria-describedby={nombreError ? 'nombre-error' : undefined}
         />
+        {nombreError && (
+          <p id="nombre-error" className="text-rose-400 text-xs mt-1 animate-fade-in">
+            {nombreError}
+          </p>
+        )}
       </div>
 
       <div>
@@ -96,14 +131,23 @@ export default function InvitacionForm({ eventoId, eventoNombre }: Props) {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          onBlur={() => setTouched(t => ({ ...t, email: true }))}
           placeholder="tu@correo.com"
           required
-          className="input-glass"
+          className={`input-glass transition-colors ${emailError ? 'border-rose-500/60 focus:border-rose-500' : email && !emailError ? 'border-green-500/40' : ''}`}
           disabled={estado === 'loading'}
+          aria-invalid={!!emailError}
+          aria-describedby={emailError ? 'email-error' : undefined}
         />
-        <p className="text-slate-600 text-xs mt-1">
-          Tu invitación con QR llegará a este correo
-        </p>
+        {emailError ? (
+          <p id="email-error" className="text-rose-400 text-xs mt-1 animate-fade-in">
+            {emailError}
+          </p>
+        ) : (
+          <p className="text-slate-600 text-xs mt-1">
+            Tu invitación con QR llegará a este correo
+          </p>
+        )}
       </div>
 
       {(estado === 'error' || estado === 'duplicado') && (

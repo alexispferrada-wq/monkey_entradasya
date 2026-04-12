@@ -35,6 +35,15 @@ export default function ScannerClient() {
   const [resultado, setResultado] = useState<ResultadoScan>(null)
   const [error, setError] = useState('')
   const [scanCount, setScanCount] = useState(0)
+  const [sessionSeconds, setSessionSeconds] = useState(0)
+
+  // Session timer — ticks every second from component mount
+  useEffect(() => {
+    const interval = setInterval(() => setSessionSeconds(s => s + 1), 1000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const sessionTime = `${String(Math.floor(sessionSeconds / 60)).padStart(2, '0')}:${String(sessionSeconds % 60).padStart(2, '0')}`
 
   // Cargar jsQR desde CDN
   useEffect(() => {
@@ -138,7 +147,7 @@ export default function ScannerClient() {
       <div className="glass border-b border-white/5 px-4 py-3 flex items-center justify-between sticky top-0 z-10" style={{top: '64px'}}>
         <div>
           <p className="text-sm font-bold text-white">Modo Anfitrión</p>
-          <p className="text-xs text-slate-500">{scanCount} escaneados hoy</p>
+          <p className="text-xs text-slate-500">{scanCount} escaneados · Sesión {sessionTime}</p>
         </div>
         <div className="flex items-center gap-2">
           <span className={`w-2 h-2 rounded-full ${estado === 'scanning' ? 'bg-green-400 animate-pulse' : 'bg-slate-600'}`} />
