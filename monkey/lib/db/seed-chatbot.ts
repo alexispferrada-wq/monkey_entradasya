@@ -197,9 +197,43 @@ Contáctanos por WhatsApp para coordinar.`,
     categoria: 'faq',
     titulo: 'FAQ: ¿Tienen menú de comida y tragos?',
     orden: 43,
-    contenido: `Sí, contamos con carta de coctelería, cervezas, vinos y platos para compartir.
-(Completar con el menú real cuando esté disponible)
-Para conocer los precios actuales, consulta en el local o por WhatsApp.`,
+    contenido: `Sí, contamos con carta de coctelería, cervezas, vinos, grill y platos para compartir.
+Los precios están disponibles en nuestra carta — abajo te damos una idea de los valores aproximados.`,
+  },
+
+  // ──────────────────────────────────────────
+  // MENÚ CON PRECIOS (actualizar con precios reales)
+  // ──────────────────────────────────────────
+  {
+    clave: 'menu_precios',
+    categoria: 'menu',
+    titulo: 'Carta y precios',
+    orden: 50,
+    contenido: `CARTA MONKEY RESTOBAR — PRECIOS APROXIMADOS
+(Actualizar con los precios reales del local)
+
+🍺 CERVEZAS Y BEBESTIBLES:
+- Cerveza en lata / botella (330ml): $2.500 – $3.000
+- Cerveza artesanal / porrón (500ml): $4.000 – $5.000
+- Jarro de cerveza (1L): $7.000 – $9.000
+- Copa de vino tinto / blanco: $4.000
+- Botella de vino: desde $18.000
+- Agua mineral: $1.500 – $2.000
+- Bebidas / jugos: $2.000 – $3.000
+
+🍹 COCTELERÍA:
+- Pisco sour / sours en general: $5.000 – $6.500
+- Cocteles de autor (Monkey Sour, Jungle Mojito, etc.): $6.000 – $7.500
+- Trago doble / largo: $7.000 – $9.000
+
+🔥 GRILL / PLATOS PRINCIPALES:
+- Hamburguesa completa con papas: $10.000 – $12.000
+- Costillar BBQ con acompañamiento: $15.000 – $18.000
+- Picoteo / tabla para compartir (2-4 personas): $12.000 – $16.000
+- Anticuchos o brochetas (porción): $8.000 – $10.000
+- Ensaladas / entradas: $5.000 – $8.000
+
+⚠️ Nota: Precios referenciales. Para la carta exacta del día, consulta al llegar o por WhatsApp.`,
   },
 ]
 
