@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { socios } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
+import { isDisposableEmail } from '@/lib/email-validation'
 
 const crearSocioSchema = z.object({
   nombre: z.string().min(2).max(100),
@@ -17,6 +18,13 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { nombre, email, telefono } = crearSocioSchema.parse(body)
     const emailNorm = email.toLowerCase()
+
+    if (isDisposableEmail(emailNorm)) {
+      return NextResponse.json(
+        { error: 'No se permiten correos temporales o descartables.' },
+        { status: 400 }
+      )
+    }
 
     const [existente] = await db
       .select({ id: socios.id })

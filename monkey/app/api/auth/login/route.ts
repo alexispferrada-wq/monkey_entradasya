@@ -1,15 +1,21 @@
 export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
-import { SignJWT } from 'jose'
 import { ZodError } from 'zod'
 import { loginSchema } from '@/lib/schemas'
 import { verifyPassword } from '@/lib/auth'
 import { handleError, ValidationError } from '@/lib/errors'
+import {
+  signAccessToken,
+  signRefreshToken,
+  hashUserAgent,
+  ACCESS_COOKIE_OPTIONS,
+  REFRESH_COOKIE_OPTIONS,
+} from '@/lib/auth-tokens'
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    
+
     // Validate input
     const { usuario, password } = loginSchema.parse(body)
 
@@ -43,21 +49,17 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Generate JWT token
-    const secret = new TextEncoder().encode(process.env.ADMIN_JWT_SECRET!)
-    const token = await new SignJWT({ user: usuario })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setExpirationTime('4h')
-      .sign(secret)
+    // Fingerprint de User-Agent para detección de sesiones sospechosas
+    const ua = req.headers.get('user-agent') || ''
+    const uaHash = await hashUserAgent(ua)
+
+    // Access token: 15 min; Refresh token: 7 días
+    const accessToken = await signAccessToken(usuario, uaHash)
+    const { token: refreshToken } = await signRefreshToken(usuario, uaHash)
 
     const res = NextResponse.json({ ok: true })
-    res.cookies.set('admin_token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 4, // 4 horas
-      path: '/',
-    })
+    res.cookies.set('admin_token', accessToken, ACCESS_COOKIE_OPTIONS)
+    res.cookies.set('admin_refresh_token', refreshToken, REFRESH_COOKIE_OPTIONS)
     return res
   } catch (error) {
     if (error instanceof ValidationError) {

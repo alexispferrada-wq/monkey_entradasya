@@ -8,6 +8,7 @@ import { enviarInvitacion } from '@/lib/email'
 import QRCode from 'qrcode'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
+import { isDisposableEmail } from '@/lib/email-validation'
 
 const invitacionSchema = z.object({
   eventoId: z.string().uuid(),
@@ -26,6 +27,14 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { eventoId, nombre, email } = invitacionSchema.parse(body)
     const emailNorm = email.toLowerCase()
+
+    if (isDisposableEmail(emailNorm)) {
+      return NextResponse.json(
+        { error: 'No se permiten correos temporales o descartables.' },
+        { status: 400 }
+      )
+    }
+
     const isTestEmail = TEST_EMAILS.includes(emailNorm)
 
     // 1. Verificar que el evento existe y está activo
