@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { invitaciones, eventos } from '@/lib/db/schema'
-import { eq, and, or } from 'drizzle-orm'
+import { eq, and, or, gt, sql } from 'drizzle-orm'
 import { uploadQR, cloudinary } from '@/lib/cloudinary'
 import { enviarInvitacion } from '@/lib/email'
 import QRCode from 'qrcode'
@@ -97,12 +97,21 @@ export async function POST(req: NextRequest) {
       })
       .returning()
 
-    // 6. Decrementar cupos (no aplica a emails de prueba)
+    // 6. Decrementar cupos de forma atómica (no aplica a emails de prueba)
+    // WHERE cuposDisponibles > 0 previene race conditions con requests simultáneas
     if (!isTestEmail) {
-      await db
+      const [eventoActualizado] = await db
         .update(eventos)
-        .set({ cuposDisponibles: evento.cuposDisponibles - 1 })
-        .where(eq(eventos.id, eventoId))
+        .set({ cuposDisponibles: sql`${eventos.cuposDisponibles} - 1` })
+        .where(and(eq(eventos.id, eventoId), gt(eventos.cuposDisponibles, 0)))
+        .returning({ cuposDisponibles: eventos.cuposDisponibles })
+
+      if (!eventoActualizado) {
+        // Otro request tomó el último cupo entre nuestra verificación y este update
+        await db.delete(invitaciones).where(eq(invitaciones.id, nuevaInvitacion.id))
+        if (qrPubId) cloudinary.uploader.destroy(qrPubId, { resource_type: 'image' }).catch(() => {})
+        return NextResponse.json({ error: 'No hay cupos disponibles para este evento.' }, { status: 409 })
+      }
     }
 
     // 7. Enviar email

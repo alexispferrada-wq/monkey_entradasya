@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm'
 import Image from 'next/image'
 import Link from 'next/link'
 
-export const revalidate = 0
+export const revalidate = 60
 
 function formatFecha(fecha: Date): string {
   return new Date(fecha).toLocaleDateString('es-CL', {

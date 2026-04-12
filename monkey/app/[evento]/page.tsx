@@ -6,7 +6,8 @@ import Image from 'next/image'
 import InvitacionForm from './InvitacionForm'
 import ColorExtractor from './ColorExtractor'
 
-export const revalidate = 0
+// Revalidar cada 60s: reduce queries a la DB manteniendo datos frescos
+export const revalidate = 60
 
 interface Props {
   params: Promise<{ evento: string }>

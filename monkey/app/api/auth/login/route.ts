@@ -15,44 +15,28 @@ export async function POST(req: NextRequest) {
 
     const adminUser = process.env.ADMIN_USER
     const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH
-    const adminPassword = process.env.ADMIN_PASSWORD
+    // Fallback de solo desarrollo: ADMIN_PASSWORD solo funciona fuera de producción
+    const adminPassword = process.env.NODE_ENV !== 'production' ? process.env.ADMIN_PASSWORD : undefined
 
-    if (!adminUser) {
-      console.error('ADMIN_USER env var not configured')
+    if (!adminUser || (!adminPasswordHash && !adminPassword)) {
+      console.error('ADMIN_USER y ADMIN_PASSWORD_HASH son requeridos en producción')
       return NextResponse.json(
         { error: 'Configuración de servidor incompleta' },
         { status: 500 }
       )
     }
 
-    if (!adminPasswordHash && !adminPassword) {
-      console.error('Neither ADMIN_PASSWORD_HASH nor ADMIN_PASSWORD env vars configured')
-      return NextResponse.json(
-        { error: 'Configuración de servidor incompleta' },
-        { status: 500 }
-      )
-    }
-
-    // Check username
-    if (usuario !== adminUser) {
-      return NextResponse.json(
-        { error: 'Credenciales incorrectas' },
-        { status: 401 }
-      )
-    }
-
-    // Check password
+    // Validar usuario y contraseña sin revelar cuál falló (evitar enumeración)
+    const usuarioValido = usuario === adminUser
     let passwordValid = false
-    
+
     if (adminPasswordHash) {
-      // Use bcrypt-hashed password (recommended)
-      passwordValid = await verifyPassword(password, adminPasswordHash)
+      passwordValid = usuarioValido && await verifyPassword(password, adminPasswordHash)
     } else if (adminPassword) {
-      // Fall back to plain-text password (temporary, for migration)
-      passwordValid = password === adminPassword
+      passwordValid = usuarioValido && password === adminPassword
     }
 
-    if (!passwordValid) {
+    if (!usuarioValido || !passwordValid) {
       return NextResponse.json(
         { error: 'Credenciales incorrectas' },
         { status: 401 }

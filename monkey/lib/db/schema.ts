@@ -94,6 +94,36 @@ export const chatbotDocs = pgTable('chatbot_docs', {
 export type ChatbotDoc    = typeof chatbotDocs.$inferSelect
 export type NuevoChatbotDoc = typeof chatbotDocs.$inferInsert
 
+// ============================================================
+// RESERVAS — guardadas por el chatbot antes de enviar email
+// ============================================================
+export const reservasChatbot = pgTable('reservas_chatbot', {
+  id:           uuid('id').defaultRandom().primaryKey(),
+  nombre:       text('nombre').notNull(),
+  fecha:        text('fecha').notNull(),
+  hora:         text('hora').notNull(),
+  personas:     integer('personas').notNull(),
+  contacto:     text('contacto').notNull(),
+  notas:        text('notas'),
+  emailEnviado: boolean('email_enviado').default(false).notNull(),
+  createdAt:    timestamp('created_at').defaultNow().notNull(),
+})
+
+export type ReservaChatbot = typeof reservasChatbot.$inferSelect
+
+// ============================================================
+// AUDIT LOG — registro de acciones del panel admin
+// ============================================================
+export const auditLog = pgTable('audit_log', {
+  id:        uuid('id').defaultRandom().primaryKey(),
+  accion:    text('accion').notNull(),     // 'delete_evento', 'update_puntos', etc.
+  entidad:   text('entidad').notNull(),    // 'evento', 'socio', 'chatbot_doc'
+  entidadId: text('entidad_id'),          // UUID del objeto afectado
+  detalle:   text('detalle'),             // JSON con cambios relevantes
+  ip:        text('ip'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
 export const eventosRelations = relations(eventos, ({ many }) => ({
   invitaciones: many(invitaciones),
 }))

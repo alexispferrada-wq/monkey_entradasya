@@ -5,6 +5,7 @@ import { eventos, invitaciones } from '@/lib/db/schema'
 import { eq, count, and, sql } from 'drizzle-orm'
 import { eventoUpdateSchema } from '@/lib/schemas'
 import { handleError } from '@/lib/errors'
+import { logAudit } from '@/lib/audit'
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -57,15 +58,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const method = body.get('_method')
 
   if (method === 'delete') {
+    const [eventoAEliminar] = await db.select({ nombre: eventos.nombre }).from(eventos).where(eq(eventos.id, id)).limit(1)
     await db.delete(eventos).where(eq(eventos.id, id))
+    await logAudit(req, 'delete_evento', 'evento', id, { nombre: eventoAEliminar?.nombre })
     return NextResponse.redirect(new URL('/admin', req.url))
   }
 
   return NextResponse.json({ error: 'Method not allowed' }, { status: 405 })
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const [eventoAEliminar] = await db.select({ nombre: eventos.nombre }).from(eventos).where(eq(eventos.id, id)).limit(1)
   await db.delete(eventos).where(eq(eventos.id, id))
+  await logAudit(req, 'delete_evento', 'evento', id, { nombre: eventoAEliminar?.nombre })
   return NextResponse.json({ ok: true })
 }

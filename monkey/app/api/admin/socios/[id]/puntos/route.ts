@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { socios, movimientosPuntos } from '@/lib/db/schema'
+import { logAudit } from '@/lib/audit'
 import { eq } from 'drizzle-orm'
 import { calcularNivel, actualizarPuntosWallet } from '@/lib/wallet/google'
 import { z } from 'zod'
@@ -45,7 +46,8 @@ export async function POST(
       operadorNombre: 'admin',
     })
 
-    // Actualizar Google Wallet sin bloquear la respuesta
+    // Audit log + Google Wallet sin bloquear respuesta
+    logAudit(req, 'update_puntos', 'socio', id, { puntos, motivo, puntosAntes: socio.puntos, puntosAhora: nuevosPuntos })
     actualizarPuntosWallet(actualizado).catch(err =>
       console.error('[wallet] Error actualizando puntos:', err)
     )

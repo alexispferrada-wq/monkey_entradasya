@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Groq from 'groq-sdk'
 import { db } from '@/lib/db'
-import { eventos, chatbotDocs, type ChatbotDoc } from '@/lib/db/schema'
+import { eventos, chatbotDocs, reservasChatbot, type ChatbotDoc } from '@/lib/db/schema'
 import { eq, asc } from 'drizzle-orm'
 import { Resend } from 'resend'
 import { buildSystemPromptFromDocs } from '@/lib/chatbot/system-prompt'
+import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
 
@@ -174,8 +175,40 @@ export async function POST(req: NextRequest) {
       const toolCall = choice.message.tool_calls[0]
 
       if (toolCall.function.name === 'crear_reserva') {
-        const reservaData = JSON.parse(toolCall.function.arguments) as {
-          nombre: string; fecha: string; hora: string; personas: number; contacto: string; notas?: string
+        // Validar argumentos del tool con Zod antes de usarlos
+        const reservaSchema = z.object({
+          nombre:   z.string().min(1).max(200),
+          fecha:    z.string().min(1).max(100),
+          hora:     z.string().min(1).max(20),
+          personas: z.number().int().min(1).max(500),
+          contacto: z.string().min(1).max(200),
+          notas:    z.string().max(500).optional(),
+        })
+
+        let reservaData: z.infer<typeof reservaSchema>
+        try {
+          reservaData = reservaSchema.parse(JSON.parse(toolCall.function.arguments))
+        } catch {
+          return NextResponse.json({ reply: 'Hubo un problema procesando los datos de la reserva. ¿Puedes repetirlos?' })
+        }
+
+        // Guardar reserva en DB primero (garantiza que no se pierda aunque falle el email)
+        let reservaId: string | undefined
+        try {
+          const [reservaGuardada] = await db
+            .insert(reservasChatbot)
+            .values({
+              nombre:   reservaData.nombre,
+              fecha:    reservaData.fecha,
+              hora:     reservaData.hora,
+              personas: reservaData.personas,
+              contacto: reservaData.contacto,
+              notas:    reservaData.notas,
+            })
+            .returning({ id: reservasChatbot.id })
+          reservaId = reservaGuardada.id
+        } catch (err) {
+          console.error('[chat] Error guardando reserva en DB:', err)
         }
 
         let emailEnviado = false
@@ -183,6 +216,12 @@ export async function POST(req: NextRequest) {
         try {
           await enviarEmailReserva(reservaData)
           emailEnviado = true
+          // Marcar email como enviado
+          if (reservaId) {
+            await db.update(reservasChatbot)
+              .set({ emailEnviado: true })
+              .where(eq(reservasChatbot.id, reservaId))
+          }
         } catch (err) {
           emailError = err instanceof Error ? err.message : 'Error desconocido'
         }
@@ -199,8 +238,8 @@ export async function POST(req: NextRequest) {
               role: 'tool',
               tool_call_id: toolCall.id,
               content: emailEnviado
-                ? `Reserva creada exitosamente. Email enviado al restaurante${reservaData.contacto.includes('@') ? ' y al cliente' : ''}.`
-                : `Error al enviar email: ${emailError}. Indica al cliente que contacte por WhatsApp.`,
+                ? `Reserva guardada y confirmada. Email enviado al restaurante${reservaData.contacto.includes('@') ? ' y al cliente' : ''}.`
+                : `Reserva guardada en el sistema${reservaId ? ` (ID: ${reservaId.slice(0,8)})` : ''}. Error al enviar email: ${emailError}. Indica al cliente que contacte por WhatsApp para confirmar.`,
             },
           ],
         })
