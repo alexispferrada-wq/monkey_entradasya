@@ -36,7 +36,7 @@ export async function signRefreshToken(
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
-    .setJWTId(jti)
+    .setJti(jti)
     .sign(getSecret())
   return { token, jti }
 }

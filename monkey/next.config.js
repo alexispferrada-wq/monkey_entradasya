@@ -5,8 +5,6 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
   // Enable gzip/brotli compression on all responses
   compress: true,
-  // Optimize web fonts (subset, preload)
-  optimizeFonts: true,
   logging: {
     fetches: {
       fullUrl: true,

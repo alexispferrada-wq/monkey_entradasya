@@ -36,10 +36,10 @@ export const socios = pgTable('socios', {
   deletedAt: timestamp('deleted_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-}, (t) => [
-  index('socios_email_idx').on(t.email),
-  index('socios_puntos_idx').on(t.puntos),
-])
+}, (t) => ({
+  emailIdx: index('socios_email_idx').on(t.email),
+  puntosIdx: index('socios_puntos_idx').on(t.puntos),
+}))
 
 export const movimientosPuntos = pgTable('movimientos_puntos', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -66,11 +66,11 @@ export const eventos = pgTable('eventos', {
   slug: text('slug').unique().notNull(),
   deletedAt: timestamp('deleted_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-}, (t) => [
-  index('eventos_fecha_idx').on(t.fecha),
-  index('eventos_slug_idx').on(t.slug),
-  index('eventos_activo_fecha_idx').on(t.activo, t.fecha),
-])
+}, (t) => ({
+  fechaIdx: index('eventos_fecha_idx').on(t.fecha),
+  slugIdx: index('eventos_slug_idx').on(t.slug),
+  activoFechaIdx: index('eventos_activo_fecha_idx').on(t.activo, t.fecha),
+}))
 
 export const invitaciones = pgTable('invitaciones', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -85,11 +85,11 @@ export const invitaciones = pgTable('invitaciones', {
   qrPublicId: text('qr_public_id'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   usedAt: timestamp('used_at'),
-}, (t) => [
-  index('invitaciones_evento_id_idx').on(t.eventoId),
-  index('invitaciones_token_idx').on(t.token),
-  index('invitaciones_email_idx').on(t.email),
-])
+}, (t) => ({
+  eventoIdIdx: index('invitaciones_evento_id_idx').on(t.eventoId),
+  tokenIdx: index('invitaciones_token_idx').on(t.token),
+  emailIdx: index('invitaciones_email_idx').on(t.email),
+}))
 
 // ============================================================
 // CHATBOT — base de conocimiento editable desde el admin
@@ -138,10 +138,10 @@ export const auditLog = pgTable('audit_log', {
   detalle:   text('detalle'),             // JSON con cambios relevantes
   ip:        text('ip'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-}, (t) => [
-  index('audit_log_entidad_id_idx').on(t.entidad, t.entidadId),
-  index('audit_log_created_at_idx').on(t.createdAt),
-])
+}, (t) => ({
+  entidadIdIdx: index('audit_log_entidad_id_idx').on(t.entidad, t.entidadId),
+  createdAtIdx: index('audit_log_created_at_idx').on(t.createdAt),
+}))
 
 export const eventosRelations = relations(eventos, ({ many }) => ({
   invitaciones: many(invitaciones),
