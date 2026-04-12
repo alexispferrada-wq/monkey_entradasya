@@ -59,7 +59,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   if (method === 'delete') {
     const [eventoAEliminar] = await db.select({ nombre: eventos.nombre }).from(eventos).where(eq(eventos.id, id)).limit(1)
-    await db.delete(eventos).where(eq(eventos.id, id))
+    await db.update(eventos).set({ deletedAt: new Date(), activo: false }).where(eq(eventos.id, id))
     await logAudit(req, 'delete_evento', 'evento', id, { nombre: eventoAEliminar?.nombre })
     return NextResponse.redirect(new URL('/admin', req.url))
   }
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const [eventoAEliminar] = await db.select({ nombre: eventos.nombre }).from(eventos).where(eq(eventos.id, id)).limit(1)
-  await db.delete(eventos).where(eq(eventos.id, id))
+  await db.update(eventos).set({ deletedAt: new Date(), activo: false }).where(eq(eventos.id, id))
   await logAudit(req, 'delete_evento', 'evento', id, { nombre: eventoAEliminar?.nombre })
   return NextResponse.json({ ok: true })
 }

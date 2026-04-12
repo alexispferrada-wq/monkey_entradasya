@@ -2,10 +2,12 @@ import { db } from '@/lib/db'
 import { auditLog } from '@/lib/db/schema'
 import { NextRequest } from 'next/server'
 
+type AuditEntidad = 'evento' | 'socio' | 'chatbot_doc' | 'invitacion'
+
 export async function logAudit(
   req: NextRequest,
   accion: string,
-  entidad: string,
+  entidad: AuditEntidad,
   entidadId?: string,
   detalle?: Record<string, unknown>
 ) {

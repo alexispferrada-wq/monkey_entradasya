@@ -6,6 +6,7 @@ import {
   timestamp,
   boolean,
   pgEnum,
+  index,
 } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
@@ -32,9 +33,13 @@ export const socios = pgTable('socios', {
   nivel: nivelSocio('nivel').notNull().default('bronze'),
   googlePassObjectId: text('google_pass_object_id'),
   activo: boolean('activo').default(true).notNull(),
+  deletedAt: timestamp('deleted_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-})
+}, (t) => [
+  index('socios_email_idx').on(t.email),
+  index('socios_puntos_idx').on(t.puntos),
+])
 
 export const movimientosPuntos = pgTable('movimientos_puntos', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -59,8 +64,13 @@ export const eventos = pgTable('eventos', {
   cuposDisponibles: integer('cupos_disponibles').notNull().default(100),
   activo: boolean('activo').default(true).notNull(),
   slug: text('slug').unique().notNull(),
+  deletedAt: timestamp('deleted_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-})
+}, (t) => [
+  index('eventos_fecha_idx').on(t.fecha),
+  index('eventos_slug_idx').on(t.slug),
+  index('eventos_activo_fecha_idx').on(t.activo, t.fecha),
+])
 
 export const invitaciones = pgTable('invitaciones', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -75,7 +85,11 @@ export const invitaciones = pgTable('invitaciones', {
   qrPublicId: text('qr_public_id'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   usedAt: timestamp('used_at'),
-})
+}, (t) => [
+  index('invitaciones_evento_id_idx').on(t.eventoId),
+  index('invitaciones_token_idx').on(t.token),
+  index('invitaciones_email_idx').on(t.email),
+])
 
 // ============================================================
 // CHATBOT — base de conocimiento editable desde el admin
@@ -114,15 +128,20 @@ export type ReservaChatbot = typeof reservasChatbot.$inferSelect
 // ============================================================
 // AUDIT LOG — registro de acciones del panel admin
 // ============================================================
+// entidad is text (not enum) so existing rows can be migrated safely;
+// application-layer type enforcement is in lib/audit.ts (AuditEntidad type)
 export const auditLog = pgTable('audit_log', {
   id:        uuid('id').defaultRandom().primaryKey(),
   accion:    text('accion').notNull(),     // 'delete_evento', 'update_puntos', etc.
-  entidad:   text('entidad').notNull(),    // 'evento', 'socio', 'chatbot_doc'
+  entidad:   text('entidad').notNull(),    // 'evento' | 'socio' | 'chatbot_doc' | 'invitacion'
   entidadId: text('entidad_id'),          // UUID del objeto afectado
   detalle:   text('detalle'),             // JSON con cambios relevantes
   ip:        text('ip'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-})
+}, (t) => [
+  index('audit_log_entidad_id_idx').on(t.entidad, t.entidadId),
+  index('audit_log_created_at_idx').on(t.createdAt),
+])
 
 export const eventosRelations = relations(eventos, ({ many }) => ({
   invitaciones: many(invitaciones),

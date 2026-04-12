@@ -11,7 +11,7 @@ function getClientIp(req: NextRequest): string {
 }
 
 export async function middleware(req: NextRequest) {
-  const { pathname, searchParams } = req.nextUrl
+  const { pathname } = req.nextUrl
   const clientIp = getClientIp(req)
 
   // Rate limiting for public API endpoints
@@ -42,6 +42,35 @@ export async function middleware(req: NextRequest) {
         { error: 'Demasiados intentos de login. Intenta más tarde.' },
         { status: 429 }
       )
+    }
+  }
+
+  if (pathname === '/api/chat' && req.method === 'POST') {
+    const rateLimit = await checkRateLimit(rateLimiters?.chat, clientIp)
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'Demasiadas solicitudes al chat. Intenta más tarde.' },
+        { status: 429 }
+      )
+    }
+  }
+
+  // CSRF: verify Origin/Referer for admin mutations (defense-in-depth alongside sameSite:lax)
+  if (
+    pathname.startsWith('/api/admin') &&
+    ['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)
+  ) {
+    const origin = req.headers.get('origin')
+    const host = req.headers.get('host')
+    if (origin && host) {
+      try {
+        const originHost = new URL(origin).host
+        if (originHost !== host) {
+          return NextResponse.json({ error: 'Solicitud no permitida.' }, { status: 403 })
+        }
+      } catch {
+        return NextResponse.json({ error: 'Solicitud no permitida.' }, { status: 403 })
+      }
     }
   }
 

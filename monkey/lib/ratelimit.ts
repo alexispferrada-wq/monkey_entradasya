@@ -12,6 +12,7 @@ let rateLimiters: {
   invitations: Ratelimit
   scanner: Ratelimit
   login: Ratelimit
+  chat: Ratelimit
   api: Ratelimit
 } | null = null
 
@@ -36,6 +37,11 @@ if (hasRedis) {
       redis,
       limiter: Ratelimit.slidingWindow(3, '1 m'),
       prefix: 'ratelimit:login',
+    }),
+    chat: new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(10, '1 m'),
+      prefix: 'ratelimit:chat',
     }),
     api: new Ratelimit({
       redis,

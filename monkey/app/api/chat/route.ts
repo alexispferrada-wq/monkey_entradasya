@@ -256,8 +256,12 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
     console.error('[Chat API Error]', msg)
+    // Never expose internal error details to the client in production
+    const clientMsg = process.env.NODE_ENV === 'production'
+      ? 'Error interno del servidor'
+      : msg
     return NextResponse.json(
-      { error: msg || 'Error interno del servidor' },
+      { error: clientMsg },
       { status: 500 }
     )
   }

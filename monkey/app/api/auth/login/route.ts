@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     const secret = new TextEncoder().encode(process.env.ADMIN_JWT_SECRET!)
     const token = await new SignJWT({ user: usuario })
       .setProtectedHeader({ alg: 'HS256' })
-      .setExpirationTime('8h')
+      .setExpirationTime('4h')
       .sign(secret)
 
     const res = NextResponse.json({ ok: true })
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 8, // 8 horas
+      maxAge: 60 * 60 * 4, // 4 horas
       path: '/',
     })
     return res

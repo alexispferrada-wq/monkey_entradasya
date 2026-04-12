@@ -2,12 +2,15 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { eventos } from '@/lib/db/schema'
-import { desc } from 'drizzle-orm'
+import { desc, isNull } from 'drizzle-orm'
 import { eventoCreateSchema } from '@/lib/schemas'
 import { handleError } from '@/lib/errors'
 
 export async function GET() {
-  const lista = await db.select().from(eventos).orderBy(desc(eventos.fecha))
+  const lista = await db.select().from(eventos)
+    .where(isNull(eventos.deletedAt))
+    .orderBy(desc(eventos.fecha))
+    .limit(200)
   return NextResponse.json(lista)
 }
 

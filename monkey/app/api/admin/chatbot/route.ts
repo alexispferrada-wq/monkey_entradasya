@@ -17,7 +17,9 @@ const chatbotDocSchema = z.object({
 })
 
 export async function GET() {
-  const docs = await db.select().from(chatbotDocs).orderBy(asc(chatbotDocs.orden), asc(chatbotDocs.categoria))
+  const docs = await db.select().from(chatbotDocs)
+    .orderBy(asc(chatbotDocs.orden), asc(chatbotDocs.categoria))
+    .limit(200)
   return NextResponse.json(docs)
 }
 

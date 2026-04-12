@@ -11,6 +11,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     .from(invitaciones)
     .where(eq(invitaciones.eventoId, id))
     .orderBy(desc(invitaciones.createdAt))
+    .limit(1000)
 
   return NextResponse.json(lista)
 }
