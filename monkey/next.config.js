@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   outputFileTracingRoot: __dirname,
+  // Enable gzip/brotli compression on all responses
+  compress: true,
   logging: {
     fetches: {
       fullUrl: true,
@@ -12,6 +14,20 @@ const nextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
+  /**
+   * API versioning: /api/v1/* → /api/*
+   * Establishes a versioning contract without touching existing routes.
+   * Future breaking changes go to /api/v2/*.
+   */
+  async rewrites() {
+    return [
+      {
+        source: '/api/v1/:path*',
+        destination: '/api/:path*',
+      },
+    ]
+  },
+
   async headers() {
     const csp = [
       "default-src 'self'",

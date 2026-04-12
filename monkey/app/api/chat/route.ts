@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { unstable_cache } from 'next/cache'
 import Groq from 'groq-sdk'
 import { db } from '@/lib/db'
 import { eventos, chatbotDocs, reservasChatbot, type ChatbotDoc } from '@/lib/db/schema'
@@ -6,6 +7,18 @@ import { eq, asc } from 'drizzle-orm'
 import { Resend } from 'resend'
 import { buildSystemPromptFromDocs } from '@/lib/chatbot/system-prompt'
 import { z } from 'zod'
+
+// ── Validation limits ──────────────────────────────────────────────────────────
+const MAX_MESSAGES   = 20   // Conversation history cap
+const MAX_MSG_LENGTH = 500  // Characters per message
+
+// ── Cache chatbot docs for 60s — they rarely change ───────────────────────────
+const getCachedChatbotDocs = unstable_cache(
+  async (): Promise<ChatbotDoc[]> =>
+    db.select().from(chatbotDocs).orderBy(asc(chatbotDocs.orden)),
+  ['chatbot-docs'],
+  { revalidate: 60, tags: ['chatbot-docs'] }
+)
 
 export const dynamic = 'force-dynamic'
 
@@ -127,14 +140,33 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Mensajes inválidos' }, { status: 400 })
     }
 
-    // Fetch active events and chatbot docs in parallel
+    // Validate message count and per-message length
+    if (messages.length > MAX_MESSAGES) {
+      return NextResponse.json(
+        { error: `Máximo ${MAX_MESSAGES} mensajes por solicitud.` },
+        { status: 400 }
+      )
+    }
+
+    const oversized = messages.find(
+      (m: { role: string; content: string }) =>
+        typeof m.content === 'string' && m.content.length > MAX_MSG_LENGTH
+    )
+    if (oversized) {
+      return NextResponse.json(
+        { error: `Cada mensaje no puede superar ${MAX_MSG_LENGTH} caracteres.` },
+        { status: 400 }
+      )
+    }
+
+    // Fetch active events (always fresh) and chatbot docs (cached 60s) in parallel
     let eventosActivos: Array<{ nombre: string; fecha: Date; slug: string; cuposDisponibles: number }> = []
     let knowledgeDocs: ChatbotDoc[] = []
     try {
       const [evts, docs] = await Promise.all([
         db.select({ nombre: eventos.nombre, fecha: eventos.fecha, slug: eventos.slug, cuposDisponibles: eventos.cuposDisponibles })
           .from(eventos).where(eq(eventos.activo, true)).orderBy(eventos.fecha),
-        db.select().from(chatbotDocs).orderBy(asc(chatbotDocs.orden)),
+        getCachedChatbotDocs(),
       ])
       eventosActivos = evts
       knowledgeDocs = docs

@@ -78,7 +78,9 @@ export default async function InvitacionPage({ params }: Props) {
                     alt="QR de acceso"
                     width={200}
                     height={200}
+                    quality={90}
                     className="block"
+                    priority
                   />
                 </div>
                 <p className="text-slate-500 text-xs">

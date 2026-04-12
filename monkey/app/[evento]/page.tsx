@@ -65,6 +65,8 @@ export default async function EventoPage({ params }: Props) {
                   fill
                   className="object-cover"
                   priority
+                  quality={85}
+                  sizes="(max-width: 768px) 100vw, 672px"
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center bg-black">
