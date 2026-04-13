@@ -111,43 +111,20 @@ function EventoCard({ evento }: { evento: Evento }) {
 export default function SectorEventos({ eventos }: Props) {
   const [sectorActivo, setSectorActivo] = useState<string | null>(null)
 
-  // Separar cumpleaños de regulares
-  const eventosCumpleanos = eventos.filter((e) => e.tipo === 'cumpleanos')
-  const eventosRegulares = eventos.filter((e) => e.tipo !== 'cumpleanos')
-
+  // Todos los eventos (regulares + cumpleaños) se muestran dentro del sector
   const eventosFiltrados = sectorActivo
-    ? eventosRegulares.filter((e) => matchesSector(e.lugar, sectorActivo))
+    ? eventos.filter((e) => matchesSector(e.lugar, sectorActivo))
     : []
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
 
-      {/* ── Celebraciones privadas (siempre visible) ──────────── */}
-      {eventosCumpleanos.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-lg">🎂</span>
-            <span className="text-xs font-bold uppercase tracking-widest text-purple-400">
-              Celebraciones privadas
-            </span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30 font-bold">
-              {eventosCumpleanos.length}
-            </span>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-            {eventosCumpleanos.map((evento) => (
-              <EventoCard key={evento.id} evento={evento} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ── Selector de sectores + eventos regulares ─────────── */}
-      {eventosRegulares.length > 0 && (
+      {/* ── Selector de sectores ─────────────────────────────── */}
+      {eventos.length > 0 && (
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row gap-3">
             {SECTORES.map((s) => {
-              const count = eventosRegulares.filter((e) => matchesSector(e.lugar, s.key)).length
+              const count = eventos.filter((e) => matchesSector(e.lugar, s.key)).length
               const activo = sectorActivo === s.key
               return (
                 <button
