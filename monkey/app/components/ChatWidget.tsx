@@ -29,7 +29,7 @@ export default function ChatWidget() {
       setStarted(true)
       setMessages([{
         role: 'assistant',
-        content: '¡Hola! Soy **Mono**, el asistente de Monkey Restobar 🐒\n\n¿En qué puedo ayudarte hoy? Puedo contarte sobre el menú, eventos, reservas o lo que necesites.',
+        content: '¡Hola! Soy **Mono**, el asistente de Monkey Restobar 🦍\n\n¿En qué puedo ayudarte hoy? Puedo contarte sobre el menú, eventos, reservas o lo que necesites.',
       }])
     }
   }, [open, started])
@@ -92,7 +92,7 @@ export default function ChatWidget() {
         style={{ background: 'linear-gradient(135deg, #F5C200, #F97316)', boxShadow: '0 0 30px rgba(245,194,0,0.4)' }}
         aria-label="Abrir chat"
       >
-        <span className="text-2xl">🐒</span>
+        <img src="/monkey-logo.png" alt="Monkey" className="w-9 h-9 object-contain" />
         {/* Pulse ring */}
         <span className="absolute inset-0 rounded-full animate-ping opacity-30"
           style={{ background: 'linear-gradient(135deg, #F5C200, #F97316)' }} />
@@ -117,9 +117,9 @@ export default function ChatWidget() {
           {/* Header */}
           <div className="flex items-center gap-3 px-4 py-3 border-b flex-shrink-0"
             style={{ background: '#0d0d0d', borderColor: 'rgba(245,194,0,0.15)' }}>
-            <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0"
+            <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
               style={{ background: 'linear-gradient(135deg, #F5C200, #F97316)' }}>
-              🐒
+              <img src="/monkey-logo.png" alt="Mono" className="w-8 h-8 object-contain" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="font-display text-sm text-primary tracking-wider uppercase">Mono</div>
@@ -153,9 +153,9 @@ export default function ChatWidget() {
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {msg.role === 'assistant' && (
-                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-sm flex-shrink-0 mr-2 mt-0.5"
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mr-2 mt-0.5 overflow-hidden"
                     style={{ background: 'linear-gradient(135deg, #F5C200, #F97316)' }}>
-                    🐒
+                    <img src="/monkey-logo.png" alt="Mono" className="w-5 h-5 object-contain" />
                   </div>
                 )}
                 <div
@@ -176,9 +176,9 @@ export default function ChatWidget() {
             {/* Loading indicator */}
             {loading && (
               <div className="flex justify-start">
-                <div className="w-7 h-7 rounded-full flex items-center justify-center text-sm flex-shrink-0 mr-2 mt-0.5"
+                <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mr-2 mt-0.5 overflow-hidden"
                   style={{ background: 'linear-gradient(135deg, #F5C200, #F97316)' }}>
-                  🐒
+                  <img src="/monkey-logo.png" alt="Mono" className="w-5 h-5 object-contain" />
                 </div>
                 <div className="px-3 py-2 rounded-2xl rounded-bl-sm flex items-center gap-1"
                   style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>

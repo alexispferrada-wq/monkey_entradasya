@@ -1,5 +1,3 @@
-'use client'
-
 import { db } from '@/lib/db'
 import { eventos } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'

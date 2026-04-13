@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3001",
+    "dev": "lsof -ti:3001 | xargs kill -9 2>/dev/null; next dev -p 3001",
     "migrate": "drizzle-kit push",
     "build": "next build",
     "build:prod": "drizzle-kit push && next build",
-    "start": "next start -p ${PORT:-3001}",
+    "start": "lsof -ti:3001 | xargs kill -9 2>/dev/null; next start -p ${PORT:-3001}",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",

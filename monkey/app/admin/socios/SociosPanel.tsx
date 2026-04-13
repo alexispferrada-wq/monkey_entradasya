@@ -207,7 +207,7 @@ export default function SociosPanel({ sociosIniciales }: Props) {
           </>
         ) : (
           <div className="flex flex-col items-center justify-center h-full min-h-[300px] text-center space-y-3">
-            <div className="text-5xl opacity-30">🐒</div>
+            <div className="opacity-30"><img src="/monkey-logo.png" alt="Monkey" className="w-16 h-16 object-contain mx-auto" /></div>
             <p className="text-zinc-600">Selecciona un socio de la lista para gestionar sus puntos</p>
           </div>
         )}

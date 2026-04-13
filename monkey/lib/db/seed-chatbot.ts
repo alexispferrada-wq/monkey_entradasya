@@ -202,6 +202,39 @@ Los precios están disponibles en nuestra carta — abajo te damos una idea de l
   },
 
   // ──────────────────────────────────────────
+  // ARTISTAS / STAFF
+  // ──────────────────────────────────────────
+  {
+    clave: 'staff_djs_animadores',
+    categoria: 'info',
+    titulo: 'DJs Residentes, Animadores e Invitados Especiales',
+    orden: 32,
+    contenido: `En Monkey Restobar contamos con un equipo recurrente encargado de prender las noches. Los DJs que se presentan habitualmente son DJ Xhuxhu, DJ Cepo y DJ Shano Roots. La animación oficial del local está a cargo de Sholo MC y Migue Anima. Además, el restobar trae constantemente invitados especiales, como por ejemplo DJ Janyi.`,
+  },
+
+  // ──────────────────────────────────────────
+  // EVENTOS TEMÁTICOS Y TRIBUTOS
+  // ──────────────────────────────────────────
+  {
+    clave: 'historial_tributos_fiestas',
+    categoria: 'info',
+    titulo: 'Tributos de Artistas y Fiestas Temáticas',
+    orden: 33,
+    contenido: `Monkey Restobar destaca por sus eventos temáticos y tributos a grandes exponentes del género urbano. Entre los tributos más destacados que se han realizado están el Tributo a J Alvarez y el Tributo a Bad Bunny (fiesta temática "El Conejo en la Jungla"). Además, el local organiza conceptos exitosos como "Bellakona 2.0" (enfocado en Reggaetón Old School y New School) y batallas musicales como "Black Music: Old School vs Dancehall".`,
+  },
+
+  // ──────────────────────────────────────────
+  // SERVICIOS Y UBICACIÓN
+  // ──────────────────────────────────────────
+  {
+    clave: 'servicios_ubicacion_amenidades',
+    categoria: 'info',
+    titulo: 'Ubicación, Carta y Servicios del Restobar',
+    orden: 34,
+    contenido: `Monkey Restobar se encuentra ubicado en Av. Concha y Toro 1060, Local 3. El recinto ofrece una experiencia completa para los asistentes que incluye: carta de comidas para todos los gustos, excelente coctelería y tragos, música con DJs en vivo y Karaoke para soltar la voz. Para comodidad de los clientes, el local cuenta con estacionamiento de mall, reserva de sector VIP, opciones de After Office y Happy Hour, además de entregar diversión asegurada con concursos, premios y sorpresas durante la noche.`,
+  },
+
+  // ──────────────────────────────────────────
   // MENÚ CON PRECIOS (actualizar con precios reales)
   // ──────────────────────────────────────────
   {

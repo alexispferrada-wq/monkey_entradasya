@@ -55,6 +55,7 @@ export const eventoSchema = z.object({
     ),
   
   activo: z.boolean().optional().default(true),
+  destacado: z.boolean().optional().default(false),
 });
 
 export type EventoInput = z.infer<typeof eventoSchema>;
@@ -88,6 +89,7 @@ export const eventoUpdateSchema = z.object({
     .max(1000, 'Los cupos disponibles no pueden exceder 1000')
     .optional(),
   activo: z.boolean().optional(),
+  destacado: z.boolean().optional(),
   imagenUrl: z
     .string()
     .trim()

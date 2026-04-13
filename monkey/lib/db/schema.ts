@@ -63,6 +63,7 @@ export const eventos = pgTable('eventos', {
   cuposTotal: integer('cupos_total').notNull().default(100),
   cuposDisponibles: integer('cupos_disponibles').notNull().default(100),
   activo: boolean('activo').default(true).notNull(),
+  destacado: boolean('destacado').default(false).notNull(),
   slug: text('slug').unique().notNull(),
   deletedAt: timestamp('deleted_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),

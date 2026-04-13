@@ -37,6 +37,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       ...(validated.cuposTotal !== undefined && { cuposTotal: validated.cuposTotal }),
       ...(validated.cuposDisponibles !== undefined && { cuposDisponibles: validated.cuposDisponibles }),
       ...(validated.activo !== undefined && { activo: validated.activo }),
+      ...(validated.destacado !== undefined && { destacado: validated.destacado }),
       ...(validated.imagenUrl !== undefined && { imagenUrl: validated.imagenUrl }),
     }
 

@@ -13,18 +13,25 @@ export default function EventoForm({ evento }: Props) {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const SECTORES = [
+    'MONKEY LOUNGE',
+    'MONKEY GRILL',
+    'TERRAZA',
+  ] as const
+
   const [form, setForm] = useState({
     nombre: evento?.nombre || '',
     descripcion: evento?.descripcion || '',
     fecha: evento?.fecha
       ? new Date(evento.fecha).toISOString().slice(0, 16)
       : '',
-    lugar: evento?.lugar || '',
+    lugar: evento?.lugar || 'MONKEY LOUNGE',
     cuposTotal: evento?.cuposTotal?.toString() || '100',
     cuposDisponibles: evento?.cuposDisponibles?.toString() || '100',
     slug: evento?.slug || '',
     imagenUrl: evento?.imagenUrl || '',
     activo: evento?.activo ?? true,
+    destacado: evento?.destacado ?? false,
   })
 
   const [loading, setLoading] = useState(false)
@@ -110,6 +117,7 @@ export default function EventoForm({ evento }: Props) {
         ...form,
         cuposTotal: Number(form.cuposTotal),
         cuposDisponibles: Number(form.cuposDisponibles),
+        destacado: form.destacado,
       }),
     })
 
@@ -254,19 +262,21 @@ export default function EventoForm({ evento }: Props) {
         />
       </div>
 
-      {/* Lugar */}
+      {/* Sector */}
       <div>
         <label className="block text-sm font-medium text-slate-300 mb-2">
-          Lugar <span className="text-rose-400">*</span>
+          Sector <span className="text-rose-400">*</span>
         </label>
-        <input
-          type="text"
+        <select
           value={form.lugar}
           onChange={(e) => setForm((f) => ({ ...f, lugar: e.target.value }))}
-          placeholder="Ej: W Hotel Santiago, El Bosque Norte 5"
           required
           className="input-glass"
-        />
+        >
+          {SECTORES.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
       </div>
 
       {/* Cupos */}
@@ -393,22 +403,40 @@ export default function EventoForm({ evento }: Props) {
         </div>
       </div>
 
-      {/* Activo */}
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => setForm((f) => ({ ...f, activo: !f.activo }))}
-          className={`relative w-11 h-6 rounded-full transition-colors ${
-            form.activo ? 'bg-primary' : 'bg-slate-700'
-          }`}
-        >
-          <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-            form.activo ? 'translate-x-5' : 'translate-x-0'
-          }`} />
-        </button>
-        <label className="text-sm text-slate-300">
-          Evento {form.activo ? 'activo (visible en el sitio)' : 'inactivo (oculto)'}
-        </label>
+      {/* Activo + Destacado */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setForm((f) => ({ ...f, activo: !f.activo }))}
+            className={`relative w-11 h-6 rounded-full transition-colors ${
+              form.activo ? 'bg-primary' : 'bg-slate-700'
+            }`}
+          >
+            <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+              form.activo ? 'translate-x-5' : 'translate-x-0'
+            }`} />
+          </button>
+          <label className="text-sm text-slate-300">
+            Evento {form.activo ? 'activo (visible en el sitio)' : 'inactivo (oculto)'}
+          </label>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setForm((f) => ({ ...f, destacado: !f.destacado }))}
+            className={`relative w-11 h-6 rounded-full transition-colors ${
+              form.destacado ? 'bg-yellow-500' : 'bg-slate-700'
+            }`}
+          >
+            <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+              form.destacado ? 'translate-x-5' : 'translate-x-0'
+            }`} />
+          </button>
+          <label className="text-sm text-slate-300">
+            {form.destacado ? '⭐ Flyer destacado en el inicio' : 'No destacado'}
+          </label>
+        </div>
       </div>
 
       {error && (

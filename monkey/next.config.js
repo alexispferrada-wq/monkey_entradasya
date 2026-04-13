@@ -54,11 +54,14 @@ const nextConfig = {
       // Next.js App Router requires unsafe-inline for hydration scripts.
       // cdn.jsdelivr.net is needed for jsQR (QR scanner library loaded at runtime).
       "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
-      "style-src 'self' 'unsafe-inline'",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com",
       // API calls (Groq/Resend/Cloudinary) are server-side only; client only calls 'self'
-      "connect-src 'self'",
-      "font-src 'self'",
+      // In dev, allow WebSocket connections for Next.js Fast Refresh (HMR)
+      process.env.NODE_ENV === 'production'
+        ? "connect-src 'self'"
+        : "connect-src 'self' ws://localhost:* wss://localhost:*",
       "frame-src 'none'",
       "frame-ancestors 'none'",
       "base-uri 'self'",

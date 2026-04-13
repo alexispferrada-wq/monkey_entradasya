@@ -19,7 +19,7 @@ export default function ChatbotTester() {
     if (open && messages.length === 0) {
       setMessages([{
         role: 'assistant',
-        content: '¡Hola! Soy **Mono** 🐒 — Escríbeme algo para probar cómo respondo con la base de conocimiento actual.',
+        content: '¡Hola! Soy **Mono** 🦍 — Escríbeme algo para probar cómo respondo con la base de conocimiento actual.',
       }])
     }
   }, [open])
@@ -85,9 +85,9 @@ export default function ChatbotTester() {
         className="w-full flex items-center justify-between px-5 py-4 hover:bg-white/5 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full flex items-center justify-center text-lg flex-shrink-0"
+          <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
             style={{ background: 'linear-gradient(135deg, #F5C200, #F97316)' }}>
-            🐒
+            <img src="/monkey-logo.png" alt="Mono" className="w-7 h-7 object-contain" />
           </div>
           <div className="text-left">
             <div className="font-display text-primary tracking-wider uppercase text-sm">Probar chatbot</div>
@@ -105,9 +105,9 @@ export default function ChatbotTester() {
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {msg.role === 'assistant' && (
-                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-sm flex-shrink-0 mr-2 mt-0.5"
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mr-2 mt-0.5 overflow-hidden"
                     style={{ background: 'linear-gradient(135deg, #F5C200, #F97316)' }}>
-                    🐒
+                    <img src="/monkey-logo.png" alt="Mono" className="w-5 h-5 object-contain" />
                   </div>
                 )}
                 <div
@@ -125,9 +125,9 @@ export default function ChatbotTester() {
 
             {loading && (
               <div className="flex justify-start">
-                <div className="w-7 h-7 rounded-full flex items-center justify-center text-sm flex-shrink-0 mr-2 mt-0.5"
+                <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mr-2 mt-0.5 overflow-hidden"
                   style={{ background: 'linear-gradient(135deg, #F5C200, #F97316)' }}>
-                  🐒
+                  <img src="/monkey-logo.png" alt="Mono" className="w-5 h-5 object-contain" />
                 </div>
                 <div className="px-3 py-2 rounded-2xl rounded-bl-sm flex items-center gap-1"
                   style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
