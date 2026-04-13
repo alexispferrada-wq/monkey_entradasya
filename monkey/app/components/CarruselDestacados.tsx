@@ -59,9 +59,10 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
   if (eventos.length === 0) return null
 
   // ── Cálculo del carrusel peek ──────────────────────────────
-  // card ocupa 78% del contenedor → 11% de cada tarjeta adyacente queda visible
-  const GAP = 16
-  const CARD_RATIO = eventos.length === 1 ? 1 : 0.78
+  // Con 1 evento: card al 85% centrado (no se ve nada de los lados)
+  // Con 2+ eventos: card al 65% → 17.5% de peek en cada lado
+  const GAP = 12
+  const CARD_RATIO = eventos.length === 1 ? 0.85 : 0.65
   const cardWidth = containerW * CARD_RATIO
   // Para centrar el card `current`:
   // translateX = (containerW - cardWidth)/2 - current*(cardWidth+GAP)
@@ -102,10 +103,11 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
                 key={evento.id}
                 className="flex-shrink-0 transition-all duration-500"
                 style={{
-                  width: cardWidth || '78%',
-                  opacity: isActive ? 1 : 0.45,
-                  transform: isActive ? 'scale(1)' : 'scale(0.94)',
+                  width: cardWidth || '65%',
+                  opacity: isActive ? 1 : 0.35,
+                  transform: isActive ? 'scale(1)' : 'scale(0.88)',
                   transformOrigin: 'center',
+                  filter: isActive ? 'none' : 'brightness(0.55)',
                 }}
                 onClick={() => {
                   if (!isActive) {
@@ -120,8 +122,13 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
                 >
                   {/* Flyer 3:4 */}
                   <div
-                    className="relative rounded-3xl overflow-hidden bg-black w-full"
-                    style={{ aspectRatio: '3/4' }}
+                    className="relative rounded-3xl overflow-hidden bg-black w-full transition-shadow duration-500"
+                    style={{
+                      aspectRatio: '3/4',
+                      boxShadow: isActive
+                        ? '0 24px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(245,194,0,0.15)'
+                        : 'none',
+                    }}
                   >
                     {evento.imagenUrl ? (
                       <Image
