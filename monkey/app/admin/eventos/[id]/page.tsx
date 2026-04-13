@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import EventoForm from '../EventoForm'
 import Link from 'next/link'
+import CopyLinkButton from './CopyLinkButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,23 +35,7 @@ export default async function EditarEventoPage({ params }: Props) {
           >
             Ver invitaciones →
           </Link>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={`https://entradasya.cl/scan/${evento.slug}`}
-              readOnly
-              className="text-sm px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-slate-300 w-64"
-            />
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(`https://entradasya.cl/scan/${evento.slug}`)
-                alert('Link copiado')
-              }}
-              className="text-sm px-4 py-2 rounded-xl border border-white/10 text-slate-300 hover:border-primary/50 hover:text-white transition-all"
-            >
-              Copiar
-            </button>
-          </div>
+          <CopyLinkButton scanUrl={`https://entradasya.cl/scan/${evento.slug}`} />
         </div>
       </div>
       <h1 className="text-3xl font-black text-white mb-8">Editar evento</h1>
