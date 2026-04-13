@@ -59,10 +59,10 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
   if (eventos.length === 0) return null
 
   // ── Cálculo del carrusel peek ──────────────────────────────
-  // Con 1 evento: card al 85% centrado (no se ve nada de los lados)
-  // Con 2+ eventos: card al 65% → 17.5% de peek en cada lado
+  // Con 1 evento: card al 60% centrado
+  // Con 2+ eventos: card al 48% → ~26% de cada flyer lateral queda visible
   const GAP = 12
-  const CARD_RATIO = eventos.length === 1 ? 0.85 : 0.65
+  const CARD_RATIO = eventos.length === 1 ? 0.60 : 0.48
   const cardWidth = containerW * CARD_RATIO
   // Para centrar el card `current`:
   // translateX = (containerW - cardWidth)/2 - current*(cardWidth+GAP)
@@ -142,7 +142,7 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
                       />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-zinc-900 to-black">
-                        <span className="font-display text-6xl text-primary/20 tracking-widest">MONKEY</span>
+                        <span className="font-display text-3xl text-primary/20 tracking-widest">MONKEY</span>
                       </div>
                     )}
 
@@ -150,37 +150,37 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
 
                     {/* Badges */}
-                    <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-1.5">
+                    <div className="absolute top-2.5 right-2.5 z-10 flex flex-col items-end gap-1">
                       {evento.tipo === 'cumpleanos' && (
-                        <span className="bg-purple-600/90 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                        <span className="bg-purple-600/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">
                           🔒 Privado
                         </span>
                       )}
                       {agotado ? (
-                        <span className="bg-red-600/90 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                        <span className="bg-red-600/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">
                           Agotado
                         </span>
                       ) : (
-                        <span className="bg-primary text-black text-xs font-black px-3 py-1.5 rounded-full uppercase tracking-wider">
+                        <span className="bg-primary text-black text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide">
                           {evento.cuposDisponibles} cupos
                         </span>
                       )}
                     </div>
 
                     {/* Info */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
-                      <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">
+                    <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1 truncate">
                         {evento.lugar}
                       </p>
-                      <h2 className="font-display text-2xl text-white tracking-wide uppercase leading-tight mb-2">
+                      <h2 className="font-display text-sm text-white tracking-wide uppercase leading-tight mb-1 line-clamp-2">
                         {evento.nombre}
                       </h2>
-                      <div className="flex items-center gap-2 text-sm text-zinc-300 mb-4">
+                      <div className="flex items-center gap-1 text-[10px] text-zinc-300 mb-2.5">
                         <span>📅</span>
-                        <span className="capitalize">{formatFecha(evento.fecha)}</span>
+                        <span className="capitalize truncate">{formatFecha(evento.fecha)}</span>
                       </div>
                       {isActive && !agotado && (
-                        <span className="inline-block bg-primary text-black font-display text-sm py-2.5 px-6 rounded-xl tracking-wider uppercase">
+                        <span className="inline-block bg-primary text-black font-display text-xs py-1.5 px-3 rounded-lg tracking-wider uppercase">
                           Ver invitación →
                         </span>
                       )}
