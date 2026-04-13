@@ -2,15 +2,37 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import ChatWidget from './components/ChatWidget'
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://monkey.entradasya.cl'
+// Imagen OG por defecto (logo Monkey sobre fondo oscuro vía Cloudinary)
+const OG_DEFAULT = 'https://res.cloudinary.com/dqsz4ua73/image/upload/w_1200,h_630,c_pad,g_center,b_black,f_jpg,q_80/v1775919972/logo300xp_s0gh7w.png'
+
 export const metadata: Metadata = {
-  title: 'Monkey Restobar — Invitaciones',
-  description: 'Solicita tu invitación gratuita para los eventos de Monkey Restobar.',
+  title: 'Monkey Restobar — Invitaciones y Eventos',
+  description: 'Solicita tu invitación gratuita para los eventos de Monkey Restobar. Entrada con QR personal en minutos.',
   manifest: '/manifest.json',
+  metadataBase: new URL(BASE_URL),
   other: {
     'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
   },
   icons: {
     apple: '/icons/icon-192.png',
+  },
+  openGraph: {
+    title: 'Monkey Restobar — Invitaciones y Eventos',
+    description: 'Solicita tu invitación gratuita. Entrada con QR personal en minutos.',
+    url: BASE_URL,
+    siteName: 'Monkey Restobar',
+    type: 'website',
+    locale: 'es_CL',
+    images: [{ url: OG_DEFAULT, width: 1200, height: 630, alt: 'Monkey Restobar' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Monkey Restobar — Invitaciones y Eventos',
+    description: 'Solicita tu invitación gratuita. Entrada con QR personal en minutos.',
+    images: [OG_DEFAULT],
   },
 }
 
@@ -18,6 +40,8 @@ export const viewport: Viewport = {
   themeColor: '#050505',
   width: 'device-width',
   initialScale: 1,
+  // viewport-fit=cover: el contenido llega a los bordes en iPhone con notch
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({
@@ -58,6 +82,7 @@ export default function RootLayout({
           </div>
         </nav>
 
+        {/* pt-16 = navbar height; safe-pt cubre el notch en iPhone */}
         <main className="relative z-10 pt-16">
           {children}
         </main>

@@ -64,51 +64,34 @@ Consultar por WhatsApp.`,
     categoria: 'template',
     titulo: 'Respuesta: reserva en Lounge',
     orden: 10,
-    contenido: `¡Nos encanta que quieras vivir la fiesta con nosotros en Monkey RestoBar! 🥳🐒
-¡Sí, encantados de recibirte! 🎉
+    contenido: `¡Vive la fiesta en Monkey RestoBar! 🥳🐒
 
-📍 Nuestras reservas son GRATIS en el Salón Lounge:
-✨ DJ en vivo
-✨ Animador
-✨ Karaoke para soltar la voz
-✨ Premios sorpresa 🎁
-✨ Atención VIP 🥂
-¡Y mucho, mucho más!
+📍 Reservas GRATIS en el Salón Lounge:
+✨ DJ en vivo, Animador y Karaoke 🎤
+✨ Premios sorpresa y Atención VIP 🥂
 
-📌 Las reservas son desde 2 personas en adelante
-🕗 El horario para reservar es de 20:00 a 22:00 hrs
+📌 Desde 2 personas. Llegada de 20:00 a 22:00 hrs.
+⏰ Tolerancia de espera: 15 minutos.
 
-Para reservar solo necesitamos:
-👤 Tu nombre
-📅 La fecha de la reserva
-🕗 Hora de llegada
-👥 Cantidad de personas
-
-⏰ ¡Ojo! Te esperaremos solo 15 minutos desde la hora que nos indiques 😊
-
-¡Te esperamos! 🔥
-Reserva con nosotros y vive la mejor fiesta en Monkey RestoBar 🐒🎶`,
+Para reservar envíanos: Tu nombre, Fecha, Hora de llegada y Cantidad de personas.
+¡Te esperamos para la mejor fiesta! 🔥🐒`,
   },
   {
     clave: 'template_reserva_cumpleanos',
     categoria: 'template',
     titulo: 'Respuesta: reserva de cumpleaños',
     orden: 11,
-    contenido: `Hola! 🐒🎉
-¡Nos encanta que quieras celebrar tu cumple en Monkey RestoBar! 🥳🍹
-Tenemos todo listo para que vivas una noche inolvidable:
-Valor de reserva $10.000 en total por el cumpleañero y invitados 🎂
+    contenido: `¡Celebra tu cumple en Monkey RestoBar! 🥳🎂
+Valor: $10.000 total por cumpleañero e invitados.
 
-✨ ¿Qué incluye tu reserva?
+✨ Incluye:
 ✅ Ingreso sin fila 🚫🧍‍♂️
-✅ Mesa reservada y lista sin costo adicional 🍽️
-✅ Trago de cortesía para el/la cumpleañero/a 🥂🎂
-✅ Ambiente increíble con karaoke, DJ en vivo y animación 🎤🎧🎺
+✅ Mesa reservada sin costo extra 🍽️
+✅ Trago de cortesía al cumpleañero/a 🥂
+✅ DJ en vivo, karaoke y animación 🎤
 
-📌 La hora de llegada es entre las 8:00 PM y 10:00 PM para que aproveches al máximo la experiencia 🌟
-
-Solo cuéntanos la fecha, hora y número de personas, ¡y nosotros nos encargamos del resto!
-🎂 ¡Tu cumple se celebra en Monkey RestoBar! 🎉`,
+📌 Llegada: 20:00 a 22:00 hrs.
+Solo danos fecha, hora y número de personas. ¡Nosotros nos encargamos! 🎉`,
   },
 
   // ──────────────────────────────────────────
@@ -231,7 +214,7 @@ Los precios están disponibles en nuestra carta — abajo te damos una idea de l
     categoria: 'info',
     titulo: 'Ubicación, Carta y Servicios del Restobar',
     orden: 34,
-    contenido: `Monkey Restobar se encuentra ubicado en Av. Concha y Toro 1060, Local 3. El recinto ofrece una experiencia completa para los asistentes que incluye: carta de comidas para todos los gustos, excelente coctelería y tragos, música con DJs en vivo y Karaoke para soltar la voz. Para comodidad de los clientes, el local cuenta con estacionamiento de mall, reserva de sector VIP, opciones de After Office y Happy Hour, además de entregar diversión asegurada con concursos, premios y sorpresas durante la noche.`,
+    contenido: `Ubicados en Av. Concha y Toro 1060, Local 3. Ofrecemos una experiencia completa: excelente carta de comidas y coctelería, DJs en vivo y Karaoke. Contamos con estacionamiento de mall, sector VIP, opciones de After Office y Happy Hour. Además, entregamos diversión asegurada con concursos, premios y sorpresas toda la noche.`,
   },
 
   // ──────────────────────────────────────────
@@ -242,31 +225,24 @@ Los precios están disponibles en nuestra carta — abajo te damos una idea de l
     categoria: 'menu',
     titulo: 'Carta y precios',
     orden: 50,
-    contenido: `CARTA MONKEY RESTOBAR — PRECIOS APROXIMADOS
-(Actualizar con los precios reales del local)
+    contenido: `CARTA MONKEY RESTOBAR (Referencial)
 
-🍺 CERVEZAS Y BEBESTIBLES:
-- Cerveza en lata / botella (330ml): $2.500 – $3.000
-- Cerveza artesanal / porrón (500ml): $4.000 – $5.000
-- Jarro de cerveza (1L): $7.000 – $9.000
-- Copa de vino tinto / blanco: $4.000
-- Botella de vino: desde $18.000
-- Agua mineral: $1.500 – $2.000
-- Bebidas / jugos: $2.000 – $3.000
+🍺 BEBIDAS:
+Cervezas (330ml-1L): $2.500-$9.000
+Vino (copa/botella): $4.000-$18.000
+Bebidas/Jugos: $2.000-$3.000
 
 🍹 COCTELERÍA:
-- Pisco sour / sours en general: $5.000 – $6.500
-- Cocteles de autor (Monkey Sour, Jungle Mojito, etc.): $6.000 – $7.500
-- Trago doble / largo: $7.000 – $9.000
+Sours tradicionales: $5.000-$6.500
+Cocteles de autor: $6.000-$7.500
+Tragos largos: $7.000-$9.000
 
-🔥 GRILL / PLATOS PRINCIPALES:
-- Hamburguesa completa con papas: $10.000 – $12.000
-- Costillar BBQ con acompañamiento: $15.000 – $18.000
-- Picoteo / tabla para compartir (2-4 personas): $12.000 – $16.000
-- Anticuchos o brochetas (porción): $8.000 – $10.000
-- Ensaladas / entradas: $5.000 – $8.000
+🔥 COMIDAS:
+Hamburguesas/Costillar: $10.000-$18.000
+Tablas para compartir: $12.000-$16.000
+Picoteos/Anticuchos: $8.000-$10.000
 
-⚠️ Nota: Precios referenciales. Para la carta exacta del día, consulta al llegar o por WhatsApp.`,
+⚠️ Pide la carta exacta al llegar.`,
   },
 ]
 

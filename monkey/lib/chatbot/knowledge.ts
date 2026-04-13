@@ -79,19 +79,15 @@ export const MENU = {
 // POLÍTICA DE RESERVAS
 // ============================================================
 export const POLITICAS_RESERVAS = `
-RESERVAS EN MONKEY RESTOBAR:
+RESERVAS MONKEY RESTOBAR:
+1. Grupos de 2 a 30 personas.
+2. Confirmar con 24h de anticipación.
+3. Grupos 10+ requieren consumo mínimo.
+4. Cancelaciones: avisar con 6h de anticipación.
+5. Eventos especiales: acceso exclusivo con invitación gratis (monkey.entradasya.cl).
 
-1. Las reservas se pueden hacer para grupos de 2 a 30 personas
-2. Se requiere confirmación con mínimo 24 horas de anticipación
-3. Para grupos de 10 o más personas, se solicita un consumo mínimo a acordar
-4. Las reservas se confirman una vez que nuestro equipo lo contacta
-5. Cancelaciones: avisar con al menos 6 horas de anticipación
-6. Para eventos especiales (noches de tributo, conciertos), el acceso es solo mediante invitación —
-   se puede solicitar gratuitamente en monkey.entradasya.cl
-
-CÓMO HACER UNA RESERVA:
-- Por WhatsApp (más rápido): el chatbot puede enviar los datos directamente
-- O completar el formulario que el chatbot te guiará a llenar
+CÓMO RESERVAR:
+Escríbenos por WhatsApp o completa el formulario web.
 `
 
 // ============================================================

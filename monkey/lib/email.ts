@@ -1,5 +1,169 @@
 import { Resend } from 'resend'
-import type { Evento, Invitacion } from './db/schema'
+import type { Evento, Invitacion, Reserva } from './db/schema'
+
+export async function enviarEmailOrganizadorCumpleanos(data: {
+  organizadorNombre: string
+  organizadorEmail: string
+  cumpleañeroNombre: string
+  edad: number
+  lugar: string
+  fecha: Date
+  cantidadInvitados: number
+  clave: string
+  linkEvento: string
+  precio: number
+}): Promise<void> {
+  const resend = new Resend(process.env.RESEND_API_KEY!)
+  const fechaStr = new Date(data.fecha).toLocaleDateString('es-CL', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  })
+
+  await resend.emails.send({
+    from: 'Monkey Restobar <invitaciones@entradasya.cl>',
+    to: data.organizadorEmail,
+    subject: `🎂 Cumpleaños de ${data.cumpleañeroNombre} — Tu evento está listo`,
+    html: buildEmailOrganizadorCumpleanos({ ...data, fechaStr }),
+  })
+}
+
+function buildEmailOrganizadorCumpleanos(data: {
+  organizadorNombre: string
+  cumpleañeroNombre: string
+  edad: number
+  lugar: string
+  fechaStr: string
+  cantidadInvitados: number
+  clave: string
+  linkEvento: string
+  precio: number
+}): string {
+  const palabrasClave = data.clave.split(' ')
+  const pildasHTML = palabrasClave
+    .map(p => `<span style="background:#F5C200;color:#000;font-weight:900;padding:6px 14px;border-radius:8px;font-size:15px;letter-spacing:2px;display:inline-block;margin:3px;">${p}</span>`)
+    .join(' ')
+
+  return `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#050505;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#050505;padding:32px 16px;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+  <!-- Header -->
+  <tr><td align="center" style="padding-bottom:28px;">
+    <div style="font-size:36px;margin-bottom:8px;">🎂🎉</div>
+    <div style="font-size:32px;font-weight:900;color:#F5C200;letter-spacing:6px;text-transform:uppercase;">MONKEY</div>
+    <div style="font-size:11px;color:#6b7280;letter-spacing:5px;text-transform:uppercase;margin-top:4px;">Restobar</div>
+  </td></tr>
+
+  <!-- Card principal -->
+  <tr><td style="background:#0a0a0a;border:1px solid rgba(245,194,0,0.3);border-radius:20px;padding:40px 36px;">
+
+    <table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+      <tr><td style="background:#a855f7;color:#fff;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:5px 14px;border-radius:100px;">
+        🎂 CUMPLEAÑOS CONFIRMADO
+      </td></tr>
+    </table>
+
+    <p style="color:#9ca3af;font-size:14px;margin:0 0 6px;">Hola, <strong style="color:#d1d5db;">${data.organizadorNombre}</strong></p>
+    <h1 style="color:#fff;font-size:26px;font-weight:900;margin:0 0 12px;">¡El evento de ${data.cumpleañeroNombre} está listo!</h1>
+    <p style="color:#9ca3af;font-size:14px;line-height:1.7;margin:0 0 28px;">
+      Hemos creado la página del evento automáticamente. Comparte el enlace y la clave con tus invitados para que puedan registrarse y recibir su <strong style="color:#F5C200;">QR personal de acceso</strong>.
+    </p>
+
+    <!-- Detalles del evento -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#111;border:1px solid rgba(245,194,0,0.2);border-radius:14px;margin-bottom:28px;">
+      <tr><td style="padding:24px 28px;">
+        <div style="font-size:18px;font-weight:900;color:#F5C200;letter-spacing:1px;text-transform:uppercase;margin-bottom:18px;">Detalles del evento</div>
+        <table width="100%" style="margin-bottom:10px;"><tr>
+          <td width="20" style="font-size:14px;">🎂</td>
+          <td style="padding-left:10px;color:#e5e7eb;font-size:14px;"><strong>${data.cumpleañeroNombre}</strong> cumple <strong>${data.edad} años</strong></td>
+        </tr></table>
+        <table width="100%" style="margin-bottom:10px;"><tr>
+          <td width="20" style="font-size:14px;">📅</td>
+          <td style="padding-left:10px;color:#e5e7eb;font-size:14px;text-transform:capitalize;">${data.fechaStr}</td>
+        </tr></table>
+        <table width="100%" style="margin-bottom:10px;"><tr>
+          <td width="20" style="font-size:14px;">📍</td>
+          <td style="padding-left:10px;color:#e5e7eb;font-size:14px;">${data.lugar}</td>
+        </tr></table>
+        <table width="100%" style="margin-bottom:0;"><tr>
+          <td width="20" style="font-size:14px;">👥</td>
+          <td style="padding-left:10px;color:#e5e7eb;font-size:14px;">${data.cantidadInvitados} invitados esperados</td>
+        </tr></table>
+        ${data.precio > 0 ? `
+        <table width="100%" style="margin-top:10px;"><tr>
+          <td width="20" style="font-size:14px;">💳</td>
+          <td style="padding-left:10px;color:#F5C200;font-size:14px;font-weight:700;">Reserva Monkey Grill: $${data.precio.toLocaleString('es-CL')} — Coordina el pago con nosotros.</td>
+        </tr></table>` : ''}
+      </td></tr>
+    </table>
+
+    <!-- La clave -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#111;border:2px solid #F5C200;border-radius:14px;margin-bottom:28px;">
+      <tr><td style="padding:24px 28px;text-align:center;">
+        <div style="font-size:11px;color:#6b7280;letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;font-weight:700;">🔑 Clave secreta del evento</div>
+        <div style="margin-bottom:14px;">${pildasHTML}</div>
+        <p style="color:#6b7280;font-size:12px;margin:0;line-height:1.6;">
+          <strong style="color:#9ca3af;">Guarda esta clave.</strong> Es la única forma de que tus invitados puedan registrarse al evento. Compártela solo con las personas que quieras invitar.
+        </p>
+      </td></tr>
+    </table>
+
+    <!-- Enlace del evento -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+      <tr><td align="center">
+        <p style="color:#9ca3af;font-size:13px;margin:0 0 12px;">Comparte este enlace con tus invitados:</p>
+        <a href="${data.linkEvento}" style="background:#F5C200;color:#000;text-decoration:none;padding:14px 40px;border-radius:12px;font-size:14px;font-weight:900;display:inline-block;letter-spacing:2px;text-transform:uppercase;">
+          VER PÁGINA DEL EVENTO →
+        </a>
+        <p style="color:#374151;font-size:11px;margin:10px 0 0;word-break:break-all;">${data.linkEvento}</p>
+      </td></tr>
+    </table>
+
+    <!-- Cómo funciona -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#0f0f0f;border:1px solid rgba(255,255,255,0.06);border-radius:14px;margin-bottom:24px;">
+      <tr><td style="padding:24px 28px;">
+        <div style="font-size:13px;font-weight:900;color:#9ca3af;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;">¿Cómo funciona?</div>
+        <table width="100%" style="margin-bottom:10px;"><tr>
+          <td width="24" style="font-size:14px;vertical-align:top;padding-top:2px;">1️⃣</td>
+          <td style="padding-left:10px;color:#9ca3af;font-size:13px;line-height:1.6;">Envía el enlace y la clave a cada invitado.</td>
+        </tr></table>
+        <table width="100%" style="margin-bottom:10px;"><tr>
+          <td width="24" style="font-size:14px;vertical-align:top;padding-top:2px;">2️⃣</td>
+          <td style="padding-left:10px;color:#9ca3af;font-size:13px;line-height:1.6;">Cada invitado entra al enlace, ingresa la clave y llena sus datos (nombre, RUT y correo).</td>
+        </tr></table>
+        <table width="100%" style="margin-bottom:10px;"><tr>
+          <td width="24" style="font-size:14px;vertical-align:top;padding-top:2px;">3️⃣</td>
+          <td style="padding-left:10px;color:#9ca3af;font-size:13px;line-height:1.6;">Cada invitado recibe su <strong style="color:#F5C200;">QR personal de acceso</strong> por correo. <strong style="color:#d1d5db;">Un QR = una entrada.</strong> No es transferible.</td>
+        </tr></table>
+        <table width="100%" style="margin-bottom:0;"><tr>
+          <td width="24" style="font-size:14px;vertical-align:top;padding-top:2px;">4️⃣</td>
+          <td style="padding-left:10px;color:#9ca3af;font-size:13px;line-height:1.6;">En la puerta presentan su QR para ingresar. <strong style="color:#ef4444;">Por razones de seguridad y control, se podría solicitar el carnet de identidad para verificar la identidad del portador del QR.</strong></td>
+        </tr></table>
+      </td></tr>
+    </table>
+
+    <p style="color:#374151;font-size:12px;text-align:center;margin:0;line-height:1.6;">
+      ¿Tienes dudas? Contáctanos por WhatsApp o preséntate en el local.<br>
+      Monkey Restobar · Av. Concha y Toro 1060, Local 3
+    </p>
+
+  </td></tr>
+
+  <!-- Footer -->
+  <tr><td style="padding-top:24px;text-align:center;">
+    <div style="font-size:13px;font-weight:900;color:#F5C200;letter-spacing:4px;text-transform:uppercase;margin-bottom:6px;">MONKEY RESTOBAR</div>
+    <div style="color:#374151;font-size:11px;">Powered by EntradasYa</div>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body></html>`.trim()
+}
 
 const resend = new Resend(process.env.RESEND_API_KEY!)
 
@@ -33,6 +197,204 @@ export async function enviarInvitacion(
     }),
   })
 }
+
+// ─────────────────────────────────────────────────────────
+// RESERVAS EMAILS
+// ─────────────────────────────────────────────────────────
+
+const SECTOR_LABELS: Record<string, string> = {
+  terraza: 'Terraza',
+  grill:   'Monkey Grill (Piso 2)',
+  cumpleanos: 'Celebración — Monkey Restobar',
+}
+
+export async function enviarConfirmacionReserva(reserva: Reserva): Promise<void> {
+  const esTerraza    = reserva.tipo === 'terraza'
+  const esGrill      = reserva.tipo === 'grill'
+  const esCumpleanos = reserva.tipo === 'cumpleanos'
+
+  const sector = SECTOR_LABELS[reserva.tipo] ?? reserva.tipo
+
+  let subject: string
+  let bodyHtml: string
+
+  if (esTerraza) {
+    subject  = 'MONKEY RESTOBAR — ¡Reserva de Terraza Confirmada!'
+    bodyHtml = buildReservaEmailHTML({
+      nombre:       reserva.nombre,
+      titulo:       '¡Reserva Confirmada!',
+      badge:        'TERRAZA · GRATIS',
+      badgeColor:   '#22c55e',
+      sector,
+      fecha:        reserva.fecha,
+      hora:         reserva.hora,
+      personas:     reserva.personas,
+      mensaje:      'Tu reserva en la <strong>Terraza de Monkey Restobar</strong> está confirmada. No necesitas ningún pago. Solo preséntate a la hora indicada.',
+      monto:        null,
+      eventoUrl:    null,
+    })
+  } else if (esGrill) {
+    subject  = 'MONKEY RESTOBAR — Reserva Monkey Grill Aprobada ✓'
+    bodyHtml = buildReservaEmailHTML({
+      nombre:       reserva.nombre,
+      titulo:       '¡Reserva Aprobada!',
+      badge:        'MONKEY GRILL · APROBADA',
+      badgeColor:   '#F5C200',
+      sector,
+      fecha:        reserva.fecha,
+      hora:         reserva.hora,
+      personas:     reserva.personas,
+      mensaje:      'Tu comprobante de pago fue revisado y <strong>aprobado</strong>. Preséntate a la hora indicada. ¡Los esperamos!',
+      monto:        10000,
+      eventoUrl:    null,
+    })
+  } else {
+    // cumpleaños
+    const baseUrl   = process.env.NEXT_PUBLIC_BASE_URL || 'https://monkey.entradasya.cl'
+    const eventoUrl = reserva.eventoId ? `${baseUrl}/${reserva.eventoId}` : null
+    subject  = 'MONKEY RESTOBAR — ¡Celebración Confirmada! 🎂'
+    bodyHtml = buildReservaEmailHTML({
+      nombre:       reserva.nombre,
+      titulo:       '¡Celebración Confirmada!',
+      badge:        'CUMPLEAÑOS · CONFIRMADO',
+      badgeColor:   '#F5C200',
+      sector,
+      fecha:        reserva.fecha,
+      hora:         reserva.hora,
+      personas:     reserva.personas,
+      mensaje:      'Tu evento de cumpleaños en Monkey Restobar está <strong>confirmado</strong>.' +
+        (eventoUrl ? ' Comparte el siguiente enlace con tus invitados para que soliciten su QR de acceso.' : ''),
+      monto:        null,
+      eventoUrl,
+    })
+  }
+
+  await resend.emails.send({
+    from:    'Monkey Restobar <invitaciones@entradasya.cl>',
+    to:      reserva.email,
+    subject,
+    html:    bodyHtml,
+  })
+}
+
+export async function enviarRechazoReserva(reserva: Reserva, motivo?: string): Promise<void> {
+  const sector = SECTOR_LABELS[reserva.tipo] ?? reserva.tipo
+  await resend.emails.send({
+    from:    'Monkey Restobar <invitaciones@entradasya.cl>',
+    to:      reserva.email,
+    subject: 'MONKEY RESTOBAR — Tu reserva no pudo ser procesada',
+    html:    buildReservaEmailHTML({
+      nombre:     reserva.nombre,
+      titulo:     'Reserva No Aprobada',
+      badge:      'RESERVA RECHAZADA',
+      badgeColor: '#ef4444',
+      sector,
+      fecha:      reserva.fecha,
+      hora:       reserva.hora,
+      personas:   reserva.personas,
+      mensaje:    motivo
+        ? `Tu reserva no pudo ser aprobada. Motivo: <strong>${motivo}</strong>. Contáctanos por WhatsApp para más información.`
+        : 'Tu reserva no pudo ser aprobada en esta oportunidad. Contáctanos por WhatsApp para más información.',
+      monto:      null,
+      eventoUrl:  null,
+    }),
+  })
+}
+
+function buildReservaEmailHTML(data: {
+  nombre: string
+  titulo: string
+  badge: string
+  badgeColor: string
+  sector: string
+  fecha: string
+  hora: string
+  personas: number
+  mensaje: string
+  monto: number | null
+  eventoUrl: string | null
+}): string {
+  return `
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background-color:#050505;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#050505;padding:32px 16px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+        <!-- Header -->
+        <tr><td align="center" style="padding-bottom:28px;">
+          <div style="font-size:32px;font-weight:900;color:#F5C200;letter-spacing:6px;text-transform:uppercase;">MONKEY</div>
+          <div style="font-size:11px;color:#6b7280;letter-spacing:5px;text-transform:uppercase;margin-top:4px;">Restobar</div>
+        </td></tr>
+
+        <!-- Card -->
+        <tr><td style="background-color:#0a0a0a;border:1px solid rgba(245,194,0,0.25);border-radius:20px;padding:40px 36px;">
+          <table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+            <tr><td style="background-color:${data.badgeColor};color:#000;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:5px 14px;border-radius:100px;">
+              ${data.badge}
+            </td></tr>
+          </table>
+
+          <p style="color:#9ca3af;font-size:14px;margin:0 0 6px 0;">Hola, <strong style="color:#d1d5db;">${data.nombre}</strong></p>
+          <h1 style="color:#ffffff;font-size:26px;font-weight:900;margin:0 0 16px 0;">${data.titulo}</h1>
+          <p style="color:#9ca3af;font-size:14px;margin:0 0 32px 0;line-height:1.7;">${data.mensaje}</p>
+
+          <!-- Detalle reserva -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#111;border:1px solid rgba(245,194,0,0.2);border-radius:14px;margin-bottom:32px;">
+            <tr><td style="padding:24px 28px;">
+              <div style="font-size:18px;font-weight:900;color:#F5C200;letter-spacing:1px;text-transform:uppercase;margin-bottom:20px;">${data.sector}</div>
+
+              <table width="100%" style="margin-bottom:12px;"><tr>
+                <td width="20" style="font-size:14px;">📅</td>
+                <td style="padding-left:10px;color:#e5e7eb;font-size:14px;">${data.fecha} — ${data.hora} hrs</td>
+              </tr></table>
+
+              <table width="100%" style="margin-bottom:12px;"><tr>
+                <td width="20" style="font-size:14px;">👥</td>
+                <td style="padding-left:10px;color:#e5e7eb;font-size:14px;">${data.personas} persona${data.personas !== 1 ? 's' : ''}</td>
+              </tr></table>
+
+              ${data.monto ? `
+              <table width="100%" style="margin-bottom:0;"><tr>
+                <td width="20" style="font-size:14px;">💳</td>
+                <td style="padding-left:10px;color:#e5e7eb;font-size:14px;">Pago confirmado: <strong style="color:#F5C200;">$${data.monto.toLocaleString('es-CL')}</strong></td>
+              </tr></table>` : ''}
+            </td></tr>
+          </table>
+
+          ${data.eventoUrl ? `
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+            <tr><td align="center">
+              <p style="color:#9ca3af;font-size:13px;margin:0 0 12px 0;">Comparte este enlace con tus invitados:</p>
+              <a href="${data.eventoUrl}" style="background-color:#F5C200;color:#000;text-decoration:none;padding:14px 40px;border-radius:12px;font-size:14px;font-weight:900;display:inline-block;letter-spacing:2px;text-transform:uppercase;">
+                VER EVENTO →
+              </a>
+            </td></tr>
+          </table>` : ''}
+
+          <p style="color:#374151;font-size:12px;text-align:center;margin:0;">
+            ¿Consultas? Escríbenos por WhatsApp o llámanos directamente.<br>
+            Monkey Restobar · Av. Concha y Toro 1060, Local 3
+          </p>
+        </td></tr>
+
+        <!-- Footer -->
+        <tr><td style="padding-top:24px;text-align:center;">
+          <div style="font-size:13px;font-weight:900;color:#F5C200;letter-spacing:4px;text-transform:uppercase;margin-bottom:6px;">MONKEY RESTOBAR</div>
+          <div style="color:#374151;font-size:11px;">Powered by EntradasYa</div>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body></html>`.trim()
+}
+
+// ─────────────────────────────────────────────────────────
+// INVITACIONES EMAILS
+// ─────────────────────────────────────────────────────────
 
 function buildEmailHTML(data: {
   nombreInvitado: string

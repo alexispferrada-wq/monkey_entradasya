@@ -44,7 +44,7 @@ export default async function InvitacionPage({ params }: Props) {
   const config = estadoConfig[invitacion.estado]
 
   return (
-    <div className="min-h-screen py-12 px-4">
+    <div className="min-h-screen py-8 px-4">
       <div className="max-w-md mx-auto animate-slide-up">
 
         {/* Header */}
@@ -72,19 +72,20 @@ export default async function InvitacionPage({ params }: Props) {
             {/* QR Code */}
             {invitacion.qrImageUrl && (
               <div className="text-center mb-6">
-                <div className="bg-white p-4 rounded-2xl inline-block mb-3">
+                {/* QR grande para fácil escaneo en móvil */}
+                <div className="bg-white p-4 rounded-2xl inline-block mb-3 shadow-xl">
                   <Image
                     src={invitacion.qrImageUrl}
                     alt="QR de acceso"
-                    width={200}
-                    height={200}
-                    quality={90}
+                    width={260}
+                    height={260}
+                    quality={100}
                     className="block"
                     priority
                   />
                 </div>
-                <p className="text-slate-500 text-xs">
-                  Escanea este código al ingresar
+                <p className="text-slate-400 text-sm font-medium">
+                  Muestra este QR al ingresar
                 </p>
               </div>
             )}

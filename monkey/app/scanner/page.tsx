@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import ScannerClient from './ScannerClient'
+import ScannerGate from './ScannerGate'
 import SwRegister from './SwRegister'
 
 export const metadata: Metadata = {
@@ -11,7 +11,7 @@ export default function ScannerPage() {
   return (
     <>
       <SwRegister />
-      <ScannerClient />
+      <ScannerGate />
     </>
   )
 }

@@ -9,61 +9,112 @@ interface Props {
 
 type Estado = 'idle' | 'loading' | 'success' | 'error' | 'duplicado'
 
-// Client-side field validation (mirrors server Zod schema for instant feedback)
+// ─── Validaciones ──────────────────────────────────────────────
+
 function validateNombre(v: string): string {
-  if (!v.trim()) return 'Ingresa tu nombre'
-  if (v.trim().length < 2) return 'Mínimo 2 caracteres'
-  if (v.trim().length > 100) return 'Máximo 100 caracteres'
+  if (!v.trim()) return 'Ingresa tu nombre y apellidos'
+  if (v.trim().length < 3) return 'Mínimo 3 caracteres'
+  if (v.trim().length > 150) return 'Máximo 150 caracteres'
   return ''
 }
 
 function validateEmail(v: string): string {
   if (!v.trim()) return 'Ingresa tu correo'
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return 'Correo inválido'
-  // Warn about common disposable domains (non-exhaustive, just UX hint)
   const domain = v.split('@')[1]?.toLowerCase() ?? ''
-  const warnDomains = ['mailinator.com', 'guerrillamail.com', 'yopmail.com', 'tempmail.com', 'trashmail.com', 'maildrop.cc']
-  if (warnDomains.includes(domain)) return 'No se permiten correos temporales'
+  const blocked = ['mailinator.com', 'guerrillamail.com', 'yopmail.com', 'tempmail.com', 'trashmail.com', 'maildrop.cc']
+  if (blocked.includes(domain)) return 'No se permiten correos temporales'
   return ''
 }
 
+function validarRut(rut: string): boolean {
+  const clean = rut.replace(/[.\-\s]/g, '').toUpperCase()
+  if (clean.length < 2) return false
+  const body = clean.slice(0, -1)
+  const dv = clean.slice(-1)
+  if (!/^\d+$/.test(body)) return false
+  if (!/^[\dK]$/.test(dv)) return false
+
+  let sum = 0
+  let mul = 2
+  for (let i = body.length - 1; i >= 0; i--) {
+    sum += parseInt(body[i]) * mul
+    mul = mul === 7 ? 2 : mul + 1
+  }
+  const rest = 11 - (sum % 11)
+  const expected = rest === 11 ? '0' : rest === 10 ? 'K' : String(rest)
+  return dv === expected
+}
+
+function validateRut(v: string): string {
+  if (!v.trim()) return 'Ingresa tu RUT'
+  if (!validarRut(v)) return 'RUT inválido — verifica el número y dígito verificador'
+  return ''
+}
+
+// Formatea RUT mientras el usuario escribe: 12.345.678-9
+function formatRut(raw: string): string {
+  const clean = raw.replace(/[^\dkK]/g, '').toUpperCase()
+  if (clean.length === 0) return ''
+  const dv = clean.slice(-1)
+  const body = clean.slice(0, -1)
+  if (body.length === 0) return dv
+  const formatted = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+  return `${formatted}-${dv}`
+}
+
+// ─── Componente ────────────────────────────────────────────────
+
 export default function InvitacionForm({ eventoId, eventoNombre }: Props) {
   const [nombre, setNombre] = useState('')
+  const [rut, setRut] = useState('')
   const [email, setEmail] = useState('')
   const [estado, setEstado] = useState<Estado>('idle')
   const [mensaje, setMensaje] = useState('')
-  // Field-level validation errors (shown only after the field has been touched)
-  const [touched, setTouched] = useState({ nombre: false, email: false })
+  const [touched, setTouched] = useState({ nombre: false, rut: false, email: false })
 
   const nombreError = touched.nombre ? validateNombre(nombre) : ''
+  const rutError    = touched.rut    ? validateRut(rut)       : ''
   const emailError  = touched.email  ? validateEmail(email)   : ''
-  const hasFieldErrors = !!validateNombre(nombre) || !!validateEmail(email)
+
+  const hasErrors = !!validateNombre(nombre) || !!validateRut(rut) || !!validateEmail(email)
+
+  function handleRutChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const raw = e.target.value.replace(/[^\dkK]/g, '').toUpperCase()
+    // Limitar a 9 caracteres (8 dígitos + DV)
+    if (raw.length > 9) return
+    setRut(formatRut(raw))
+  }
 
   async function handleSubmit(e: React.FormEvent) {
-    // Mark all fields as touched to surface any errors
-    setTouched({ nombre: true, email: true })
-    if (hasFieldErrors) { e.preventDefault(); return }
     e.preventDefault()
+    setTouched({ nombre: true, rut: true, email: true })
+    if (hasErrors) return
     setEstado('loading')
 
     try {
       const res = await fetch('/api/invitaciones', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eventoId, nombre: nombre.trim(), email: email.trim().toLowerCase() }),
+        body: JSON.stringify({
+          eventoId,
+          nombre: nombre.trim(),
+          rut: rut.trim(),
+          email: email.trim().toLowerCase(),
+        }),
       })
 
       const data = await res.json()
 
       if (res.status === 409) {
         setEstado('duplicado')
-        setMensaje(typeof data.error === 'string' ? data.error : data.error?.message || 'Ya tienes una invitación registrada.')
+        setMensaje(typeof data.error === 'string' ? data.error : 'Ya tienes una invitación registrada.')
         return
       }
 
       if (!res.ok) {
         setEstado('error')
-        setMensaje(typeof data.error === 'string' ? data.error : data.error?.message || 'Hubo un error. Intenta de nuevo.')
+        setMensaje(typeof data.error === 'string' ? data.error : 'Hubo un error. Intenta de nuevo.')
         return
       }
 
@@ -99,33 +150,60 @@ export default function InvitacionForm({ eventoId, eventoNombre }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+
+      {/* Nombre y apellidos */}
       <div>
         <label className="block text-sm font-medium text-slate-300 mb-2">
-          Tu nombre completo
+          Nombre y apellidos
         </label>
         <input
           type="text"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
           onBlur={() => setTouched(t => ({ ...t, nombre: true }))}
-          placeholder="Ej: María González"
+          placeholder="Ej: María González Rojas"
           required
-          minLength={2}
+          autoComplete="name"
           className={`input-glass transition-colors ${nombreError ? 'border-rose-500/60 focus:border-rose-500' : nombre && !nombreError ? 'border-green-500/40' : ''}`}
           disabled={estado === 'loading'}
           aria-invalid={!!nombreError}
-          aria-describedby={nombreError ? 'nombre-error' : undefined}
         />
         {nombreError && (
-          <p id="nombre-error" className="text-rose-400 text-xs mt-1 animate-fade-in">
-            {nombreError}
+          <p className="text-rose-400 text-xs mt-1 animate-fade-in">{nombreError}</p>
+        )}
+      </div>
+
+      {/* RUT */}
+      <div>
+        <label className="block text-sm font-medium text-slate-300 mb-2">
+          RUT
+        </label>
+        <input
+          type="text"
+          value={rut}
+          onChange={handleRutChange}
+          onBlur={() => setTouched(t => ({ ...t, rut: true }))}
+          placeholder="Ej: 12.345.678-9"
+          required
+          className={`input-glass transition-colors ${rutError ? 'border-rose-500/60 focus:border-rose-500' : rut && !rutError && touched.rut ? 'border-green-500/40' : ''}`}
+          disabled={estado === 'loading'}
+          aria-invalid={!!rutError}
+          inputMode="numeric"
+        />
+        {rutError ? (
+          <p className="text-rose-400 text-xs mt-1 animate-fade-in">{rutError}</p>
+        ) : (
+          <p className="text-slate-600 text-xs mt-1 leading-relaxed">
+            🔒 Tu RUT es requerido para verificar tu identidad y mayoría de edad, conforme a la{' '}
+            <span className="text-slate-500">Ley 19.925</span> sobre expendio de bebidas alcohólicas. Solo se usa en el contexto de este evento.
           </p>
         )}
       </div>
 
+      {/* Correo */}
       <div>
         <label className="block text-sm font-medium text-slate-300 mb-2">
-          Tu correo electrónico
+          Correo electrónico
         </label>
         <input
           type="email"
@@ -134,22 +212,20 @@ export default function InvitacionForm({ eventoId, eventoNombre }: Props) {
           onBlur={() => setTouched(t => ({ ...t, email: true }))}
           placeholder="tu@correo.com"
           required
+          autoComplete="email"
+          inputMode="email"
           className={`input-glass transition-colors ${emailError ? 'border-rose-500/60 focus:border-rose-500' : email && !emailError ? 'border-green-500/40' : ''}`}
           disabled={estado === 'loading'}
           aria-invalid={!!emailError}
-          aria-describedby={emailError ? 'email-error' : undefined}
         />
         {emailError ? (
-          <p id="email-error" className="text-rose-400 text-xs mt-1 animate-fade-in">
-            {emailError}
-          </p>
+          <p className="text-rose-400 text-xs mt-1 animate-fade-in">{emailError}</p>
         ) : (
-          <p className="text-slate-600 text-xs mt-1">
-            Tu invitación con QR llegará a este correo
-          </p>
+          <p className="text-slate-600 text-xs mt-1">Tu invitación con QR llegará a este correo</p>
         )}
       </div>
 
+      {/* Error / duplicado */}
       {(estado === 'error' || estado === 'duplicado') && (
         <div className={`rounded-xl p-4 border text-sm animate-fade-in ${
           estado === 'duplicado'

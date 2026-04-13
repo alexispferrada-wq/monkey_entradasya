@@ -1,17 +1,18 @@
 import { db } from '@/lib/db'
 import { eventos } from '@/lib/db/schema'
 import { eq, and, isNull } from 'drizzle-orm'
-import Image from 'next/image'
 import Link from 'next/link'
 import SectorEventos from './components/SectorEventos'
+import CarruselDestacados from './components/CarruselDestacados'
+
+const RESERVA_LINKS = [
+  { href: '/reservas?tipo=terraza',   emoji: '🌿', label: 'Reservar Terraza',       sub: 'Gratis',    color: '#22c55e' },
+  { href: '/reservas?tipo=grill',     emoji: '🔥', label: 'Reservar Monkey Grill',  sub: '$10.000',   color: '#F5C200' },
+  { href: '/cumpleanos/nuevo',         emoji: '🎂', label: 'Celebración / Cumpleaños', sub: 'Evento privado', color: '#a855f7' },
+]
 
 export const revalidate = 60
 
-function formatFecha(fecha: Date): string {
-  return new Date(fecha).toLocaleDateString('es-CL', {
-    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-  })
-}
 
 export default async function Home() {
   const eventosActivos = await db
@@ -20,96 +21,59 @@ export default async function Home() {
     .where(and(eq(eventos.activo, true), isNull(eventos.deletedAt)))
     .orderBy(eventos.fecha)
 
-  const destacado = eventosActivos.find((e) => e.destacado)
+  const destacados = eventosActivos.filter((e) => e.destacado)
+  // restantes: todos los no-destacados (incluye cumpleaños) → SectorEventos los separa internamente
   const restantes = eventosActivos.filter((e) => !e.destacado)
 
   return (
     <div className="min-h-screen">
 
       {/* Hero */}
-      <section className="py-16 px-4 text-center">
+      <section className="py-8 sm:py-14 px-4 text-center">
         <div className="max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 glass-card rounded-full px-5 py-2 text-sm text-zinc-400 mb-10 border-primary/20">
-            <span className="w-2 h-2 bg-primary rounded-full" />
+          <div className="inline-flex items-center gap-2 glass-card rounded-full px-4 py-1.5 text-xs sm:text-sm text-zinc-400 mb-6 sm:mb-10 border-primary/20">
+            <span className="w-1.5 h-1.5 bg-primary rounded-full shrink-0" />
             Invitaciones disponibles — entrada gratuita
           </div>
-          <h1 className="font-sans text-5xl sm:text-6xl md:text-7xl mb-8 tracking-wide leading-tight uppercase font-bold">
+          <h1 className="font-sans text-4xl sm:text-5xl md:text-7xl mb-5 sm:mb-8 tracking-wide leading-tight uppercase font-bold">
             <span className="gradient-text">Eventos y Reservas</span>
           </h1>
-          <div className="jungle-divider max-w-sm mx-auto mb-8" />
-          <p className="text-zinc-400 text-lg max-w-xl mx-auto">
+          <div className="jungle-divider max-w-sm mx-auto mb-5 sm:mb-8" />
+          <p className="text-zinc-400 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
             Solicita tu invitación gratuita. Solo necesitas tu correo
             y en minutos tendrás tu código QR de acceso.
           </p>
         </div>
       </section>
 
-      {/* Flyer destacado */}
-      {destacado && (
-        <section className="pb-10 px-4">
-          <div className="max-w-5xl mx-auto">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-primary text-lg">⭐</span>
-              <span className="text-xs font-bold uppercase tracking-widest text-primary">Evento destacado</span>
-            </div>
-            <Link
-              href={destacado.cuposDisponibles <= 0 ? '#' : `/${destacado.slug}`}
-              className={`group block ${destacado.cuposDisponibles <= 0 ? 'pointer-events-none' : ''}`}
-            >
-              <div className="relative rounded-3xl overflow-hidden bg-black w-full" style={{ aspectRatio: '16/7' }}>
-                {destacado.imagenUrl ? (
-                  <Image
-                    src={destacado.imagenUrl}
-                    alt={destacado.nombre}
-                    fill
-                    quality={100}
-                    className="object-cover group-hover:scale-105 transition-transform duration-700"
-                    sizes="(max-width: 1280px) 100vw, 1280px"
-                    priority
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-zinc-900 to-black">
-                    <span className="font-display text-7xl text-primary/20 tracking-widest">MONKEY</span>
-                  </div>
-                )}
+      {/* Carrusel destacados */}
+      {destacados.length > 0 && <CarruselDestacados eventos={destacados} />}
 
-                {/* Overlay gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-                {/* Badge */}
-                <div className="absolute top-4 right-4 z-10">
-                  {destacado.cuposDisponibles <= 0 ? (
-                    <span className="bg-red-600/90 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
-                      Agotado
-                    </span>
-                  ) : (
-                    <span className="bg-primary text-black text-xs font-black px-3 py-1.5 rounded-full uppercase tracking-wider">
-                      {destacado.cuposDisponibles} cupos
-                    </span>
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-10">
-                  <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">{destacado.lugar}</p>
-                  <h2 className="font-display text-2xl md:text-4xl text-white tracking-wide uppercase leading-tight mb-2">
-                    {destacado.nombre}
-                  </h2>
-                  <div className="flex items-center gap-2 text-sm text-zinc-300 mb-4">
-                    <span>📅</span>
-                    <span className="capitalize">{formatFecha(destacado.fecha)}</span>
-                  </div>
-                  {destacado.cuposDisponibles > 0 && (
-                    <span className="inline-block bg-primary text-black font-display text-sm py-2.5 px-6 rounded-xl tracking-wider uppercase">
-                      Ver invitación →
-                    </span>
-                  )}
-                </div>
-              </div>
-            </Link>
+      {/* Reservas rápidas */}
+      <section className="pb-8 sm:pb-10 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-primary text-sm">📌</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">Reservas</span>
           </div>
-        </section>
-      )}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {RESERVA_LINKS.map(r => (
+              <Link
+                key={r.href}
+                href={r.href}
+                className="group flex items-center gap-4 glass-card rounded-2xl px-4 py-4 min-h-[64px] border border-white/8 hover:border-primary/30 active:scale-[0.98] transition-all duration-200"
+              >
+                <span className="text-2xl shrink-0">{r.emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white text-sm font-bold leading-tight">{r.label}</p>
+                  <p className="text-xs font-semibold mt-0.5" style={{ color: r.color }}>{r.sub}</p>
+                </div>
+                <span className="text-zinc-600 group-hover:text-primary transition-colors shrink-0">→</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Sectores + eventos */}
       <section className="pb-24 px-4">

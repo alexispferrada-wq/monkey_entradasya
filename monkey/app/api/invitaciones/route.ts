@@ -10,9 +10,32 @@ import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
 import { isDisposableEmail } from '@/lib/email-validation'
 
+function validarRutChileno(rut: string): boolean {
+  const clean = rut.replace(/[.\-\s]/g, '').toUpperCase()
+  if (clean.length < 2) return false
+  const body = clean.slice(0, -1)
+  const dv = clean.slice(-1)
+  if (!/^\d+$/.test(body)) return false
+  if (!/^[\dK]$/.test(dv)) return false
+
+  let sum = 0
+  let mul = 2
+  for (let i = body.length - 1; i >= 0; i--) {
+    sum += parseInt(body[i]) * mul
+    mul = mul === 7 ? 2 : mul + 1
+  }
+  const rest = 11 - (sum % 11)
+  const expected = rest === 11 ? '0' : rest === 10 ? 'K' : String(rest)
+  return dv === expected
+}
+
 const invitacionSchema = z.object({
   eventoId: z.string().uuid(),
-  nombre: z.string().min(2).max(100).trim(),
+  nombre: z.string().min(2).max(150).trim(),
+  rut: z.string()
+    .min(7, 'RUT inválido')
+    .max(12)
+    .refine(validarRutChileno, { message: 'RUT inválido' }),
   email: z.string().email().trim(),
 })
 
@@ -25,7 +48,9 @@ const TEST_EMAILS = [
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { eventoId, nombre, email } = invitacionSchema.parse(body)
+    const { eventoId, nombre, rut, email } = invitacionSchema.parse(body)
+    // Normalizar RUT: solo dígitos + dígito verificador, sin puntos ni guión
+    const rutNorm = rut.replace(/[.\-\s]/g, '').toUpperCase()
     const emailNorm = email.toLowerCase()
 
     if (isDisposableEmail(emailNorm)) {
@@ -52,9 +77,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No hay cupos disponibles para este evento.' }, { status: 409 })
     }
 
-    // 2. Verificar duplicado (no aplica a emails de prueba)
+    // 2. Verificar duplicados (no aplica a emails de prueba)
     if (!isTestEmail) {
-      const [existente] = await db
+      // Duplicado por email
+      const [existenteEmail] = await db
         .select({ id: invitaciones.id })
         .from(invitaciones)
         .where(
@@ -69,11 +95,36 @@ export async function POST(req: NextRequest) {
         )
         .limit(1)
 
-      if (existente) {
+      if (existenteEmail) {
         return NextResponse.json(
           { error: 'Ya existe una invitación para este correo en este evento.' },
           { status: 409 }
         )
+      }
+
+      // Duplicado por RUT
+      if (rutNorm) {
+        const [existenteRut] = await db
+          .select({ id: invitaciones.id })
+          .from(invitaciones)
+          .where(
+            and(
+              eq(invitaciones.eventoId, eventoId),
+              eq(invitaciones.rut, rutNorm),
+              or(
+                eq(invitaciones.estado, 'enviada'),
+                eq(invitaciones.estado, 'pendiente')
+              )
+            )
+          )
+          .limit(1)
+
+        if (existenteRut) {
+          return NextResponse.json(
+            { error: 'Este RUT ya tiene una invitación registrada para este evento.' },
+            { status: 409 }
+          )
+        }
       }
     }
 
@@ -98,6 +149,7 @@ export async function POST(req: NextRequest) {
       .values({
         eventoId,
         nombre: nombre.trim(),
+        rut: rutNorm,
         email: emailNorm,
         token,
         estado: 'enviada',

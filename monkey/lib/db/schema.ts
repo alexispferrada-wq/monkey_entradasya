@@ -17,6 +17,19 @@ export const estadoInvitacion = pgEnum('estado_invitacion', [
   'cancelada',
 ])
 
+export const tipoReserva = pgEnum('tipo_reserva', [
+  'terraza',
+  'grill',
+  'cumpleanos',
+])
+
+export const estadoReserva = pgEnum('estado_reserva', [
+  'pendiente',
+  'comprobante_subido',
+  'aprobada',
+  'rechazada',
+])
+
 export const nivelSocio = pgEnum('nivel_socio', [
   'bronze',
   'silver',
@@ -65,6 +78,12 @@ export const eventos = pgTable('eventos', {
   activo: boolean('activo').default(true).notNull(),
   destacado: boolean('destacado').default(false).notNull(),
   slug: text('slug').unique().notNull(),
+  // Cumpleaños
+  tipo: text('tipo').default('regular').notNull(),       // 'regular' | 'cumpleanos'
+  clave: text('clave'),                                  // passphrase, solo cumpleaños
+  organizadorEmail: text('organizador_email'),           // quien recibe la clave
+  cumpleañeroNombre: text('cumpleanero_nombre'),         // nombre del cumpleañero
+  edadCumpleanos: integer('edad_cumpleanos'),            // edad que cumple
   deletedAt: timestamp('deleted_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 }, (t) => ({
@@ -79,6 +98,7 @@ export const invitaciones = pgTable('invitaciones', {
     .references(() => eventos.id, { onDelete: 'cascade' })
     .notNull(),
   nombre: text('nombre').notNull(),
+  rut: text('rut'),
   email: text('email').notNull(),
   token: uuid('token').defaultRandom().unique().notNull(),
   estado: estadoInvitacion('estado').default('pendiente').notNull(),
@@ -91,6 +111,45 @@ export const invitaciones = pgTable('invitaciones', {
   tokenIdx: index('invitaciones_token_idx').on(t.token),
   emailIdx: index('invitaciones_email_idx').on(t.email),
 }))
+
+// ============================================================
+// RESERVAS — sistema de reservas por sector
+// ============================================================
+export const reservas = pgTable('reservas', {
+  id:                  uuid('id').defaultRandom().primaryKey(),
+  tipo:                tipoReserva('tipo').notNull(),
+  estado:              estadoReserva('estado').default('pendiente').notNull(),
+  // Datos del solicitante
+  nombre:              text('nombre').notNull(),
+  email:               text('email').notNull(),
+  telefono:            text('telefono').notNull(),
+  fecha:               text('fecha').notNull(),      // 'DD/MM/YYYY'
+  hora:                text('hora').notNull(),        // 'HH:MM'
+  personas:            integer('personas').notNull(),
+  notas:               text('notas'),
+  // Cumpleaños
+  nombreEvento:        text('nombre_evento'),         // para el evento de cumpleaños
+  // Pago (Grill)
+  monto:               integer('monto').default(0).notNull(),
+  comprobantePagoUrl:  text('comprobante_pago_url'),
+  comprobantePublicId: text('comprobante_public_id'),
+  // Admin
+  adminNotas:          text('admin_notas'),
+  adminAt:             timestamp('admin_at'),
+  emailEnviado:        boolean('email_enviado').default(false).notNull(),
+  // Evento creado (para cumpleaños aprobados)
+  eventoId:            uuid('evento_id'),
+  // Standard
+  deletedAt:           timestamp('deleted_at'),
+  createdAt:           timestamp('created_at').defaultNow().notNull(),
+}, (t) => ({
+  estadoIdx: index('reservas_estado_idx').on(t.estado),
+  tipoIdx:   index('reservas_tipo_idx').on(t.tipo),
+  emailIdx:  index('reservas_email_idx').on(t.email),
+}))
+
+export type Reserva = typeof reservas.$inferSelect
+export type NuevaReserva = typeof reservas.$inferInsert
 
 // ============================================================
 // CHATBOT — base de conocimiento editable desde el admin

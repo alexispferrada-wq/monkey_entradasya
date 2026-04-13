@@ -75,14 +75,14 @@ export default function ClubPage() {
   const niveles = Object.entries(NIVELES) as [Nivel, typeof NIVELES[Nivel]][]
 
   return (
-    <div className="min-h-screen py-12 px-4">
-      <div className="max-w-2xl mx-auto space-y-12">
+    <div className="min-h-screen py-8 px-4">
+      <div className="max-w-2xl mx-auto space-y-8 sm:space-y-12">
 
         {/* Header */}
-        <div className="text-center space-y-3">
-          <div className="text-5xl mb-2">🦍</div>
-          <h1 className="font-display text-5xl text-primary tracking-widest uppercase">Club Monkey</h1>
-          <p className="text-zinc-400 text-lg">El club de lealtad de Monkey Restobar</p>
+        <div className="text-center space-y-2">
+          <div className="text-4xl sm:text-5xl mb-1">🦍</div>
+          <h1 className="font-display text-4xl sm:text-5xl text-primary tracking-widest uppercase">Club Monkey</h1>
+          <p className="text-zinc-400 text-base">El club de lealtad de Monkey Restobar</p>
           <div className="h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
         </div>
 
@@ -125,34 +125,37 @@ export default function ClubPage() {
         ) : (
           <>
             {/* ── FORMULARIO DE REGISTRO ── */}
-            <div className="glass-card rounded-2xl p-8 space-y-6">
+            <div className="glass-card rounded-2xl p-4 sm:p-8 space-y-5">
               <h2 className="font-display text-2xl text-white tracking-wide">Únete gratis</h2>
 
               <form onSubmit={registrar} className="space-y-4">
                 <div>
-                  <label className="block text-xs text-zinc-500 uppercase tracking-widest mb-1">Nombre completo</label>
+                  <label className="block text-xs text-zinc-500 uppercase tracking-widest mb-1.5">Nombre completo</label>
                   <input
                     type="text"
                     required
                     value={form.nombre}
                     onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))}
                     placeholder="Tu nombre"
-                    className="w-full bg-black/40 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-primary/60 transition-colors"
+                    className="input-glass"
+                    autoComplete="name"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-zinc-500 uppercase tracking-widest mb-1">Email</label>
+                  <label className="block text-xs text-zinc-500 uppercase tracking-widest mb-1.5">Email</label>
                   <input
                     type="email"
                     required
                     value={form.email}
                     onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                     placeholder="tu@email.com"
-                    className="w-full bg-black/40 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-primary/60 transition-colors"
+                    className="input-glass"
+                    autoComplete="email"
+                    inputMode="email"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-zinc-500 uppercase tracking-widest mb-1">
+                  <label className="block text-xs text-zinc-500 uppercase tracking-widest mb-1.5">
                     Teléfono <span className="text-zinc-600 normal-case">(opcional)</span>
                   </label>
                   <input
@@ -160,7 +163,9 @@ export default function ClubPage() {
                     value={form.telefono}
                     onChange={e => setForm(f => ({ ...f, telefono: e.target.value }))}
                     placeholder="+56 9 xxxx xxxx"
-                    className="w-full bg-black/40 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-primary/60 transition-colors"
+                    className="input-glass"
+                    autoComplete="tel"
+                    inputMode="tel"
                   />
                 </div>
 
