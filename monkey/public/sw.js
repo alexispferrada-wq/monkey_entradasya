@@ -85,8 +85,9 @@ self.addEventListener('fetch', (event) => {
   const { request } = event
   const url = new URL(request.url)
 
-  // Only intercept same-origin requests
+  // Only intercept same-origin GET requests — Cache API doesn't support POST/PUT/etc.
   if (url.origin !== self.location.origin) return
+  if (request.method !== 'GET') return
 
   // API calls: network-first with timeout (QR scanner must validate live)
   if (url.pathname.startsWith('/api/')) {
