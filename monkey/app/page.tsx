@@ -28,29 +28,36 @@ export default async function Home() {
     : 'Ver shows'
 
   const RESERVA_LINKS = [
-    { href: '/reservas/normal',    emoji: '🌿', label: 'Mesa Normal',              sub: 'Gratis',     color: '#22c55e' },
-    { href: '/reservas/show',      emoji: '🎫', label: proximoShow ? proximoShow.nombre : 'Reservar Show', sub: showSub, color: '#F5C200' },
-    { href: '/cumpleanos/nuevo',   emoji: '🎂', label: 'Celebración / Cumpleaños', sub: 'Evento privado', color: '#a855f7' },
+    { href: '/reservas/show',    emoji: '🎫', label: 'Reserva de Show',       sub: showSub,           color: '#F5C200' },
+    { href: '/cumpleanos/nuevo', emoji: '🎂', label: 'Reserva de Cumpleaños', sub: 'Evento privado',  color: '#a855f7' },
+    { href: '/reservas/normal',  emoji: '🌿', label: 'Reserva Normal',        sub: 'Gratis',          color: '#22c55e' },
   ]
 
   return (
     <div className="min-h-screen">
 
       {/* Hero */}
-      <section className="py-8 sm:py-14 px-4 text-center jungle-bg min-h-[400px] flex items-center justify-center relative">
-        {/* Fondo decorativo con glow */}
-        <div className="absolute inset-0 -z-10 flex items-center justify-center">
-          <div className="absolute w-96 h-96 bg-gradient-to-r from-yellow-600/20 to-green-600/20 rounded-full blur-3xl"></div>
-        </div>
-        <div className="max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 card-jungle-glow rounded-full px-4 py-1.5 text-xs sm:text-sm text-jungle mb-6 sm:mb-10 font-bold">
-            <span className="w-2 h-2 bg-yellow-400 rounded-full shrink-0 animate-pulse"></span>
-            Invitaciones disponibles — entrada gratuita
+      <section className="py-8 sm:py-12 px-6 sm:px-10 flex items-center justify-center">
+        <div className="flex items-center gap-5 sm:gap-8 md:gap-12 max-w-3xl mx-auto w-full">
+
+          {/* Logo */}
+          <div className="shrink-0">
+            <img
+              src="https://res.cloudinary.com/dqsz4ua73/image/upload/q_auto/f_auto/v1776194477/copy_of_gemini_generated_image_r0isfur0isfur0is_jc6xaa_7b01b6.png"
+              alt="Monkey"
+              className="w-28 sm:w-40 md:w-52 object-contain"
+              style={{ filter: 'drop-shadow(0 4px 24px rgba(245,194,0,0.3))' }}
+            />
           </div>
-          <h1 className="font-sans text-4xl sm:text-5xl md:text-7xl mb-5 sm:mb-8 tracking-wide leading-tight uppercase font-bold">
-            <span className="jungle-title">Bienvenidos a la jungla...</span>
-          </h1>
-          <div className="jungle-divider max-w-sm mx-auto mb-5 sm:mb-8" />
+
+          {/* Texto */}
+          <div className="min-w-0">
+            <h1 className="uppercase leading-none font-black">
+              <span className="jungle-title text-4xl sm:text-6xl md:text-7xl lg:text-8xl">BIENVENIDOS</span>
+              <span className="jungle-title text-4xl sm:text-6xl md:text-7xl lg:text-8xl">A LA JUNGLA</span>
+            </h1>
+          </div>
+
         </div>
       </section>
 

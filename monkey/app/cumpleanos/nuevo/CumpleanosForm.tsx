@@ -157,30 +157,42 @@ export default function CumpleanosForm() {
       </div>
 
       {/* Lugar */}
-      <div className="glass-card rounded-2xl p-6 space-y-4">
+      <div className="glass-card rounded-2xl p-4 sm:p-6 space-y-4">
         <h2 className="text-sm font-bold uppercase tracking-widest text-primary">📍 Elige el lugar</h2>
-        <div className="grid grid-cols-3 gap-2 sm:gap-3">
-          {LUGARES.map(l => (
-            <button
-              key={l.id} type="button"
-              onClick={() => setLugar(l.id)}
-              className={`flex flex-col items-center gap-1.5 p-3 sm:p-4 rounded-2xl border font-bold text-xs sm:text-sm transition-all duration-200 min-h-[80px] active:scale-[0.97] ${
-                lugar === l.id
-                  ? 'border-primary bg-primary/15 text-primary'
-                  : 'border-white/10 text-zinc-400 hover:border-primary/40 hover:text-white'
-              }`}
-            >
-              <span className="text-xl sm:text-2xl">{l.emoji}</span>
-              <span className="leading-tight text-center">{l.label}</span>
-              <span className={`text-[11px] sm:text-xs font-semibold text-center ${l.precio > 0 ? 'text-yellow-400' : 'text-green-400'}`}>{l.sub}</span>
-            </button>
-          ))}
+
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-2">Sector del evento</label>
+          <select
+            className="input-glass w-full"
+            value={lugar}
+            onChange={e => setLugar(e.target.value as Lugar)}
+          >
+            {LUGARES.map(l => (
+              <option key={l.id} value={l.id}>
+                {l.emoji} {l.label} — {l.sub}{l.id === 'MONKEY LOUNGE' ? ' ⭐ Recomendado' : ''}
+              </option>
+            ))}
+          </select>
         </div>
-        {lugarInfo.precio > 0 && (
-          <div className="p-4 rounded-xl border border-yellow-500/30 bg-yellow-500/5 text-yellow-400 text-sm">
-            💳 El sector <strong>{lugarInfo.label}</strong> tiene un costo de <strong>${lugarInfo.precio.toLocaleString('es-CL')}</strong>. Coordina el pago con nosotros al confirmar tu reserva.
+
+        {/* Info del sector seleccionado */}
+        <div className={`flex items-start gap-3 p-3 rounded-xl border text-sm ${
+          lugarInfo.precio > 0
+            ? 'border-yellow-500/30 bg-yellow-500/5 text-yellow-400'
+            : lugar === 'MONKEY LOUNGE'
+              ? 'border-primary/30 bg-primary/5 text-primary'
+              : 'border-green-500/30 bg-green-500/5 text-green-400'
+        }`}>
+          <span className="text-lg shrink-0">{lugarInfo.emoji}</span>
+          <div>
+            <p className="font-bold">{lugarInfo.label}</p>
+            <p className="text-xs mt-0.5 opacity-80">
+              {lugar === 'MONKEY LOUNGE' && 'Piso 1 · Ambiente íntimo · Ideal para celebraciones · Sin costo adicional'}
+              {lugar === 'MONKEY GRILL'  && `Piso 2 · Consumo mínimo $10.000 por persona · Coordina el pago al confirmar`}
+              {lugar === 'TERRAZA'       && 'Sector exterior fumadores · Sin costo adicional'}
+            </p>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Fecha y hora */}

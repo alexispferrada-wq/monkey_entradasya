@@ -3,6 +3,32 @@
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
+function validarRut(rut: string): boolean {
+  const clean = rut.replace(/[.\-\s]/g, '').toUpperCase()
+  if (!/^\d{7,8}[0-9K]$/.test(clean)) return false
+  const cuerpo = clean.slice(0, -1)
+  const dv = clean.slice(-1)
+
+  let suma = 0
+  let multiplo = 2
+  for (let i = cuerpo.length - 1; i >= 0; i--) {
+    suma += parseInt(cuerpo[i], 10) * multiplo
+    multiplo = multiplo === 7 ? 2 : multiplo + 1
+  }
+  const resto = 11 - (suma % 11)
+  const dvEsperado = resto === 11 ? '0' : resto === 10 ? 'K' : String(resto)
+  return dv === dvEsperado
+}
+
+function formatRut(raw: string): string {
+  const clean = raw.replace(/[^0-9kK]/g, '').toUpperCase()
+  if (clean.length <= 1) return clean
+  const body = clean.slice(0, -1)
+  const dv = clean.slice(-1)
+  const bodyFmt = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+  return `${bodyFmt}-${dv}`
+}
+
 export type ShowEvento = {
   id: string
   nombre: string
@@ -23,6 +49,7 @@ export default function ShowForm({ eventos }: { eventos: ShowEvento[] }) {
   const [form, setForm] = useState({
     nombre: '',
     apellido: '',
+    rut: '',
     email: '',
     telefono: '',
     hora: '',
@@ -39,6 +66,10 @@ export default function ShowForm({ eventos }: { eventos: ShowEvento[] }) {
 
   function set(field: string, value: string) {
     setForm((f) => ({ ...f, [field]: value }))
+  }
+
+  function handleRutChange(e: React.ChangeEvent<HTMLInputElement>) {
+    set('rut', formatRut(e.target.value))
   }
 
   const personas = Math.max(1, parseInt(form.personas, 10) || 1)
@@ -82,6 +113,7 @@ export default function ShowForm({ eventos }: { eventos: ShowEvento[] }) {
     e.preventDefault()
     if (!selectedEvento) { setError('Selecciona un show para reservar.'); return }
     if (!form.nombre.trim() || !form.apellido.trim()) { setError('Ingresa tu nombre y apellido.'); return }
+    if (!validarRut(form.rut)) { setError('Ingresa un RUT valido.'); return }
     if (uploadState === 'uploading') { setError('Espera a que termine de subir el comprobante.'); return }
     if (selectedEvento.precioBase > 0 && !comprobanteUrl) {
       setError(`Debes adjuntar el comprobante de pago ($${totalMonto.toLocaleString('es-CL')}).`)
@@ -97,6 +129,7 @@ export default function ShowForm({ eventos }: { eventos: ShowEvento[] }) {
         tipo: 'show',
         eventoId: selectedEvento.id,
         nombre: `${form.nombre.trim()} ${form.apellido.trim()}`,
+        rut: form.rut.trim(),
         email: form.email,
         telefono: form.telefono,
         fecha: selectedEvento.fechaReserva,
@@ -162,38 +195,26 @@ export default function ShowForm({ eventos }: { eventos: ShowEvento[] }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
 
-      {/* Selector de show (si hay más de uno) */}
-      {eventos.length > 1 && (
-        <div>
-          <label className="block text-xs font-medium text-zinc-400 mb-2 uppercase tracking-wide">
-            Selecciona el show
-          </label>
-          <div className="space-y-2">
-            {eventos.map((ev) => (
-              <button
-                key={ev.id}
-                type="button"
-                onClick={() => { setSelectedId(ev.id); setError('') }}
-                className={`w-full text-left rounded-xl border p-3 transition-all ${
-                  selectedId === ev.id
-                    ? 'border-primary/60 bg-primary/10'
-                    : 'border-white/10 bg-white/5 hover:border-white/20'
-                }`}
-              >
-                <p className="text-white text-sm font-bold">{ev.nombre}</p>
-                <p className="text-zinc-500 text-xs">{ev.fechaDisplay}</p>
-                {ev.cuposRestantes >= 0 && (
-                  <p className={`text-xs font-bold mt-0.5 ${ev.cuposRestantes < 10 ? 'text-rose-400' : 'text-zinc-500'}`}>
-                    {ev.cuposRestantes} cupos disponibles
-                  </p>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Selector desplegable de show */}
+      <div>
+        <label className="block text-xs font-medium text-zinc-400 mb-1.5 uppercase tracking-wide">
+          Elige el show
+        </label>
+        <select
+          className="input-glass w-full"
+          value={selectedId}
+          onChange={e => { setSelectedId(e.target.value); setError('') }}
+        >
+          {eventos.map((ev) => (
+            <option key={ev.id} value={ev.id}>
+              {ev.nombre} · {ev.fechaDisplay}
+              {ev.precioBase > 0 ? ` · $${ev.precioBase.toLocaleString('es-CL')} p/p` : ' · Gratis'}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      {/* Banner del evento seleccionado */}
+      {/* Info del evento seleccionado */}
       {selectedEvento && (
         <div className="rounded-xl bg-primary/10 border border-primary/30 p-4">
           <div className="flex items-start justify-between gap-2 mb-1">
@@ -258,6 +279,23 @@ export default function ShowForm({ eventos }: { eventos: ShowEvento[] }) {
                 placeholder="García" className="input-glass w-full" autoComplete="family-name"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-zinc-400 mb-1.5 uppercase tracking-wide">
+              RUT
+            </label>
+            <input
+              type="text"
+              required
+              value={form.rut}
+              onChange={handleRutChange}
+              placeholder="12.345.678-9"
+              className="input-glass w-full"
+              autoComplete="off"
+              inputMode="text"
+            />
+            <p className="text-zinc-600 text-xs mt-1">🔒 Requerido por Ley 19.925 sobre expendio de bebidas alcoholicas</p>
           </div>
 
           {/* Email */}

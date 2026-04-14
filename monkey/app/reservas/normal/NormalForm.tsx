@@ -3,11 +3,39 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+function validarRut(rut: string): boolean {
+  const clean = rut.replace(/[.\-\s]/g, '').toUpperCase()
+  if (!/^\d{7,8}[0-9K]$/.test(clean)) return false
+  const cuerpo = clean.slice(0, -1)
+  const dv = clean.slice(-1)
+
+  let suma = 0
+  let multiplo = 2
+  for (let i = cuerpo.length - 1; i >= 0; i--) {
+    suma += parseInt(cuerpo[i], 10) * multiplo
+    multiplo = multiplo === 7 ? 2 : multiplo + 1
+  }
+  const resto = 11 - (suma % 11)
+  const dvEsperado = resto === 11 ? '0' : resto === 10 ? 'K' : String(resto)
+  return dv === dvEsperado
+}
+
+function formatRut(raw: string): string {
+  const clean = raw.replace(/[^0-9kK]/g, '').toUpperCase()
+  if (clean.length <= 1) return clean
+  const body = clean.slice(0, -1)
+  const dv = clean.slice(-1)
+  const bodyFmt = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+  return `${bodyFmt}-${dv}`
+}
+
 export default function NormalForm() {
   const router = useRouter()
+  const [sector, setSector] = useState<'terraza' | 'lounge'>('terraza')
   const [form, setForm] = useState({
     nombre: '',
     apellido: '',
+    rut: '',
     email: '',
     telefono: '',
     fecha: '',
@@ -23,10 +51,18 @@ export default function NormalForm() {
     setForm((f) => ({ ...f, [field]: value }))
   }
 
+  function handleRutChange(e: React.ChangeEvent<HTMLInputElement>) {
+    set('rut', formatRut(e.target.value))
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!form.nombre.trim() || !form.apellido.trim()) {
       setError('Ingresa tu nombre y apellido.')
+      return
+    }
+    if (!validarRut(form.rut)) {
+      setError('Ingresa un RUT valido.')
       return
     }
     setLoading(true)
@@ -38,12 +74,16 @@ export default function NormalForm() {
       body: JSON.stringify({
         tipo: 'terraza',
         nombre: `${form.nombre.trim()} ${form.apellido.trim()}`,
+        rut: form.rut.trim(),
         email: form.email,
         telefono: form.telefono,
         fecha: form.fecha,
         hora: form.hora,
         personas: parseInt(form.personas, 10),
-        notas: form.notas,
+        notas: [
+          sector === 'lounge' ? 'Sector preferido: Monkey Lounge.' : '',
+          form.notas.trim(),
+        ].filter(Boolean).join(' ') || undefined,
       }),
     })
 
@@ -65,7 +105,7 @@ export default function NormalForm() {
           ¡Reserva confirmada!
         </h2>
         <p className="text-zinc-400 text-sm leading-relaxed">
-          Tu mesa en la Terraza está reservada. Te enviamos un correo con los detalles.
+          Tu reserva está confirmada. Te enviamos un correo con los detalles.
           Recuerda llegar con al menos 15 minutos de anticipación.
         </p>
         <button
@@ -120,6 +160,23 @@ export default function NormalForm() {
             autoComplete="family-name"
           />
         </div>
+      </div>
+
+      <div>
+        <label className="block text-xs font-medium text-zinc-400 mb-1.5 uppercase tracking-wide">
+          RUT
+        </label>
+        <input
+          type="text"
+          required
+          value={form.rut}
+          onChange={handleRutChange}
+          placeholder="12.345.678-9"
+          className="input-glass w-full"
+          autoComplete="off"
+          inputMode="text"
+        />
+        <p className="text-zinc-600 text-xs mt-1">🔒 Requerido por Ley 19.925 sobre expendio de bebidas alcoholicas</p>
       </div>
 
       {/* Email */}
@@ -181,6 +238,41 @@ export default function NormalForm() {
             onChange={(e) => set('hora', e.target.value)}
             className="input-glass w-full"
           />
+        </div>
+      </div>
+
+      {/* Sector */}
+      <div>
+        <label className="block text-xs font-medium text-zinc-400 mb-2 uppercase tracking-wide">
+          Sector <span className="normal-case text-zinc-600">(opcional)</span>
+        </label>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => setSector('terraza')}
+            className={`flex flex-col items-center gap-1 p-3 rounded-xl border text-xs font-bold transition-all duration-200 ${
+              sector === 'terraza'
+                ? 'border-green-500/60 bg-green-500/10 text-green-400'
+                : 'border-white/10 text-zinc-500 hover:border-white/20'
+            }`}
+          >
+            <span className="text-xl">🌿</span>
+            <span>Terraza</span>
+            <span className="font-semibold text-green-400/70 text-[10px]">Fumadores · Gratis</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setSector('lounge')}
+            className={`flex flex-col items-center gap-1 p-3 rounded-xl border text-xs font-bold transition-all duration-200 ${
+              sector === 'lounge'
+                ? 'border-primary/60 bg-primary/10 text-primary'
+                : 'border-white/10 text-zinc-500 hover:border-white/20'
+            }`}
+          >
+            <span className="text-xl">🍸</span>
+            <span>Monkey Lounge</span>
+            <span className="font-semibold text-primary/70 text-[10px]">Piso 1 · Gratis</span>
+          </button>
         </div>
       </div>
 
