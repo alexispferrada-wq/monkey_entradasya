@@ -15,6 +15,8 @@ export const metadata: Metadata = {
     'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
+  'theme-color': '#000000',
+  'color-scheme': 'dark',
   },
   icons: {
     apple: '/icons/icon-192.png',
@@ -37,7 +39,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#050505',
+  themeColor: '#000000',
   width: 'device-width',
   initialScale: 1,
   // viewport-fit=cover: el contenido llega a los bordes en iPhone con notch

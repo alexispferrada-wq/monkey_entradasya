@@ -81,7 +81,7 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
     : 0
 
   return (
-    <section className="pb-10 perspective">
+    <section className="pb-10 perspective relative">
       {/* Header mejorado */}
       <div className="flex items-center gap-2 mb-6 px-4 max-w-5xl mx-auto">
         <span className="text-3xl animate-bounce">⭐</span>
@@ -97,6 +97,31 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
           </span>
         )}
       </div>
+
+      {/* Gorila flotante - fuera del overflow */}
+      {eventos.length > 0 && eventos[current] && (
+        <div 
+          className="absolute -top-12 right-4 sm:right-12 z-50 text-7xl sm:text-8xl transition-all duration-500 pointer-events-none"
+          style={{
+            textShadow: '0 0 40px rgba(245,194,0,0.8), -8px -8px 0 rgba(0,0,0,0.7), 2px 2px 12px rgba(0,0,0,0.6)',
+            filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.7)) drop-shadow(0 0 40px rgba(245,194,0,0.5))',
+            transform: gorillaShake ? 'rotate(-8deg) scale(1.25) translateY(-10px)' : 'rotate(-20deg) scale(1.2)',
+            lineHeight: '1',
+            letterSpacing: '0',
+            opacity: 1,
+          }}
+        >
+          🦍
+        </div>
+      )}
+
+      {/* Brillo amarillo detras del gorila */}
+      {eventos.length > 0 && eventos[current] && (
+        <div 
+          className="absolute -top-6 right-6 sm:right-14 w-32 h-32 rounded-full bg-yellow-400/30 blur-3xl -z-40 animate-pulse"
+          style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite', pointerEvents: 'none' }}
+        />
+      )}
 
       {/* Pista del carrusel con perspectiva 3D */}
       <div ref={containerRef} className="overflow-hidden perspective" style={{ perspective: '1000px' }}>
@@ -132,30 +157,6 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
                   href={agotado ? '#' : `/${evento.slug}`}
                   className={`group block relative ${agotado || !isActive ? 'pointer-events-none' : ''}`}
                 >
-                  {/* Gorila afirmando el cartel - solo en evento activo */}
-                  {isActive && (
-                    <div 
-                      className={`absolute -top-16 -right-12 z-50 text-7xl transition-transform duration-500 ${gorillaShake ? 'animate-bounce' : ''}`}
-                      style={{
-                        textShadow: '0 0 30px rgba(245,194,0,0.8), -6px -6px 0 rgba(0,0,0,0.6), 2px 2px 8px rgba(0,0,0,0.5)',
-                        filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.6)) drop-shadow(0 0 30px rgba(245,194,0,0.4))',
-                        transform: gorillaShake ? 'rotate(-8deg) scale(1.2)' : 'rotate(-20deg) scale(1.15)',
-                        lineHeight: '1',
-                        letterSpacing: '0',
-                      }}
-                    >
-                      🦍
-                    </div>
-                  )}
-
-                  {/* Brillo amarillo detras del gorila */}
-                  {isActive && (
-                    <div 
-                      className="absolute -top-4 -right-4 w-24 h-24 rounded-full bg-yellow-400/20 blur-3xl -z-10 animate-pulse"
-                      style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}
-                    />
-                  )}
-
                   {/* Flyer 3:4 */}
                   <div
                     className="relative rounded-3xl overflow-hidden bg-black w-full transition-all duration-500"
