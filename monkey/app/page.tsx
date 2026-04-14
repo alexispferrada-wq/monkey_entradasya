@@ -5,12 +5,6 @@ import Link from 'next/link'
 import SectorEventos from './components/SectorEventos'
 import CarruselDestacados from './components/CarruselDestacados'
 
-const RESERVA_LINKS = [
-  { href: '/reservas?tipo=terraza',   emoji: '🌿', label: 'Reservar Terraza',       sub: 'Gratis',    color: '#22c55e' },
-  { href: '/reservas?tipo=grill',     emoji: '🔥', label: 'Reservar Monkey Grill',  sub: '$10.000',   color: '#F5C200' },
-  { href: '/cumpleanos/nuevo',         emoji: '🎂', label: 'Celebración / Cumpleaños', sub: 'Evento privado', color: '#a855f7' },
-]
-
 export const revalidate = 60
 
 
@@ -24,6 +18,20 @@ export default async function Home() {
   const destacados = eventosActivos.filter((e) => e.destacado)
   // restantes: todos los no-destacados (incluye cumpleaños) → SectorEventos los separa internamente
   const restantes = eventosActivos.filter((e) => !e.destacado)
+
+  // Próximo show para el link dinámico
+  const proximoShow = eventosActivos.find((e) => e.tipo === 'regular')
+  const showSub = proximoShow
+    ? proximoShow.precioBase > 0
+      ? `$${proximoShow.precioBase.toLocaleString('es-CL')} p/p`
+      : 'Gratis'
+    : 'Ver shows'
+
+  const RESERVA_LINKS = [
+    { href: '/reservas/normal',    emoji: '🌿', label: 'Mesa Normal',              sub: 'Gratis',     color: '#22c55e' },
+    { href: '/reservas/show',      emoji: '🎫', label: proximoShow ? proximoShow.nombre : 'Reservar Show', sub: showSub, color: '#F5C200' },
+    { href: '/cumpleanos/nuevo',   emoji: '🎂', label: 'Celebración / Cumpleaños', sub: 'Evento privado', color: '#a855f7' },
+  ]
 
   return (
     <div className="min-h-screen">
@@ -45,9 +53,6 @@ export default async function Home() {
           </p>
         </div>
       </section>
-
-      {/* Carrusel destacados */}
-      {destacados.length > 0 && <CarruselDestacados eventos={destacados} />}
 
       {/* Reservas rápidas */}
       <section className="pb-8 sm:pb-10 px-4">
@@ -74,6 +79,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* Carrusel destacados */}
+      {destacados.length > 0 && <CarruselDestacados eventos={destacados} />}
 
       {/* Sectores + eventos */}
       <section className="pb-24 px-4">

@@ -32,6 +32,8 @@ export async function POST(req: NextRequest) {
         slug: validated.slug,
         activo: validated.activo,
         imagenUrl: validated.imagenUrl || null,
+        precioBase: validated.precioBase ?? 0,
+        cuposReserva: validated.cuposReserva ?? 0,
       })
       .returning()
 

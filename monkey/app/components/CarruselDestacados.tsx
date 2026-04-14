@@ -19,6 +19,7 @@ type Evento = {
 function formatFecha(fecha: Date): string {
   return new Date(fecha).toLocaleDateString('es-CL', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    timeZone: 'America/Santiago',
   })
 }
 

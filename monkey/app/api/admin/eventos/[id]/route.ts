@@ -39,6 +39,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       ...(validated.activo !== undefined && { activo: validated.activo }),
       ...(validated.destacado !== undefined && { destacado: validated.destacado }),
       ...(validated.imagenUrl !== undefined && { imagenUrl: validated.imagenUrl }),
+      ...(validated.precioBase !== undefined && { precioBase: validated.precioBase }),
+      ...(validated.cuposReserva !== undefined && { cuposReserva: validated.cuposReserva }),
     }
 
     const [updated] = await db

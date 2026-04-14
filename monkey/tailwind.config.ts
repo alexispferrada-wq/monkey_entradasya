@@ -13,7 +13,7 @@ const config: Config = {
         display: ['"Bebas Neue"', 'sans-serif'],
       },
       colors: {
-        primary: '#F5C200',      // Amarillo Monkey
+        primary: '#FFE600',      // Amarillo Monkey
         secondary: '#F97316',    // Naranja acento
         jungle: '#15532A',       // Verde selva
         dark: '#0A0A0A',

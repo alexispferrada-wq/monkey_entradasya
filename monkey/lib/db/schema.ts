@@ -21,6 +21,7 @@ export const tipoReserva = pgEnum('tipo_reserva', [
   'terraza',
   'grill',
   'cumpleanos',
+  'show',
 ])
 
 export const estadoReserva = pgEnum('estado_reserva', [
@@ -84,6 +85,9 @@ export const eventos = pgTable('eventos', {
   organizadorEmail: text('organizador_email'),           // quien recibe la clave
   cumpleañeroNombre: text('cumpleanero_nombre'),         // nombre del cumpleañero
   edadCumpleanos: integer('edad_cumpleanos'),            // edad que cumple
+  // Reservas de show
+  precioBase: integer('precio_base').default(0).notNull(),     // precio por persona (0 = gratis)
+  cuposReserva: integer('cupos_reserva').default(0).notNull(), // 0 = sin límite
   deletedAt: timestamp('deleted_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 }, (t) => ({

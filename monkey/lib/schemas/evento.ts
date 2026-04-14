@@ -17,7 +17,7 @@ export const eventoSchema = z.object({
   fecha: z
     .coerce.date()
     .refine(
-      (date) => date > new Date(),
+      (date) => date.getTime() > Date.now(),
       'La fecha del evento debe ser en el futuro'
     ),
   
@@ -67,6 +67,8 @@ export const eventoCreateSchema = eventoSchema.extend({
     .positive('Los cupos deben ser un número positivo')
     .max(1000, 'Los cupos no pueden exceder 1000')
     .optional(),
+  precioBase: z.coerce.number().int().min(0).optional().default(0),
+  cuposReserva: z.coerce.number().int().min(0).optional().default(0),
 });
 
 export type EventoCreateInput = z.infer<typeof eventoCreateSchema>;
@@ -98,6 +100,8 @@ export const eventoUpdateSchema = z.object({
       (value) => !value || z.string().url().safeParse(value).success,
       'URL de imagen inválida'
     ),
+  precioBase: z.coerce.number().int().min(0).optional(),
+  cuposReserva: z.coerce.number().int().min(0).optional(),
 });
 
 export type EventoUpdateInput = z.infer<typeof eventoUpdateSchema>;

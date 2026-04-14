@@ -19,6 +19,7 @@ function formatFecha(fecha: Date) {
   return new Date(fecha).toLocaleDateString('es-CL', {
     day: 'numeric', month: 'short', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
+    timeZone: 'America/Santiago',
   })
 }
 

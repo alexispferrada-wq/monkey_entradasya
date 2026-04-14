@@ -51,15 +51,18 @@ function buildEmailOrganizadorCumpleanos(data: {
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
 
-  <!-- Header -->
-  <tr><td align="center" style="padding-bottom:28px;">
-    <div style="font-size:36px;margin-bottom:8px;">🎂🎉</div>
-    <div style="font-size:32px;font-weight:900;color:#F5C200;letter-spacing:6px;text-transform:uppercase;">MONKEY</div>
-    <div style="font-size:11px;color:#6b7280;letter-spacing:5px;text-transform:uppercase;margin-top:4px;">Restobar</div>
+  <!-- Header gorila -->
+  <tr><td style="padding-bottom:0;line-height:0;font-size:0;">
+    <img src="https://res.cloudinary.com/dqsz4ua73/image/upload/w_600,h_220,c_fill,g_auto,f_jpg,q_85/v1776100172/entradasya/eventos/g71klelokr1caj9dynz2.png"
+         alt="Monkey Restobar" width="600" style="width:100%;display:block;border-radius:16px 16px 0 0;max-width:600px;">
+  </td></tr>
+  <tr><td align="center" style="background:#111;padding:16px 24px;border-bottom:2px solid rgba(245,194,0,0.4);">
+    <div style="font-size:26px;font-weight:900;color:#F5C200;letter-spacing:6px;text-transform:uppercase;">MONKEY RESTOBAR</div>
+    <div style="font-size:10px;color:#6b7280;letter-spacing:5px;text-transform:uppercase;margin-top:3px;">Puente Alto</div>
   </td></tr>
 
   <!-- Card principal -->
-  <tr><td style="background:#0a0a0a;border:1px solid rgba(245,194,0,0.3);border-radius:20px;padding:40px 36px;">
+  <tr><td style="background:#0a0a0a;border:1px solid rgba(245,194,0,0.3);border-top:0;border-radius:0 0 20px 20px;padding:40px 36px;">
 
     <table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
       <tr><td style="background:#a855f7;color:#fff;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:5px 14px;border-radius:100px;">
@@ -155,8 +158,7 @@ function buildEmailOrganizadorCumpleanos(data: {
 
   <!-- Footer -->
   <tr><td style="padding-top:24px;text-align:center;">
-    <div style="font-size:13px;font-weight:900;color:#F5C200;letter-spacing:4px;text-transform:uppercase;margin-bottom:6px;">MONKEY RESTOBAR</div>
-    <div style="color:#374151;font-size:11px;">Powered by EntradasYa</div>
+    <div style="font-size:11px;color:#374151;">Powered by EntradasYa</div>
   </td></tr>
 
 </table>
@@ -203,33 +205,35 @@ export async function enviarInvitacion(
 // ─────────────────────────────────────────────────────────
 
 const SECTOR_LABELS: Record<string, string> = {
-  terraza: 'Terraza',
-  grill:   'Monkey Grill (Piso 2)',
+  terraza:    'Terraza',
+  grill:      'Monkey Grill (Piso 2)',
   cumpleanos: 'Celebración — Monkey Restobar',
+  show:       'Show — Monkey Restobar',
 }
 
 export async function enviarConfirmacionReserva(reserva: Reserva): Promise<void> {
   const esTerraza    = reserva.tipo === 'terraza'
   const esGrill      = reserva.tipo === 'grill'
   const esCumpleanos = reserva.tipo === 'cumpleanos'
+  const esShow       = reserva.tipo === 'show'
 
-  const sector = SECTOR_LABELS[reserva.tipo] ?? reserva.tipo
+  const sector = reserva.nombreEvento || SECTOR_LABELS[reserva.tipo] || reserva.tipo
 
   let subject: string
   let bodyHtml: string
 
   if (esTerraza) {
-    subject  = 'MONKEY RESTOBAR — ¡Reserva de Terraza Confirmada!'
+    subject  = 'MONKEY RESTOBAR — ¡Reserva Confirmada!'
     bodyHtml = buildReservaEmailHTML({
       nombre:       reserva.nombre,
       titulo:       '¡Reserva Confirmada!',
-      badge:        'TERRAZA · GRATIS',
+      badge:        'MESA NORMAL · GRATIS',
       badgeColor:   '#22c55e',
-      sector,
+      sector:       'Terraza — Monkey Restobar',
       fecha:        reserva.fecha,
       hora:         reserva.hora,
       personas:     reserva.personas,
-      mensaje:      'Tu reserva en la <strong>Terraza de Monkey Restobar</strong> está confirmada. No necesitas ningún pago. Solo preséntate a la hora indicada.',
+      mensaje:      'Tu reserva en <strong>Monkey Restobar</strong> está confirmada. No necesitas ningún pago. Solo preséntate a la hora indicada.',
       monto:        null,
       eventoUrl:    null,
     })
@@ -240,12 +244,29 @@ export async function enviarConfirmacionReserva(reserva: Reserva): Promise<void>
       titulo:       '¡Reserva Aprobada!',
       badge:        'MONKEY GRILL · APROBADA',
       badgeColor:   '#F5C200',
-      sector,
+      sector:       'Monkey Grill (Piso 2)',
       fecha:        reserva.fecha,
       hora:         reserva.hora,
       personas:     reserva.personas,
       mensaje:      'Tu comprobante de pago fue revisado y <strong>aprobado</strong>. Preséntate a la hora indicada. ¡Los esperamos!',
       monto:        10000,
+      eventoUrl:    null,
+    })
+  } else if (esShow) {
+    subject  = `MONKEY RESTOBAR — Reserva de Show Aprobada ✓`
+    bodyHtml = buildReservaEmailHTML({
+      nombre:       reserva.nombre,
+      titulo:       '¡Reserva de Show Aprobada!',
+      badge:        'SHOW · APROBADA',
+      badgeColor:   '#F5C200',
+      sector,
+      fecha:        reserva.fecha,
+      hora:         reserva.hora,
+      personas:     reserva.personas,
+      mensaje:      reserva.monto > 0
+        ? 'Tu comprobante de pago fue revisado y <strong>aprobado</strong>. Preséntate a la hora indicada con tu confirmación. ¡Los esperamos!'
+        : 'Tu reserva para el show está <strong>confirmada</strong>. Preséntate a la hora indicada. ¡Los esperamos!',
+      monto:        reserva.monto > 0 ? reserva.monto : null,
       eventoUrl:    null,
     })
   } else {
@@ -257,8 +278,8 @@ export async function enviarConfirmacionReserva(reserva: Reserva): Promise<void>
       nombre:       reserva.nombre,
       titulo:       '¡Celebración Confirmada!',
       badge:        'CUMPLEAÑOS · CONFIRMADO',
-      badgeColor:   '#F5C200',
-      sector,
+      badgeColor:   '#a855f7',
+      sector:       'Celebración — Monkey Restobar',
       fecha:        reserva.fecha,
       hora:         reserva.hora,
       personas:     reserva.personas,
@@ -274,6 +295,79 @@ export async function enviarConfirmacionReserva(reserva: Reserva): Promise<void>
     to:      reserva.email,
     subject,
     html:    bodyHtml,
+  })
+}
+
+export async function enviarNotificacionAdminReserva(reserva: Reserva): Promise<void> {
+  const adminEmail = process.env.ADMIN_EMAIL || 'monkeyrestobar@gmail.com'
+  const tipoLabels: Record<string, string> = {
+    terraza:    'Mesa Normal (Gratis)',
+    grill:      'Monkey Grill ($10.000)',
+    cumpleanos: 'Cumpleaños',
+    show:       'Show / Evento',
+  }
+  const tipoLabel = reserva.tipo === 'show' && reserva.nombreEvento
+    ? `Show: ${reserva.nombreEvento}`
+    : (tipoLabels[reserva.tipo] ?? reserva.tipo)
+
+  await resend.emails.send({
+    from: 'Monkey Restobar <invitaciones@entradasya.cl>',
+    to: adminEmail,
+    subject: `📋 Nueva reserva: ${tipoLabel} — ${reserva.nombre}`,
+    html: `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#050505;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#050505;padding:24px 16px;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+  <tr><td style="padding-bottom:0;line-height:0;font-size:0;">
+    <img src="https://res.cloudinary.com/dqsz4ua73/image/upload/w_600,h_180,c_fill,g_auto,f_jpg,q_85/v1776100172/entradasya/eventos/g71klelokr1caj9dynz2.png"
+         alt="Monkey Restobar" width="600" style="width:100%;display:block;border-radius:16px 16px 0 0;max-width:600px;">
+  </td></tr>
+  <tr><td align="center" style="background:#111;padding:14px 24px;border-bottom:2px solid rgba(245,194,0,0.4);">
+    <div style="font-size:22px;font-weight:900;color:#F5C200;letter-spacing:5px;text-transform:uppercase;">MONKEY RESTOBAR</div>
+    <div style="font-size:10px;color:#6b7280;letter-spacing:4px;text-transform:uppercase;margin-top:2px;">NUEVA RESERVA</div>
+  </td></tr>
+  <tr><td style="background:#0a0a0a;border:1px solid rgba(245,194,0,0.3);border-top:0;border-radius:0 0 16px 16px;padding:28px 28px;">
+    <div style="font-size:11px;color:#F5C200;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;">📋 ${tipoLabel}</div>
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr><td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <span style="color:#6b7280;font-size:12px;">Nombre</span><br>
+        <strong style="color:#fff;font-size:15px;">${reserva.nombre}</strong>
+      </td></tr>
+      <tr><td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <span style="color:#6b7280;font-size:12px;">Contacto</span><br>
+        <span style="color:#d1d5db;font-size:13px;">${reserva.email} · ${reserva.telefono}</span>
+      </td></tr>
+      <tr><td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <span style="color:#6b7280;font-size:12px;">Fecha y hora</span><br>
+        <strong style="color:#F5C200;font-size:14px;">${reserva.fecha} — ${reserva.hora} hrs</strong>
+      </td></tr>
+      <tr><td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <span style="color:#6b7280;font-size:12px;">Personas</span><br>
+        <span style="color:#d1d5db;font-size:13px;">${reserva.personas} persona${reserva.personas !== 1 ? 's' : ''}</span>
+      </td></tr>
+      ${reserva.notas ? `<tr><td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <span style="color:#6b7280;font-size:12px;">Notas</span><br>
+        <span style="color:#d1d5db;font-size:13px;">${reserva.notas}</span>
+      </td></tr>` : ''}
+      ${reserva.comprobantePagoUrl ? `<tr><td style="padding:8px 0;">
+        <span style="color:#6b7280;font-size:12px;">Comprobante</span><br>
+        <a href="${reserva.comprobantePagoUrl}" style="color:#F5C200;font-size:13px;">Ver comprobante →</a>
+      </td></tr>` : ''}
+    </table>
+    <div style="margin-top:20px;text-align:center;">
+      <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'https://monkey.entradasya.cl'}/admin/reservas"
+         style="background:#F5C200;color:#000;text-decoration:none;padding:12px 32px;border-radius:10px;font-size:13px;font-weight:900;display:inline-block;letter-spacing:2px;text-transform:uppercase;">
+        VER EN ADMIN →
+      </a>
+    </div>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>`,
   })
 }
 
@@ -323,14 +417,18 @@ function buildReservaEmailHTML(data: {
     <tr><td align="center">
       <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
 
-        <!-- Header -->
-        <tr><td align="center" style="padding-bottom:28px;">
-          <div style="font-size:32px;font-weight:900;color:#F5C200;letter-spacing:6px;text-transform:uppercase;">MONKEY</div>
-          <div style="font-size:11px;color:#6b7280;letter-spacing:5px;text-transform:uppercase;margin-top:4px;">Restobar</div>
+        <!-- Header gorila -->
+        <tr><td style="padding-bottom:0;line-height:0;font-size:0;">
+          <img src="https://res.cloudinary.com/dqsz4ua73/image/upload/w_600,h_220,c_fill,g_auto,f_jpg,q_85/v1776100172/entradasya/eventos/g71klelokr1caj9dynz2.png"
+               alt="Monkey Restobar" width="600" style="width:100%;display:block;border-radius:16px 16px 0 0;max-width:600px;">
+        </td></tr>
+        <tr><td align="center" style="background:#111;padding:16px 24px;border-bottom:2px solid rgba(245,194,0,0.4);">
+          <div style="font-size:26px;font-weight:900;color:#F5C200;letter-spacing:6px;text-transform:uppercase;">MONKEY RESTOBAR</div>
+          <div style="font-size:10px;color:#6b7280;letter-spacing:5px;text-transform:uppercase;margin-top:3px;">Puente Alto</div>
         </td></tr>
 
         <!-- Card -->
-        <tr><td style="background-color:#0a0a0a;border:1px solid rgba(245,194,0,0.25);border-radius:20px;padding:40px 36px;">
+        <tr><td style="background-color:#0a0a0a;border:1px solid rgba(245,194,0,0.25);border-top:0;border-radius:0 0 20px 20px;padding:40px 36px;">
           <table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
             <tr><td style="background-color:${data.badgeColor};color:#000;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:5px 14px;border-radius:100px;">
               ${data.badge}
@@ -382,7 +480,6 @@ function buildReservaEmailHTML(data: {
 
         <!-- Footer -->
         <tr><td style="padding-top:24px;text-align:center;">
-          <div style="font-size:13px;font-weight:900;color:#F5C200;letter-spacing:4px;text-transform:uppercase;margin-bottom:6px;">MONKEY RESTOBAR</div>
           <div style="color:#374151;font-size:11px;">Powered by EntradasYa</div>
         </td></tr>
 
@@ -419,19 +516,17 @@ function buildEmailHTML(data: {
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
 
-          <!-- ══ HEADER — Logo Monkey ══ -->
+          <!-- ══ HEADER — Gorila ══ -->
           <tr>
-            <td align="center" style="padding-bottom:28px;">
-              <!-- Círculo dorado con cara de mono -->
-              <table cellpadding="0" cellspacing="0" style="margin:0 auto 12px;">
-                <tr>
-                  <td align="center" style="width:64px;height:64px;background-color:#F5C200;border-radius:50%;line-height:64px;font-size:32px;">
-                    🐒
-                  </td>
-                </tr>
-              </table>
-              <div style="font-size:32px;font-weight:900;color:#F5C200;letter-spacing:6px;text-transform:uppercase;line-height:1;">MONKEY</div>
-              <div style="font-size:11px;color:#6b7280;letter-spacing:5px;text-transform:uppercase;margin-top:4px;">Restobar</div>
+            <td style="padding-bottom:0;line-height:0;font-size:0;">
+              <img src="https://res.cloudinary.com/dqsz4ua73/image/upload/w_600,h_220,c_fill,g_auto,f_jpg,q_85/v1776100172/entradasya/eventos/g71klelokr1caj9dynz2.png"
+                   alt="Monkey Restobar" width="600" style="width:100%;display:block;border-radius:16px 16px 0 0;max-width:600px;">
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="background:#111;padding:16px 24px;border-bottom:2px solid rgba(245,194,0,0.4);margin-bottom:28px;">
+              <div style="font-size:26px;font-weight:900;color:#F5C200;letter-spacing:6px;text-transform:uppercase;">MONKEY RESTOBAR</div>
+              <div style="font-size:10px;color:#6b7280;letter-spacing:5px;text-transform:uppercase;margin-top:3px;">Puente Alto</div>
             </td>
           </tr>
 
@@ -555,17 +650,8 @@ function buildEmailHTML(data: {
           <!-- ══ FOOTER ══ -->
           <tr>
             <td style="padding-top:28px;text-align:center;">
-              <div style="font-size:13px;font-weight:900;color:#F5C200;letter-spacing:4px;text-transform:uppercase;margin-bottom:6px;">MONKEY RESTOBAR</div>
-              <div style="color:#374151;font-size:12px;margin-bottom:12px;">Av. Concha y Toro 1060, Local 3</div>
-              <!-- Divider final -->
-              <table width="200" cellpadding="0" cellspacing="0" style="margin:0 auto 12px;">
-                <tr>
-                  <td style="height:1px;background:linear-gradient(90deg,transparent,rgba(245,194,0,0.3),transparent);font-size:0;">&nbsp;</td>
-                </tr>
-              </table>
-              <div style="color:#1f2937;font-size:11px;letter-spacing:1px;">
-                Powered by EntradasYa
-              </div>
+              <div style="color:#374151;font-size:12px;margin-bottom:6px;">Av. Concha y Toro 1060, Local 3</div>
+              <div style="color:#1f2937;font-size:11px;letter-spacing:1px;">Powered by EntradasYa</div>
             </td>
           </tr>
 

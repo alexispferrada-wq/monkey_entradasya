@@ -8,6 +8,23 @@ interface Props {
   evento?: Evento
 }
 
+// Convierte un Date UTC a string "YYYY-MM-DDTHH:mm" en hora Santiago
+function fechaToSantiagoInput(fecha: Date | string): string {
+  return new Date(fecha)
+    .toLocaleString('sv-SE', { timeZone: 'America/Santiago' })
+    .slice(0, 16)
+    .replace(' ', 'T')
+}
+
+// Convierte "YYYY-MM-DDTHH:mm" (hora local Santiago) a ISO UTC
+function santiagoInputToISO(localStr: string): string {
+  const asUTC = new Date(localStr + 'Z')
+  const santiagoStr = asUTC.toLocaleString('sv-SE', { timeZone: 'America/Santiago' })
+  const santiagoDate = new Date(santiagoStr.replace(' ', 'T') + 'Z')
+  const offsetMs = asUTC.getTime() - santiagoDate.getTime()
+  return new Date(asUTC.getTime() + offsetMs).toISOString()
+}
+
 export default function EventoForm({ evento }: Props) {
   const isEdit = !!evento
   const router = useRouter()
@@ -23,11 +40,13 @@ export default function EventoForm({ evento }: Props) {
     nombre: evento?.nombre || '',
     descripcion: evento?.descripcion || '',
     fecha: evento?.fecha
-      ? new Date(evento.fecha).toISOString().slice(0, 16)
+      ? fechaToSantiagoInput(evento.fecha)
       : '',
     lugar: evento?.lugar || 'MONKEY LOUNGE',
     cuposTotal: evento?.cuposTotal?.toString() || '100',
     cuposDisponibles: evento?.cuposDisponibles?.toString() || '100',
+    precioBase: evento?.precioBase?.toString() || '0',
+    cuposReserva: evento?.cuposReserva?.toString() || '0',
     slug: evento?.slug || '',
     imagenUrl: evento?.imagenUrl || '',
     activo: evento?.activo ?? true,
@@ -115,8 +134,11 @@ export default function EventoForm({ evento }: Props) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ...form,
+        fecha: form.fecha ? santiagoInputToISO(form.fecha) : form.fecha,
         cuposTotal: Number(form.cuposTotal),
         cuposDisponibles: Number(form.cuposDisponibles),
+        precioBase: Number(form.precioBase),
+        cuposReserva: Number(form.cuposReserva),
         destacado: form.destacado,
       }),
     })
@@ -309,6 +331,45 @@ export default function EventoForm({ evento }: Props) {
             <p className="text-slate-600 text-xs mt-1">Ajusta si hubo cancelaciones</p>
           </div>
         )}
+      </div>
+
+      {/* Reservas de Show — Precio y Cupos */}
+      <div className="glass-card rounded-xl p-4 space-y-4 border border-primary/20">
+        <p className="text-xs font-bold uppercase tracking-widest text-primary">Configuración de reservas de Show</p>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Precio por persona
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">$</span>
+              <input
+                type="number"
+                min="0"
+                step="1000"
+                value={form.precioBase}
+                onChange={(e) => setForm((f) => ({ ...f, precioBase: e.target.value }))}
+                className="input-glass pl-7"
+                placeholder="0"
+              />
+            </div>
+            <p className="text-slate-600 text-xs mt-1">0 = entrada gratuita</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Cupo máx. de reservas
+            </label>
+            <input
+              type="number"
+              min="0"
+              value={form.cuposReserva}
+              onChange={(e) => setForm((f) => ({ ...f, cuposReserva: e.target.value }))}
+              className="input-glass"
+              placeholder="0"
+            />
+            <p className="text-slate-600 text-xs mt-1">0 = sin límite</p>
+          </div>
+        </div>
       </div>
 
       {/* Imagen — Upload a Cloudinary */}
