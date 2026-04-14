@@ -135,11 +135,13 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
                   {/* Gorila afirmando el cartel - solo en evento activo */}
                   {isActive && (
                     <div 
-                      className={`absolute -top-8 -right-6 z-20 text-5xl transition-transform duration-500 ${gorillaShake ? 'animate-bounce' : ''}`}
+                      className={`absolute -top-16 -right-12 z-50 text-7xl transition-transform duration-500 ${gorillaShake ? 'animate-bounce' : ''}`}
                       style={{
-                        textShadow: '0 0 20px rgba(245,194,0,0.6), -4px -4px 0 rgba(0,0,0,0.5)',
-                        filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))',
-                        transform: gorillaShake ? 'rotate(-8deg) scale(1.15)' : 'rotate(-15deg) scale(1)',
+                        textShadow: '0 0 30px rgba(245,194,0,0.8), -6px -6px 0 rgba(0,0,0,0.6), 2px 2px 8px rgba(0,0,0,0.5)',
+                        filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.6)) drop-shadow(0 0 30px rgba(245,194,0,0.4))',
+                        transform: gorillaShake ? 'rotate(-8deg) scale(1.2)' : 'rotate(-20deg) scale(1.15)',
+                        lineHeight: '1',
+                        letterSpacing: '0',
                       }}
                     >
                       🦍
