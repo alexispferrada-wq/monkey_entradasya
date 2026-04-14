@@ -68,10 +68,10 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
   if (eventos.length === 0) return null
 
   // ── Cálculo del carrusel peek ──────────────────────────────
-  // Con 1 evento: card al 60% centrado
-  // Con 2+ eventos: card al 48% → ~26% de cada flyer lateral queda visible
+  // Con 1 evento: card al 48% centrado (-20%)
+  // Con 2+ eventos: card al 38.4% → más laterales visibles (-20%)
   const GAP = 12
-  const CARD_RATIO = eventos.length === 1 ? 0.60 : 0.48
+  const CARD_RATIO = eventos.length === 1 ? 0.48 : 0.384
   const cardWidth = containerW * CARD_RATIO
   // Para centrar el card `current`:
   // translateX = (containerW - cardWidth)/2 - current*(cardWidth+GAP)
