@@ -229,7 +229,40 @@ button, a {
     transform: translateY(-4px);
   }
 
-  /* ── Fondo con Partículas Jungla ────────────────────────────────────────← */\n  .jungle-bg {\n    position: relative;\n    background: linear-gradient(135deg, rgba(245, 194, 0, 0.02) 0%, transparent 100%);\n  }\n\n  /* ── Texto Destacado Amarillo ──────────────────────────────────────────── */\n  .text-jungle {\n    color: #F5C200;\n    text-shadow: 0 0 20px rgba(245, 194, 0, 0.3);\n    font-weight: 700;\n  }\n\n  /* ── Tema dinámico por evento ────────────────────────────── */
+  /* ── Cards con Brillo Amarillo ──────────────────────────────────────────── */
+  .card-jungle-glow {
+    position: relative;
+    background: rgba(10, 10, 10, 0.75);
+    border: 2px solid rgba(245, 194, 0, 0.2);
+    box-shadow: 
+      0 0 20px rgba(245, 194, 0, 0.15),
+      inset 0 0 20px rgba(245, 194, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+
+  .card-jungle-glow:hover {
+    border-color: rgba(245, 194, 0, 0.6);
+    box-shadow: 
+      0 0 40px rgba(245, 194, 0, 0.4),
+      0 0 80px rgba(245, 194, 0, 0.2),
+      inset 0 0 30px rgba(245, 194, 0, 0.1);
+    transform: translateY(-4px);
+  }
+
+  /* ── Fondo con Gradiente Jungla ────────────────────────────────────────── */
+  .jungle-bg {
+    position: relative;
+    background: linear-gradient(135deg, rgba(245, 194, 0, 0.02) 0%, transparent 100%);
+  }
+
+  /* ── Texto Destacado Amarillo ──────────────────────────────────────────── */
+  .text-jungle {
+    color: #F5C200;
+    text-shadow: 0 0 20px rgba(245, 194, 0, 0.3);
+    font-weight: 700;
+  }
+
+  /* ── Tema dinámico por evento ────────────────────────────── */
   .evento-bg {
     background:
       radial-gradient(ellipse at top left, rgba(var(--evt-r, 245), var(--evt-g, 194), var(--evt-b, 0), 0.18) 0%, transparent 55%),
