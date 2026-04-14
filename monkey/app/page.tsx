@@ -37,43 +37,43 @@ export default async function Home() {
     <div className="min-h-screen">
 
       {/* Hero */}
-      <section className="py-8 sm:py-14 px-4 text-center">
+      <section className="py-8 sm:py-14 px-4 text-center jungle-bg min-h-[400px] flex items-center justify-center relative">
+        {/* Fondo decorativo con glow */}
+        <div className="absolute inset-0 -z-10 flex items-center justify-center">
+          <div className="absolute w-96 h-96 bg-gradient-to-r from-yellow-600/20 to-green-600/20 rounded-full blur-3xl"></div>
+        </div>
         <div className="max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 glass-card rounded-full px-4 py-1.5 text-xs sm:text-sm text-zinc-400 mb-6 sm:mb-10 border-primary/20">
-            <span className="w-1.5 h-1.5 bg-primary rounded-full shrink-0" />
+          <div className="inline-flex items-center gap-2 card-jungle-glow rounded-full px-4 py-1.5 text-xs sm:text-sm text-jungle mb-6 sm:mb-10 font-bold">
+            <span className="w-2 h-2 bg-yellow-400 rounded-full shrink-0 animate-pulse"></span>
             Invitaciones disponibles — entrada gratuita
           </div>
           <h1 className="font-sans text-4xl sm:text-5xl md:text-7xl mb-5 sm:mb-8 tracking-wide leading-tight uppercase font-bold">
-            <span className="gradient-text">Eventos y Reservas</span>
+            <span className="jungle-title">Bienvenidos a la jungla...</span>
           </h1>
           <div className="jungle-divider max-w-sm mx-auto mb-5 sm:mb-8" />
-          <p className="text-zinc-400 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
-            Solicita tu invitación gratuita. Solo necesitas tu correo
-            y en minutos tendrás tu código QR de acceso.
-          </p>
         </div>
       </section>
 
       {/* Reservas rápidas */}
-      <section className="pb-8 sm:pb-10 px-4">
+      <section className="pb-8 sm:pb-10 px-4 jungle-bg">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center gap-2 mb-4">
             <span className="text-primary text-sm">📌</span>
-            <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">Reservas</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-jungle">Reservas</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {RESERVA_LINKS.map(r => (
               <Link
                 key={r.href}
                 href={r.href}
-                className="group flex items-center gap-4 glass-card rounded-2xl px-4 py-4 min-h-[64px] border border-white/8 hover:border-primary/30 active:scale-[0.98] transition-all duration-200"
+                className="group flex items-center gap-4 card-jungle-glow rounded-2xl px-4 py-4 min-h-[64px] active:scale-[0.98] transition-all duration-200"
               >
                 <span className="text-2xl shrink-0">{r.emoji}</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-white text-sm font-bold leading-tight">{r.label}</p>
                   <p className="text-xs font-semibold mt-0.5" style={{ color: r.color }}>{r.sub}</p>
                 </div>
-                <span className="text-zinc-600 group-hover:text-primary transition-colors shrink-0">→</span>
+                <span className="text-jungle group-hover:text-yellow-400 transition-colors shrink-0 font-bold">→</span>
               </Link>
             ))}
           </div>
