@@ -26,6 +26,7 @@ function formatFecha(fecha: Date): string {
 export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
   const [current, setCurrent] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const [gorillaShake, setGorillaShake] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerW, setContainerW] = useState(0)
 
@@ -38,6 +39,13 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
     window.addEventListener('resize', medir)
     return () => window.removeEventListener('resize', medir)
   }, [])
+
+  // Efecto de shake del gorila cuando cambia el evento
+  useEffect(() => {
+    setGorillaShake(true)
+    const timer = setTimeout(() => setGorillaShake(false), 500)
+    return () => clearTimeout(timer)
+  }, [current])
 
   const prev = useCallback(() => {
     setCurrent((c) => (c === 0 ? eventos.length - 1 : c - 1))
@@ -73,22 +81,25 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
     : 0
 
   return (
-    <section className="pb-10">
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-4 px-4 max-w-5xl mx-auto">
-        <span className="text-primary text-lg">⭐</span>
-        <span className="text-xs font-bold uppercase tracking-widest text-primary">
-          {eventos.length > 1 ? 'Eventos destacados' : 'Evento destacado'}
-        </span>
+    <section className="pb-10 perspective">
+      {/* Header mejorado */}
+      <div className="flex items-center gap-2 mb-6 px-4 max-w-5xl mx-auto">
+        <span className="text-3xl animate-bounce">⭐</span>
+        <div>
+          <span className="text-xs font-bold uppercase tracking-widest text-jungle block mb-0.5">
+            {eventos.length > 1 ? 'Eventos destacados' : 'Evento destacado'}
+          </span>
+          <div className="h-0.5 w-12 bg-gradient-to-r from-yellow-400 to-transparent rounded-full" />
+        </div>
         {eventos.length > 1 && (
-          <span className="ml-auto text-xs text-zinc-500 font-mono">
+          <span className="ml-auto text-xs text-zinc-400 font-mono bg-black/50 px-3 py-1 rounded-full border border-yellow-400/30">
             {current + 1} / {eventos.length}
           </span>
         )}
       </div>
 
-      {/* Pista del carrusel */}
-      <div ref={containerRef} className="overflow-hidden">
+      {/* Pista del carrusel con perspectiva 3D */}
+      <div ref={containerRef} className="overflow-hidden perspective" style={{ perspective: '1000px' }}>
         <div
           className="flex transition-transform duration-500 ease-[cubic-bezier(.25,.8,.25,1)]"
           style={{
@@ -119,16 +130,39 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
               >
                 <Link
                   href={agotado ? '#' : `/${evento.slug}`}
-                  className={`group block ${agotado || !isActive ? 'pointer-events-none' : ''}`}
+                  className={`group block relative ${agotado || !isActive ? 'pointer-events-none' : ''}`}
                 >
+                  {/* Gorila afirmando el cartel - solo en evento activo */}
+                  {isActive && (
+                    <div 
+                      className={`absolute -top-8 -right-6 z-20 text-5xl transition-transform duration-500 ${gorillaShake ? 'animate-bounce' : ''}`}
+                      style={{
+                        textShadow: '0 0 20px rgba(245,194,0,0.6), -4px -4px 0 rgba(0,0,0,0.5)',
+                        filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))',
+                        transform: gorillaShake ? 'rotate(-8deg) scale(1.15)' : 'rotate(-15deg) scale(1)',
+                      }}
+                    >
+                      🦍
+                    </div>
+                  )}
+
+                  {/* Brillo amarillo detras del gorila */}
+                  {isActive && (
+                    <div 
+                      className="absolute -top-4 -right-4 w-24 h-24 rounded-full bg-yellow-400/20 blur-3xl -z-10 animate-pulse"
+                      style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}
+                    />
+                  )}
+
                   {/* Flyer 3:4 */}
                   <div
-                    className="relative rounded-3xl overflow-hidden bg-black w-full transition-shadow duration-500"
+                    className="relative rounded-3xl overflow-hidden bg-black w-full transition-all duration-500"
                     style={{
                       aspectRatio: '3/4',
                       boxShadow: isActive
-                        ? '0 24px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(245,194,0,0.15)'
-                        : 'none',
+                        ? '0 0 60px rgba(245,194,0,0.6), 0 0 120px rgba(245,194,0,0.3), 0 24px 60px rgba(0,0,0,0.9), 0 0 0 3px rgba(245,194,0,0.3)'
+                        : '0 10px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(245,194,0,0.1)',
+                      border: isActive ? '2px solid rgba(245,194,0,0.3)' : '1px solid rgba(245,194,0,0.05)',
                     }}
                   >
                     {evento.imagenUrl ? (
@@ -194,24 +228,26 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
         </div>
       </div>
 
-      {/* Dots + flechas */}
+      {/* Dots + flechas mejoradas */}
       {eventos.length > 1 && (
-        <div className="flex items-center justify-center gap-4 mt-5 px-4">
+        <div className="flex items-center justify-center gap-6 mt-7 px-4">
           <button
             onClick={prev}
-            className="w-9 h-9 rounded-full bg-black/60 border border-white/10 flex items-center justify-center text-white hover:bg-primary hover:text-black transition-all text-lg"
+            className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 border-2 border-yellow-400/50 flex items-center justify-center text-yellow-300 hover:text-yellow-200 hover:border-yellow-300 hover:shadow-lg hover:shadow-yellow-500/30 transition-all text-xl font-bold group"
             aria-label="Anterior"
           >
-            ‹
+            <span className="group-hover:scale-125 transition-transform">‹</span>
           </button>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2.5 items-center p-1.5 rounded-full bg-black/70 border border-yellow-400/20">
             {eventos.map((_, i) => (
               <button
                 key={i}
                 onClick={() => { setCurrent(i); setIsAutoPlaying(false) }}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === current ? 'w-6 bg-primary' : 'w-1.5 bg-zinc-600'
+                className={`rounded-full transition-all duration-300 cursor-pointer ${
+                  i === current 
+                    ? 'w-7 h-2.5 bg-gradient-to-r from-yellow-400 to-yellow-300 shadow-lg shadow-yellow-500/50' 
+                    : 'w-2 h-2 bg-zinc-600 hover:bg-zinc-500'
                 }`}
                 aria-label={`Ir al evento ${i + 1}`}
               />
@@ -220,10 +256,10 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
 
           <button
             onClick={next}
-            className="w-9 h-9 rounded-full bg-black/60 border border-white/10 flex items-center justify-center text-white hover:bg-primary hover:text-black transition-all text-lg"
+            className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 border-2 border-yellow-400/50 flex items-center justify-center text-yellow-300 hover:text-yellow-200 hover:border-yellow-300 hover:shadow-lg hover:shadow-yellow-500/30 transition-all text-xl font-bold group"
             aria-label="Siguiente"
           >
-            ›
+            <span className="group-hover:scale-125 transition-transform">›</span>
           </button>
         </div>
       )}
