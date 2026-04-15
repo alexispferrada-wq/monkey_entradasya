@@ -3,31 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-function validarRut(rut: string): boolean {
-  const clean = rut.replace(/[.\-\s]/g, '').toUpperCase()
-  if (!/^\d{7,8}[0-9K]$/.test(clean)) return false
-  const cuerpo = clean.slice(0, -1)
-  const dv = clean.slice(-1)
-
-  let suma = 0
-  let multiplo = 2
-  for (let i = cuerpo.length - 1; i >= 0; i--) {
-    suma += parseInt(cuerpo[i], 10) * multiplo
-    multiplo = multiplo === 7 ? 2 : multiplo + 1
-  }
-  const resto = 11 - (suma % 11)
-  const dvEsperado = resto === 11 ? '0' : resto === 10 ? 'K' : String(resto)
-  return dv === dvEsperado
-}
-
-function formatRut(raw: string): string {
-  const clean = raw.replace(/[^0-9kK]/g, '').toUpperCase()
-  if (clean.length <= 1) return clean
-  const body = clean.slice(0, -1)
-  const dv = clean.slice(-1)
-  const bodyFmt = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-  return `${bodyFmt}-${dv}`
-}
 
 export default function NormalForm() {
   const router = useRouter()
@@ -35,7 +10,6 @@ export default function NormalForm() {
   const [form, setForm] = useState({
     nombre: '',
     apellido: '',
-    rut: '',
     email: '',
     telefono: '',
     fecha: '',
@@ -51,18 +25,10 @@ export default function NormalForm() {
     setForm((f) => ({ ...f, [field]: value }))
   }
 
-  function handleRutChange(e: React.ChangeEvent<HTMLInputElement>) {
-    set('rut', formatRut(e.target.value))
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!form.nombre.trim() || !form.apellido.trim()) {
       setError('Ingresa tu nombre y apellido.')
-      return
-    }
-    if (!validarRut(form.rut)) {
-      setError('Ingresa un RUT valido.')
       return
     }
     setLoading(true)
@@ -74,7 +40,6 @@ export default function NormalForm() {
       body: JSON.stringify({
         tipo: 'terraza',
         nombre: `${form.nombre.trim()} ${form.apellido.trim()}`,
-        rut: form.rut.trim(),
         email: form.email,
         telefono: form.telefono,
         fecha: form.fecha,
@@ -160,23 +125,6 @@ export default function NormalForm() {
             autoComplete="family-name"
           />
         </div>
-      </div>
-
-      <div>
-        <label className="block text-xs font-medium text-zinc-400 mb-1.5 uppercase tracking-wide">
-          RUT
-        </label>
-        <input
-          type="text"
-          required
-          value={form.rut}
-          onChange={handleRutChange}
-          placeholder="12.345.678-9"
-          className="input-glass w-full"
-          autoComplete="off"
-          inputMode="text"
-        />
-        <p className="text-zinc-600 text-xs mt-1">🔒 Requerido por Ley 19.925 sobre expendio de bebidas alcoholicas</p>
       </div>
 
       {/* Email */}

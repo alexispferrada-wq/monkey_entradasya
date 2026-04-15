@@ -11,31 +11,6 @@ const LUGARES: { id: Lugar; label: string; sub: string; precio: number; emoji: s
   { id: 'TERRAZA',       label: 'Terraza',         sub: 'Fumadores · Gratis', precio: 0,     emoji: '🌿' },
 ]
 
-function validarRut(rut: string): boolean {
-  const clean = rut.replace(/[.\-\s]/g, '').toUpperCase()
-  if (clean.length < 2) return false
-  const body = clean.slice(0, -1)
-  const dv   = clean.slice(-1)
-  if (!/^\d+$/.test(body)) return false
-  if (!/^[\dK]$/.test(dv)) return false
-  let sum = 0, mul = 2
-  for (let i = body.length - 1; i >= 0; i--) {
-    sum += parseInt(body[i]) * mul
-    mul = mul === 7 ? 2 : mul + 1
-  }
-  const rest = 11 - (sum % 11)
-  const expected = rest === 11 ? '0' : rest === 10 ? 'K' : String(rest)
-  return dv === expected
-}
-
-function formatRut(raw: string): string {
-  const clean = raw.replace(/[^\dkK]/g, '').toUpperCase()
-  if (clean.length === 0) return ''
-  const dv = clean.slice(-1)
-  const body = clean.slice(0, -1)
-  if (body.length === 0) return dv
-  return `${body.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}-${dv}`
-}
 
 export default function CumpleanosForm() {
   const router = useRouter()
@@ -46,7 +21,6 @@ export default function CumpleanosForm() {
   const [form, setForm] = useState({
     organizadorNombre:   '',
     organizadorEmail:    '',
-    organizadorRut:      '',
     organizadorTelefono: '',
     cumpleañeroNombre:   '',
     edad:                '',
@@ -59,20 +33,9 @@ export default function CumpleanosForm() {
     setForm(f => ({ ...f, [field]: value }))
   }
 
-  function handleRutChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const raw = e.target.value.replace(/[^\dkK]/g, '').toUpperCase()
-    if (raw.length > 9) return
-    set('organizadorRut', formatRut(raw))
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
-
-    if (!validarRut(form.organizadorRut)) {
-      setError('El RUT del organizador no es válido.')
-      return
-    }
 
     const edad = parseInt(form.edad)
     const cantidadInvitados = parseInt(form.cantidadInvitados)
@@ -89,7 +52,6 @@ export default function CumpleanosForm() {
         body: JSON.stringify({
           organizadorNombre:   form.organizadorNombre.trim(),
           organizadorEmail:    form.organizadorEmail.trim().toLowerCase(),
-          organizadorRut:      form.organizadorRut.trim(),
           organizadorTelefono: form.organizadorTelefono.trim(),
           cumpleañeroNombre:   form.cumpleañeroNombre.trim(),
           edad,
@@ -233,17 +195,6 @@ export default function CumpleanosForm() {
               placeholder="Ej: Juan Pérez González"
               className="input-glass"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">RUT</label>
-            <input
-              type="text" required value={form.organizadorRut}
-              onChange={handleRutChange}
-              placeholder="12.345.678-9"
-              inputMode="numeric"
-              className="input-glass"
-            />
-            <p className="text-zinc-600 text-xs mt-1">🔒 Requerido por Ley 19.925 sobre expendio de bebidas alcohólicas</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Teléfono</label>
