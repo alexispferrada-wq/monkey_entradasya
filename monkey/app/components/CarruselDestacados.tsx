@@ -26,7 +26,6 @@ function formatFecha(fecha: Date): string {
 export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
   const [current, setCurrent] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
-  const [gorillaShake, setGorillaShake] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerW, setContainerW] = useState(0)
 
@@ -39,13 +38,6 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
     window.addEventListener('resize', medir)
     return () => window.removeEventListener('resize', medir)
   }, [])
-
-  // Efecto de shake del gorila cuando cambia el evento
-  useEffect(() => {
-    setGorillaShake(true)
-    const timer = setTimeout(() => setGorillaShake(false), 500)
-    return () => clearTimeout(timer)
-  }, [current])
 
   const prev = useCallback(() => {
     setCurrent((c) => (c === 0 ? eventos.length - 1 : c - 1))
@@ -68,10 +60,10 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
   if (eventos.length === 0) return null
 
   // ── Cálculo del carrusel peek ──────────────────────────────
-  // Con 1 evento: card al 48% centrado (-20%)
-  // Con 2+ eventos: card al 38.4% → más laterales visibles (-20%)
+  // Con 1 evento: card al 26.88% centrado (-30% adicional)
+  // Con 2+ eventos: card al 21.504% → más laterales visibles (-30% adicional)
   const GAP = 12
-  const CARD_RATIO = eventos.length === 1 ? 0.48 : 0.384
+  const CARD_RATIO = eventos.length === 1 ? 0.2688 : 0.21504
   const cardWidth = containerW * CARD_RATIO
   // Para centrar el card `current`:
   // translateX = (containerW - cardWidth)/2 - current*(cardWidth+GAP)
@@ -97,31 +89,6 @@ export default function CarruselDestacados({ eventos }: { eventos: Evento[] }) {
           </span>
         )}
       </div>
-
-      {/* Gorila flotante - fuera del overflow */}
-      {eventos.length > 0 && eventos[current] && (
-        <div 
-          className="absolute -top-12 right-4 sm:right-12 z-50 text-7xl sm:text-8xl transition-all duration-500 pointer-events-none"
-          style={{
-            textShadow: '0 0 40px rgba(245,194,0,0.8), -8px -8px 0 rgba(0,0,0,0.7), 2px 2px 12px rgba(0,0,0,0.6)',
-            filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.7)) drop-shadow(0 0 40px rgba(245,194,0,0.5))',
-            transform: gorillaShake ? 'rotate(-8deg) scale(1.25) translateY(-10px)' : 'rotate(-20deg) scale(1.2)',
-            lineHeight: '1',
-            letterSpacing: '0',
-            opacity: 1,
-          }}
-        >
-          🦍
-        </div>
-      )}
-
-      {/* Brillo amarillo detras del gorila */}
-      {eventos.length > 0 && eventos[current] && (
-        <div 
-          className="absolute -top-6 right-6 sm:right-14 w-32 h-32 rounded-full bg-yellow-400/30 blur-3xl -z-40 animate-pulse"
-          style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite', pointerEvents: 'none' }}
-        />
-      )}
 
       {/* Pista del carrusel con perspectiva 3D */}
       <div ref={containerRef} className="overflow-hidden perspective" style={{ perspective: '1000px' }}>

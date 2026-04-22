@@ -1,0 +1,463 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base mobile ─────────────────────────────────────────────── */
+*, *::before, *::after {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+html { touch-action: manipulation; }
+body {
+  overscroll-behavior-y: none;
+  font-size: 16px;
+  line-height: 1.5;
+}
+input, textarea, select, button { -webkit-appearance: none; appearance: none; border-radius: 0; }
+input[type="date"], input[type="time"], input[type="number"] { -webkit-appearance: none; }
+button, a { touch-action: manipulation; cursor: pointer; }
+
+/* ── Animaciones base ────────────────────────────────────────── */
+@keyframes fade-in  { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+@keyframes slide-up { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+.animate-fade-in  { animation: fade-in  0.3s ease both; }
+.animate-slide-up { animation: slide-up 0.4s ease both; }
+
+/* ── Orb float ───────────────────────────────────────────────── */
+@keyframes orb-float {
+  0%,100% { transform: translate(0,0) scale(1);        opacity: 0.9; }
+  40%      { transform: translate(12px,-18px) scale(1.06); opacity: 1; }
+  70%      { transform: translate(-8px,10px) scale(0.96);  opacity: 0.85; }
+}
+
+/* ── Logo glow — dancehall neon ──────────────────────────────── */
+@keyframes logo-breathe {
+  0%,100% {
+    filter:
+      drop-shadow(0 0 12px rgba(255,214,0,0.70))
+      drop-shadow(0 0 40px rgba(255,214,0,0.35))
+      drop-shadow(0 0 90px rgba(232,0,110,0.20))
+      drop-shadow(0 6px 20px rgba(0,0,0,0.90));
+  }
+  40% {
+    filter:
+      drop-shadow(0 0 20px rgba(255,214,0,1))
+      drop-shadow(0 0 70px rgba(255,214,0,0.55))
+      drop-shadow(0 0 140px rgba(232,0,110,0.35))
+      drop-shadow(0 8px 30px rgba(0,0,0,0.90));
+  }
+  70% {
+    filter:
+      drop-shadow(0 0 15px rgba(255,214,0,0.85))
+      drop-shadow(0 0 55px rgba(255,90,31,0.45))
+      drop-shadow(0 0 110px rgba(232,0,110,0.25))
+      drop-shadow(0 6px 22px rgba(0,0,0,0.90));
+  }
+}
+
+/* ── Bass pulse — sound system vibes ────────────────────────── */
+@keyframes bass-pulse {
+  0%,100%  { transform: scale(1); }
+  8%       { transform: scale(1.018); }
+  16%      { transform: scale(1); }
+  50%      { transform: scale(1.010); }
+  58%      { transform: scale(1); }
+}
+
+/* ── Beam sweep — stage lights ───────────────────────────────── */
+@keyframes beam-left {
+  0%,100% { transform: rotate(-28deg); opacity: 0.10; }
+  50%      { transform: rotate(-12deg); opacity: 0.18; }
+}
+@keyframes beam-right {
+  0%,100% { transform: rotate(28deg);  opacity: 0.08; }
+  50%      { transform: rotate(12deg);  opacity: 0.16; }
+}
+@keyframes beam-center {
+  0%,100% { opacity: 0.06; transform: scaleX(1); }
+  50%      { opacity: 0.14; transform: scaleX(1.1); }
+}
+
+/* ── Speaker pulse ───────────────────────────────────────────── */
+@keyframes spk-pulse {
+  0%,100% { transform: scale(1);     opacity: 1; }
+  10%      { transform: scale(1.04); opacity: 0.92; }
+  20%      { transform: scale(1);     opacity: 1; }
+  60%      { transform: scale(1.02); opacity: 0.96; }
+}
+
+/* ── Star twinkle ────────────────────────────────────────────── */
+@keyframes star-twinkle {
+  0%,100% { opacity: 0.75; transform: scale(1); }
+  50%      { opacity: 0.12; transform: scale(0.7); }
+}
+@keyframes star-twinkle-2 {
+  0%,100% { opacity: 0.55; transform: scale(1); }
+  33%      { opacity: 0.08; transform: scale(0.75); }
+  66%      { opacity: 0.9;  transform: scale(1.15); }
+}
+
+/* ── Dancer sway ─────────────────────────────────────────────── */
+@keyframes dancer-sway {
+  0%,100% { transform: rotate(-2deg) translateX(0); }
+  30%      { transform: rotate(3deg)  translateX(4px); }
+  65%      { transform: rotate(-1deg) translateX(-3px); }
+}
+@keyframes dancer-sway-r {
+  0%,100% { transform: rotate(2deg) translateX(0); }
+  30%      { transform: rotate(-3deg) translateX(-4px); }
+  65%      { transform: rotate(1deg)  translateX(3px); }
+}
+
+/* ── Smoke rise ──────────────────────────────────────────────── */
+@keyframes smoke-rise {
+  0%   { opacity:0.28; transform:translateY(0)  scaleX(1); }
+  50%  { opacity:0.40; transform:translateY(-6px) scaleX(1.04); }
+  100% { opacity:0.28; transform:translateY(0)  scaleX(1); }
+}
+
+/* ── Shimmer ─────────────────────────────────────────────────── */
+@keyframes shimmer-move {
+  0%   { transform:translateX(-100%); }
+  100% { transform:translateX(100%); }
+}
+.shimmer-bar { position:relative; overflow:hidden; }
+.shimmer-bar::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.14) 50%,transparent 100%);
+  animation:shimmer-move 2.2s ease-in-out infinite;
+}
+
+/* ── Palmeras ────────────────────────────────────────────────── */
+@keyframes palm-sway {
+  0%,100% { transform: rotate(0deg); transform-origin: bottom center; }
+  30%      { transform: rotate(1.5deg) translateX(3px); transform-origin: bottom center; }
+  70%      { transform: rotate(-1deg) translateX(-2px); transform-origin: bottom center; }
+}
+@keyframes palm-sway-r {
+  0%,100% { transform: rotate(0deg); transform-origin: bottom center; }
+  30%      { transform: rotate(-1.5deg) translateX(-3px); transform-origin: bottom center; }
+  70%      { transform: rotate(1deg) translateX(2px); transform-origin: bottom center; }
+}
+.palm-l { animation: palm-sway   7s ease-in-out infinite; }
+.palm-r { animation: palm-sway-r 8s ease-in-out 1s infinite; }
+
+/* ── Dancer classes ──────────────────────────────────────────── */
+.dancer-l { animation: dancer-sway   4.2s ease-in-out infinite; transform-origin: bottom center; }
+.dancer-r { animation: dancer-sway-r 3.8s ease-in-out 0.6s infinite; transform-origin: bottom center; }
+
+/* ── Speaker class ───────────────────────────────────────────── */
+.spk { animation: spk-pulse 1.6s ease-in-out infinite; transform-origin: center; }
+
+/* ── Sol/luna ────────────────────────────────────────────────── */
+@keyframes sun-pulse {
+  0%,100% { opacity:0.10; transform:scale(1); }
+  50%      { opacity:0.18; transform:scale(1.05); }
+}
+
+/* ── Scroll hint ─────────────────────────────────────────────── */
+@keyframes gentle-bounce {
+  0%,100% { transform:translateY(0); }
+  50%      { transform:translateY(6px); }
+}
+.bounce-slow { animation: gentle-bounce 2s ease-in-out infinite; }
+
+/* Scrollbar oculta */
+.hide-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+.hide-scrollbar::-webkit-scrollbar { display:none; }
+
+@layer components {
+
+  /* ── Fondo general ───────────────────────────────────────── */
+  .club-bg {
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -5%,  rgba(255,214,0,0.12)  0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 15% 60%,  rgba(232,0,110,0.08)  0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 85% 60%,  rgba(0,200,83,0.06)   0%, transparent 55%),
+      linear-gradient(180deg, #030202 0%, #050100 60%, #030202 100%);
+  }
+
+  /* ── Glass ───────────────────────────────────────────────── */
+  .glass {
+    background: rgba(3,2,2,0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .glass-card {
+    background: rgba(8,3,0,0.82);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,214,0,0.14);
+  }
+  .glass-card:hover {
+    border-color: rgba(255,214,0,0.40);
+    box-shadow: 0 0 30px rgba(232,0,110,0.14);
+  }
+
+  /* ── Ticket card ─────────────────────────────────────────── */
+  .ticket-card {
+    background: rgba(6,2,0,0.92);
+    border: 1px solid rgba(255,214,0,0.16);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+  }
+  .ticket-card::before {
+    content:''; position:absolute; inset:0;
+    background: linear-gradient(135deg, rgba(255,214,0,0.04) 0%, transparent 50%, rgba(232,0,110,0.03) 100%);
+    pointer-events:none;
+  }
+  .ticket-card:hover {
+    border-color: rgba(255,214,0,0.50);
+    box-shadow:
+      0 0 0 1px rgba(255,214,0,0.10),
+      0 8px 40px rgba(232,0,110,0.18),
+      0 0 60px rgba(255,214,0,0.10);
+    transform: translateY(-5px);
+  }
+  .ticket-perf {
+    border-top: 2px dashed rgba(255,214,0,0.18);
+    position: relative;
+  }
+  .ticket-perf::before, .ticket-perf::after {
+    content:''; position:absolute; top:-8px;
+    width:14px; height:14px;
+    background:#060200; border-radius:50%;
+    border:1px solid rgba(255,214,0,0.12);
+  }
+  .ticket-perf::before { left:-7px; }
+  .ticket-perf::after  { right:-7px; }
+
+  /* ── Títulos del logo — dancehall neon ───────────────────── */
+  .living-title-l {
+    font-family:'Bebas Neue',sans-serif; font-weight:900;
+    color:#FFFFFF;
+    text-shadow:
+      0 0 15px rgba(255,255,255,0.50),
+      0 0 45px rgba(255,255,255,0.18),
+      0 2px 16px rgba(0,0,0,1);
+  }
+  .living-title-i {
+    font-family:'Bebas Neue',sans-serif; font-weight:900;
+    color:#FFD600;
+    text-shadow:
+      0 0 12px rgba(255,214,0,1),
+      0 0 35px rgba(255,214,0,0.80),
+      0 0 70px rgba(255,214,0,0.45),
+      0 0 130px rgba(255,200,0,0.22),
+      0 2px 16px rgba(0,0,0,1);
+  }
+  .living-title-g {
+    font-family:'Bebas Neue',sans-serif; font-weight:900;
+    color:#FF5A1F;
+    text-shadow:
+      0 0 12px rgba(255,90,31,1),
+      0 0 35px rgba(255,90,31,0.80),
+      0 0 70px rgba(232,0,110,0.45),
+      0 0 130px rgba(200,0,80,0.25),
+      0 2px 16px rgba(0,0,0,1);
+  }
+
+  /* ── Gradient texts ──────────────────────────────────────── */
+  .gradient-text {
+    background: linear-gradient(135deg, #FFD600 0%, #FF5A1F 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  }
+  .golden-text {
+    background: linear-gradient(135deg, #cc7a00 0%, #FFD600 35%, #ffe566 55%, #FFB800 75%, #cc6600 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  }
+  .magenta-text {
+    background: linear-gradient(135deg, #E8006E 0%, #FF4FA3 50%, #E8006E 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  }
+
+  /* ── Logo neon ───────────────────────────────────────────── */
+  .logo-neon { animation: logo-breathe 4s ease-in-out infinite; }
+
+  /* ── Botón primario — gold eléctrico ──────────────────────── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center font-black rounded-xl
+           transition-all duration-300 hover:scale-[1.03]
+           tracking-wide min-h-[48px] px-5 py-3;
+    background: linear-gradient(135deg, #FFD600 0%, #FFA800 55%, #FF5A1F 100%);
+    color: #080000;
+    box-shadow:
+      0 0 30px rgba(255,214,0,0.60),
+      0 0 65px rgba(255,214,0,0.22),
+      0 4px 20px rgba(0,0,0,0.60);
+    font-family:'Bebas Neue',sans-serif;
+    letter-spacing:0.08em;
+    font-size:1.1rem;
+    touch-action:manipulation;
+  }
+  .btn-primary:hover {
+    box-shadow:
+      0 0 50px rgba(255,214,0,0.80),
+      0 0 100px rgba(232,0,110,0.30),
+      0 6px 28px rgba(0,0,0,0.70);
+  }
+
+  /* ── Botón secundario ────────────────────────────────────── */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center bg-transparent
+           font-black rounded-xl transition-all duration-300 hover:scale-[1.03]
+           min-h-[48px] px-5 py-3;
+    border: 2px solid rgba(232,0,110,0.55);
+    color: #FF4FA3;
+    font-family:'Bebas Neue',sans-serif;
+    letter-spacing:0.08em;
+    font-size:1.1rem;
+    box-shadow: 0 0 20px rgba(232,0,110,0.12), inset 0 0 20px rgba(232,0,110,0.04);
+  }
+  .btn-secondary:hover {
+    background: rgba(232,0,110,0.10);
+    border-color: #E8006E;
+    box-shadow: 0 0 40px rgba(232,0,110,0.35);
+    color: #FF4FA3;
+  }
+
+  /* ── Inputs ──────────────────────────────────────────────── */
+  .input-glass {
+    @apply bg-black/80 border text-white placeholder-zinc-600
+           rounded-xl px-4 w-full focus:outline-none transition-all duration-300;
+    border-color: rgba(255,214,0,0.18);
+    font-size:16px; min-height:48px;
+    padding-top:0.75rem; padding-bottom:0.75rem;
+    -webkit-appearance:none;
+  }
+  .input-glass:focus {
+    border-color: rgba(255,214,0,0.55);
+    box-shadow: 0 0 0 2px rgba(255,214,0,0.12);
+  }
+  .input-glass::placeholder { color:rgb(70 70 70); }
+  select.input-glass {
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 0.75rem center; background-size:1.25em; padding-right:2.5rem;
+  }
+
+  /* ── Divisores ───────────────────────────────────────────── */
+  .jungle-divider {
+    height:1px;
+    background:linear-gradient(90deg,transparent,rgba(255,214,0,0.40),rgba(232,0,110,0.30),rgba(255,214,0,0.40),transparent);
+  }
+  .divider-warm {
+    height:1px;
+    background:linear-gradient(90deg,transparent,rgba(255,214,0,0.45),transparent);
+  }
+
+  /* ── Badges ──────────────────────────────────────────────── */
+  .club-badge {
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(3,2,0,0.85);
+    border:1px solid rgba(255,214,0,0.28);
+    border-radius:999px;
+    padding:4px 14px;
+    backdrop-filter:blur(12px);
+  }
+  .pill-dark {
+    background:rgba(0,0,0,0.70);
+    border:1px solid rgba(255,214,0,0.18);
+    backdrop-filter:blur(8px);
+    border-radius:999px;
+    padding:3px 10px;
+    font-size:0.7rem; font-weight:600;
+    letter-spacing:0.08em; text-transform:uppercase;
+    color:rgba(255,255,255,0.55);
+  }
+
+  /* ── Price badge ─────────────────────────────────────────── */
+  .price-badge {
+    background:linear-gradient(135deg,#FFD600,#FF5A1F);
+    color:#060000;
+    font-family:'Bebas Neue',sans-serif;
+    letter-spacing:0.04em;
+    border-radius:8px;
+    padding:2px 10px;
+    font-size:1rem; line-height:1.4;
+    box-shadow:0 0 18px rgba(255,214,0,0.60);
+  }
+
+  /* ── Living gradient (CTA cards) ─────────────────────────── */
+  .living-gradient {
+    background: linear-gradient(135deg, #FFD600 0%, #FFA800 55%, #FF5A1F 100%);
+    box-shadow: 0 0 22px rgba(255,214,0,0.45), 0 2px 14px rgba(0,0,0,0.50);
+  }
+
+  /* ── Card glow ───────────────────────────────────────────── */
+  .card-jungle-glow {
+    background:rgba(6,2,0,0.88);
+    border:1px solid rgba(255,214,0,0.16);
+    transition:all 0.3s ease;
+  }
+  .card-jungle-glow:hover {
+    border-color:rgba(255,214,0,0.50);
+    box-shadow:0 0 30px rgba(232,0,110,0.22);
+    transform:translateY(-3px);
+  }
+
+  /* ── Evento theme ────────────────────────────────────────── */
+  .evento-bg {
+    background:
+      radial-gradient(ellipse at top left,rgba(var(--evt-r,255),var(--evt-g,214),var(--evt-b,0),0.12) 0%,transparent 55%),
+      radial-gradient(ellipse at bottom right,rgba(var(--evt-r,255),var(--evt-g,214),var(--evt-b,0),0.08) 0%,transparent 55%);
+  }
+  .evento-badge  { background:rgb(var(--evt-r,255),var(--evt-g,214),var(--evt-b,0)); color:var(--evt-text,#000); }
+  .evento-border { border-color:rgba(var(--evt-r,255),var(--evt-g,214),var(--evt-b,0),0.35)!important; }
+  .evento-label  { color:rgb(var(--evt-r,255),var(--evt-g,214),var(--evt-b,0)); }
+  .evento-btn {
+    background:rgb(var(--evt-r,255),var(--evt-g,214),var(--evt-b,0)); color:var(--evt-text,#000);
+    font-family:'Bebas Neue',sans-serif; letter-spacing:0.06em; font-size:1.1rem; min-height:48px;
+  }
+  .evento-btn:hover { opacity:0.9; transform:scale(1.02); }
+  .evento-glow     { box-shadow:0 0 60px rgba(var(--evt-r,255),var(--evt-g,214),var(--evt-b,0),0.15); }
+  .evento-divider  { height:1px; background:linear-gradient(90deg,transparent,rgba(var(--evt-r,255),var(--evt-g,214),var(--evt-b,0),0.5),transparent); }
+
+  /* ── Safe area ───────────────────────────────────────────── */
+  .safe-pb { padding-bottom:env(safe-area-inset-bottom,0px); }
+  .safe-pt { padding-top:env(safe-area-inset-top,0px); }
+
+  /* ── Ambient orb ─────────────────────────────────────────── */
+  .ambient-orb {
+    border-radius:50%;
+    filter:blur(90px);
+    animation: orb-float 10s ease-in-out infinite;
+    pointer-events:none;
+  }
+
+  /* ── Hero grid sutil ─────────────────────────────────────── */
+  .jungle-hero-grid {
+    background-image:
+      linear-gradient(rgba(255,214,0,0.03) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,214,0,0.03) 1px,transparent 1px);
+    background-size:60px 60px;
+    mask-image:radial-gradient(ellipse 80% 70% at 50% 50%,black 20%,transparent 75%);
+    -webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 50%,black 20%,transparent 75%);
+  }
+
+  /* ── Compat clases legacy ────────────────────────────────── */
+  .jungle-bg   { background:transparent; }
+  .jungle-hero-bg { background:linear-gradient(180deg,#030202 0%,#050100 100%); }
+  .text-jungle { color:#FFD600; text-shadow:0 0 14px rgba(255,214,0,0.5); font-weight:700; }
+  .jungle-badge {
+    border:1px solid rgba(255,214,0,0.30);
+    background:rgba(3,2,0,0.72);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+  }
+  .jungle-title {
+    display:block;
+    font-family:'Bebas Neue',sans-serif; font-weight:900;
+    letter-spacing:0.04em; line-height:0.95;
+    color:#fff;
+    text-shadow:
+      0 0 20px rgba(255,214,0,0.35),
+      0 0 60px rgba(232,0,110,0.18),
+      0 2px 10px rgba(0,0,0,1);
+  }
+  .glow-primary { box-shadow:0 0 40px rgba(255,214,0,0.35),0 0 80px rgba(232,0,110,0.18); }
+}

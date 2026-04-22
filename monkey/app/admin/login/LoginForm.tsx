@@ -33,7 +33,8 @@ export default function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="glass-card rounded-2xl p-8 space-y-5">
+    <form onSubmit={handleSubmit} className="glass-card rounded-2xl p-8 space-y-5 border border-amber-400/25 bg-gradient-to-b from-black/70 to-[#1a0c00]/75">
+      <p className="text-[11px] uppercase tracking-[0.2em] text-amber-300/90 font-semibold">Acceso privado Monkey</p>
       <div>
         <label className="block text-sm font-medium text-slate-300 mb-2">Usuario</label>
         <input
@@ -78,10 +79,10 @@ export default function LoginForm() {
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            Ingresando...
+            Entrando a Monkey...
           </>
         ) : (
-          'Ingresar →'
+          'Entrar a Monkey Admin →'
         )}
       </button>
     </form>

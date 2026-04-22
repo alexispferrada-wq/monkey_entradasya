@@ -9,6 +9,7 @@ import { z } from 'zod'
 const reservaSchema = z.object({
   tipo: z.enum(['terraza', 'grill', 'cumpleanos', 'show']),
   nombre: z.string().min(2).max(100),
+  rut: z.string().min(8).max(15).optional(),
   email: z.string().email(),
   telefono: z.string().min(8),
   fecha: z.string(),
@@ -107,6 +108,10 @@ export async function POST(req: NextRequest) {
       nombreEventoGuardado = evento.nombre
     }
 
+    const notasConRut = parsed.rut
+      ? `${parsed.notas ? `${parsed.notas.trim()}\n\n` : ''}RUT: ${parsed.rut.trim()}`
+      : parsed.notas
+
     const [nuevaReserva] = await db.insert(reservas).values({
       tipo: parsed.tipo,
       estado,
@@ -116,7 +121,7 @@ export async function POST(req: NextRequest) {
       fecha: parsed.fecha,
       hora: parsed.hora,
       personas: parsed.personas,
-      notas: parsed.notas,
+      notas: notasConRut,
       monto,
       comprobantePagoUrl: parsed.comprobantePagoUrl,
       comprobantePublicId: parsed.comprobantePublicId,

@@ -19,7 +19,7 @@ export default function ChatbotTester() {
     if (open && messages.length === 0) {
       setMessages([{
         role: 'assistant',
-        content: '¡Hola! Soy **Mono** 🦍 — Escríbeme algo para probar cómo respondo con la base de conocimiento actual.',
+        content: '¡Hola! Soy **Mono** — Escríbeme algo para probar cómo respondo con la base de conocimiento actual.',
       }])
     }
   }, [open])

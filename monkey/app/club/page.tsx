@@ -80,7 +80,7 @@ export default function ClubPage() {
 
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="text-4xl sm:text-5xl mb-1">🦍</div>
+          <div className="text-4xl sm:text-5xl mb-1">✨</div>
           <h1 className="font-display text-4xl sm:text-5xl text-primary tracking-widest uppercase">Club Monkey</h1>
           <p className="text-zinc-400 text-base">El club de lealtad de Monkey Restobar</p>
           <div className="h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
@@ -178,7 +178,7 @@ export default function ClubPage() {
                   disabled={estado === 'loading'}
                   className="btn-primary w-full py-4 text-lg font-black tracking-widest uppercase disabled:opacity-50"
                 >
-                  {estado === 'loading' ? 'Registrando...' : '🦍 Unirme al club'}
+                  {estado === 'loading' ? 'Registrando...' : 'Unirme al club'}
                 </button>
               </form>
             </div>

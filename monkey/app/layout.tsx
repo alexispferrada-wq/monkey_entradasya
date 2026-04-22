@@ -7,7 +7,10 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://monkey.entradasya.
 const OG_DEFAULT = 'https://res.cloudinary.com/dqsz4ua73/image/upload/w_1200,h_630,c_pad,g_center,b_black,f_jpg,q_80/v1775919972/logo300xp_s0gh7w.png'
 
 export const metadata: Metadata = {
-  title: 'Monkey Restobar — Invitaciones y Eventos',
+  title: {
+    default: 'Monkey Restobar — Invitaciones y Eventos',
+    template: '%s · Monkey',
+  },
   description: 'Solicita tu invitación gratuita para los eventos de Monkey Restobar. Entrada con QR personal en minutos.',
   manifest: '/manifest.json',
   metadataBase: new URL(BASE_URL),
@@ -15,10 +18,12 @@ export const metadata: Metadata = {
     'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
-  'theme-color': '#000000',
+  'theme-color': '#1a0e00',
   'color-scheme': 'dark',
   },
   icons: {
+    icon: '/monkey-logo.png',
+    shortcut: '/monkey-logo.png',
     apple: '/icons/icon-192.png',
   },
   openGraph: {
@@ -39,7 +44,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#000000',
+  themeColor: '#1a0e00',
   width: 'device-width',
   initialScale: 1,
   // viewport-fit=cover: el contenido llega a los bordes en iPhone con notch
@@ -53,7 +58,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className="bg-darker text-white antialiased min-h-screen" style={{ backgroundColor: '#050505' }}>
+      <body className="bg-darker text-white antialiased min-h-screen" style={{ backgroundColor: '#050505' }} data-project="monkey">
 
         {/* Background — imagen Cloudinary */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -72,12 +77,15 @@ export default function RootLayout({
             <div className="flex items-center justify-between h-16">
 
               {/* Logo */}
-              <a href="/" className="flex items-center">
+              <a href="/" className="flex items-center gap-2">
                 <img
-                  src="https://res.cloudinary.com/dqsz4ua73/image/upload/v1775919972/logo300xp_s0gh7w.png"
+                  src="/monkey-logo.png"
                   alt="Monkey Restobar"
                   className="h-10 w-auto object-contain"
                 />
+                <span className="hidden sm:inline-flex text-[10px] uppercase tracking-[0.2em] font-black text-amber-300 border border-amber-400/30 px-2 py-1 rounded-full bg-amber-500/10">
+                  Monkey
+                </span>
               </a>
 
             </div>

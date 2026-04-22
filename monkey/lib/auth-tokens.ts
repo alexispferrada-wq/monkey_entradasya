@@ -1,5 +1,8 @@
 import { SignJWT, jwtVerify, JWTPayload } from 'jose'
 
+export const ADMIN_ACCESS_COOKIE_NAME = 'admin_token_monkey'
+export const ADMIN_REFRESH_COOKIE_NAME = 'admin_refresh_token_monkey'
+
 export interface TokenPayload extends JWTPayload {
   user: string
   uaHash?: string

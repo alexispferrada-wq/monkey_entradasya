@@ -1,6 +1,9 @@
 # monkey_entradasya
 
-Aplicación web `monkey` para la gestión de entradas y eventos.
+Workspace con dos aplicaciones Next.js:
+
+- `monkey/` → monkey.entradasya.cl → local en `http://localhost:3001`
+- `living/` → living.entradasya.cl → local en `http://localhost:3002`
 
 ## Estructura principal
 
@@ -12,8 +15,9 @@ Aplicación web `monkey` para la gestión de entradas y eventos.
 ## Instalación
 
 ```bash
-cd monkey
 npm install
+cd monkey && npm install
+cd ../living && npm install
 ```
 
 ## Desarrollo
@@ -21,30 +25,42 @@ npm install
 ```bash
 cd monkey
 npm run dev
+
+cd ../living
+npm run dev
 ```
 
-Abre `http://localhost:3001` en el navegador.
+También puedes levantar ambas desde la raíz:
+
+```bash
+npm run dev
+```
+
+Puertos locales definidos:
+
+- `monkey` en `http://localhost:3001`
+- `living` en `http://localhost:3002`
+
+No se usa el puerto `3003` en este workspace.
 
 ## Configuración de entorno
 
-Copia `monkey/.env.example` a `monkey/.env.local` y completa los valores antes de ejecutar la app.
+Copia y configura variables para cada app por separado:
 
-Ejemplo de variables necesarias:
+- `monkey/.env.local`
+- `living/.env.local`
 
-- `DATABASE_URL`
-- `NEXT_PUBLIC_BASE_URL`
-- `CLOUDINARY_CLOUD_NAME`
-- `CLOUDINARY_API_KEY`
-- `CLOUDINARY_API_SECRET`
-- `RESEND_API_KEY`
-- `ADMIN_USER`
-- `ADMIN_PASSWORD`
-- `ADMIN_JWT_SECRET`
+Variables admin dedicadas por proyecto:
 
-No compartas `monkey/.env.local` en el repositorio.
+- Monkey: `MONKEY_ADMIN_USER`, `MONKEY_ADMIN_PASSWORD`
+- Living: `LIVING_ADMIN_USER`, `LIVING_ADMIN_PASSWORD`
+
+Además de las variables de infraestructura (`DATABASE_URL`, `CLOUDINARY_*`, `RESEND_API_KEY`, etc.), cada app usa su propio `/admin/login`.
+
+No compartas archivos `.env.local` en el repositorio.
 
 ## Notas
 
-- Esta carpeta raíz contiene la app en `monkey/`.
+- Esta carpeta raíz contiene las apps en `monkey/` y `living/`.
 - El panel de administración está disponible en `/admin/login`.
 - Usa `git init`, agrega el remoto y haz push a GitHub cuando estés listo.

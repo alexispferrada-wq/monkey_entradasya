@@ -1,0 +1,26 @@
+{
+  "name": "Living Club Scanner — EntradasYa",
+  "short_name": "Living",
+  "description": "Escáner de invitaciones QR para anfitriones de EntradasYa",
+  "start_url": "/scanner",
+  "display": "standalone",
+  "background_color": "#0b0300",
+  "theme_color": "#1a0900",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "entertainment"],
+  "screenshots": []
+}

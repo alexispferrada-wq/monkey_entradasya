@@ -4,8 +4,8 @@
   "description": "Escáner de invitaciones QR para anfitriones de EntradasYa",
   "start_url": "/scanner",
   "display": "standalone",
-  "background_color": "#020617",
-  "theme_color": "#0f172a",
+  "background_color": "#140b02",
+  "theme_color": "#1a0e00",
   "orientation": "portrait",
   "icons": [
     {

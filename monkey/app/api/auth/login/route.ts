@@ -1,20 +1,25 @@
 export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
+import { ADMIN_ACCESS_COOKIE_NAME } from '@/lib/auth-tokens'
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const { usuario, password } = body
 
-    const adminUser = process.env.ADMIN_USER
-    const adminPassword = process.env.ADMIN_PASSWORD
+    const adminUser = process.env.MONKEY_ADMIN_USER || process.env.ADMIN_USER
+    const adminPassword = process.env.MONKEY_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD
+
+    if (!adminUser || !adminPassword) {
+      return NextResponse.json({ error: 'Configuración de admin incompleta' }, { status: 500 })
+    }
 
     if (usuario !== adminUser || password !== adminPassword) {
       return NextResponse.json({ error: 'Credenciales incorrectas' }, { status: 401 })
     }
 
     const res = NextResponse.json({ ok: true })
-    res.cookies.set('admin_token', 'authenticated', {
+    res.cookies.set(ADMIN_ACCESS_COOKIE_NAME, 'authenticated', {
       httpOnly: true,
       sameSite: 'lax',
       path: '/',

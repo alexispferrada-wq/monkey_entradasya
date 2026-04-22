@@ -54,7 +54,7 @@ async function enviarEmailReserva(reserva: {
   await resend.emails.send({
     from: 'Chatbot Monkey <invitaciones@entradasya.cl>',
     to: emailReservas,
-    subject: `🦍 Nueva reserva: ${reserva.nombre} — ${reserva.fecha} ${reserva.hora} (${reserva.personas}p)`,
+    subject: `Nueva reserva: ${reserva.nombre} — ${reserva.fecha} ${reserva.hora} (${reserva.personas}p)`,
     html,
   })
 }

@@ -29,7 +29,7 @@ export default function ChatWidget() {
       setStarted(true)
       setMessages([{
         role: 'assistant',
-        content: '¡Hola! Soy **Mono**, el asistente de Monkey Restobar 🦍\n\n¿En qué puedo ayudarte hoy? Puedo contarte sobre el menú, eventos, reservas o lo que necesites.',
+        content: '¡Hola! Soy **Mono**, el asistente de Monkey Restobar.\n\n¿En qué puedo ayudarte hoy? Puedo contarte sobre el menú, eventos, reservas o lo que necesites.',
       }])
     }
   }, [open, started])

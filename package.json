@@ -1,0 +1,15 @@
+{
+  "name": "monkey-entradasya-workspace",
+  "private": true,
+  "scripts": {
+    "start": "npm run build && (npm --prefix monkey run start & npm --prefix living run start & wait)",
+    "build": "npm --prefix monkey run build && npm --prefix living run build",
+    "dev": "npm --prefix monkey run dev & npm --prefix living run dev & wait",
+    "build:monkey": "npm --prefix monkey run build",
+    "build:living": "npm --prefix living run build",
+    "start:monkey": "npm --prefix monkey run start",
+    "start:living": "npm --prefix living run start",
+    "dev:monkey": "npm --prefix monkey run dev",
+    "dev:living": "npm --prefix living run dev"
+  }
+}
